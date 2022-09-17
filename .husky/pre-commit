@@ -3,3 +3,4 @@
 
 npm run lint
 cd frontend && npm test -- --watchAll=false
+cd ../backend && npm test -- --watchAll=false
