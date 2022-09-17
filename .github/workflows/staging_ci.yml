@@ -40,10 +40,13 @@ jobs:
                   flags: staging,unit,frontend
                   fail_ci_if_error: true
 
-    frontend-build:
-        name: Build frontend
-        runs-on: ubuntu-latest
+    frontend-deploy-staging:
+        name: Deploy frontend to staging environment
         needs: frontend-test
+        runs-on: ubuntu-latest
+        permissions:
+            id-token: write
+            contents: read
 
         defaults:
             run:
@@ -57,32 +60,6 @@ jobs:
                   cache: npm
             - run: npm ci
             - run: npm run build:ci
-            - uses: actions/upload-artifact@main
-              with:
-                  name: frontend-staging-build
-                  path: frontend/build
-
-    frontend-deploy-staging:
-        name: Deploy frontend to staging
-        needs: frontend-build
-        runs-on: ubuntu-latest
-        permissions:
-            id-token: write
-            contents: read
-
-        defaults:
-            run:
-                working-directory: frontend
-
-        steps:
-            - uses: actions/checkout@main
-
-            # Downloads the archived build folder
-            - name: Download Artifact
-              uses: actions/download-artifact@main
-              with:
-                  name: frontend-staging-build
-                  path: frontend/build
 
             - name: Configure AWS credentials
               uses: aws-actions/configure-aws-credentials@v1
@@ -92,7 +69,7 @@ jobs:
 
             - name: Copy files to the S3 with the AWS CLI
               run: |
-                  aws s3 sync frontend/build s3://anonymous-voting-app-frontend-staging
+                  aws s3 sync ./build s3://anonymous-voting-app-frontend-staging
 
     backend-test:
         name: Test backend
@@ -117,7 +94,7 @@ jobs:
                   fail_ci_if_error: true
 
     backend-deploy-staging:
-        name: Deploy backend to staging
+        name: Deploy backend to staging environment
         needs: backend-test
         runs-on: ubuntu-latest
         permissions:
