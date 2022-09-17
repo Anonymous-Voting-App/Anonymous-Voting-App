@@ -118,7 +118,7 @@ jobs:
 
     backend-deploy-dev:
         name: Deploy backend to dev environment
-        needs: backend-build
+        needs: backend-test
         runs-on: ubuntu-latest
 
         defaults:
