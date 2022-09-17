@@ -18,7 +18,7 @@ To utilize code formatting on commit, run `npm install` in the project root fold
 
 The project deployment is spread to two different branches:
 
-- Main: Production code => When code is pushed to `main`, it will go to production
-- Dev: Staging code => When code is pushed to `dev`, it will go to staging environment
+-   Main: Production code => When code is pushed to `main`, it will go to production
+-   Dev: Staging code => When code is pushed to `dev`, it will go to staging environment
 
 When PR is created to merge code to `dev`-branch, the code will be build and set to development environment.
