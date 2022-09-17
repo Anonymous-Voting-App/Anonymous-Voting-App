@@ -1,0 +1,22 @@
+{
+    "name": "anonymous-voting-app",
+    "version": "1.0.0",
+    "description": "Anonymous Voting App -project",
+    "scripts": {
+        "prepare": "husky install",
+        "lint": "lint-staged",
+        "check-style": "prettier --check ."
+    },
+    "lint-staged": {
+        "*.{js,jsx,ts,tsx,json,css,scss,md,html,yml}": [
+            "prettier --write"
+        ]
+    },
+    "author": "",
+    "license": "MIT",
+    "devDependencies": {
+        "husky": "^8.0.1",
+        "lint-staged": "^13.0.3",
+        "prettier": "^2.7.1"
+    }
+}
