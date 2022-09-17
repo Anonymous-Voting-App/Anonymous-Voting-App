@@ -84,13 +84,13 @@ jobs:
                   name: frontend-dev-build
                   path: frontend/build
 
-            - name: Configure AWS credentials from Test account
+            - name: Configure AWS credentials
               uses: aws-actions/configure-aws-credentials@v1
               with:
                   role-to-assume: ${{ secrets.AWS_DEV_ROLE_TO_ASSUME }}
                   aws-region: eu-north-1
 
-            - name: Copy files to the test website with the AWS CLI
+            - name: Copy files to the S3 with the AWS CLI
               run: |
                   aws s3 sync ./frontend/build s3://anonymous-voting-app-frontend-dev
 
@@ -120,6 +120,9 @@ jobs:
         name: Deploy backend to dev environment
         needs: backend-test
         runs-on: ubuntu-latest
+        permissions:
+            id-token: write
+            contents: read
 
         defaults:
             run:
