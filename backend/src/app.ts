@@ -9,7 +9,7 @@ import { notFound } from './utils/responses';
 import v1Router from './routes/v1';
 
 const app = express();
-const port = parseInt(process.env.PORT || '8080');
+const port = 8080;
 
 const corsOptions: CorsOptions = {
     // origin: process.env.FRONTEND_URL || 'http://localhost:3000'
