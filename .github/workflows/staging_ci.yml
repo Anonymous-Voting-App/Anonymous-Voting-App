@@ -1,0 +1,143 @@
+name: Staging CI
+
+on:
+    push:
+        branches:
+            - dev
+
+jobs:
+    check-style:
+        name: Check code style
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@main
+            - uses: actions/setup-node@main
+              with:
+                  node-version: lts/*
+                  cache: npm
+            - run: npm ci
+            - run: npm run check-style
+
+    frontend-test:
+        name: Test frontend
+        runs-on: ubuntu-latest
+        needs: check-style
+
+        defaults:
+            run:
+                working-directory: frontend
+
+        steps:
+            - uses: actions/checkout@main
+            - uses: actions/setup-node@main
+              with:
+                  node-version: lts/*
+                  cache: npm
+            - run: npm ci
+            - run: npm run test:ci
+
+    frontend-build:
+        name: Build frontend
+        runs-on: ubuntu-latest
+        needs: frontend-test
+
+        defaults:
+            run:
+                working-directory: frontend
+
+        steps:
+            - uses: actions/checkout@main
+            - uses: actions/setup-node@main
+              with:
+                  node-version: lts/*
+                  cache: npm
+            - run: npm ci
+            - run: npm run build:ci
+            - uses: actions/upload-artifact@main
+              with:
+                  name: frontend-build
+                  path: frontend/build
+
+    frontend-deploy-staging:
+        name: Deploy frontend to staging
+        needs: frontend-build
+        runs-on: ubuntu-latest
+        permissions:
+            id-token: write
+            contents: read
+
+        defaults:
+            run:
+                working-directory: frontend
+
+        steps:
+            - uses: actions/checkout@main
+
+            # Downloads the archived build folder
+            - name: Download Artifact
+              uses: actions/download-artifact@main
+              with:
+                  name: frontend-build
+                  path: frontend/build
+
+            - name: Configure AWS credentials from Test account
+              uses: aws-actions/configure-aws-credentials@v1
+              with:
+                  role-to-assume: ${{ secrets.AWS_STAGING_ROLE_TO_ASSUME }}
+                  aws-region: eu-north-1
+
+            - name: Copy files to the test website with the AWS CLI
+              run: |
+                  aws s3 sync ./frontend/build s3://anonymous-voting-app-frontend-staging
+
+    backend-test:
+        name: Test backend
+        needs: check-style
+        runs-on: ubuntu-latest
+
+        defaults:
+            run:
+                working-directory: backend
+
+        steps:
+            - uses: actions/checkout@main
+            - uses: actions/setup-node@main
+              with:
+                  node-version: lts/*
+                  cache: npm
+            - run: npm ci
+            - run: npm run test:ci
+
+    backend-deploy-staging:
+        name: Deploy backend to staging
+        needs: backend-build
+        runs-on: ubuntu-latest
+
+        defaults:
+            run:
+                working-directory: backend
+
+        steps:
+            # Checks out the repository
+            - name: Checkout Repo
+              uses: actions/checkout@main
+
+            - name: Configure AWS credentials
+              uses: aws-actions/configure-aws-credentials@v1
+              with:
+                  role-to-assume: ${{ secrets.AWS_STAGING_ROLE_TO_ASSUME }}
+                  aws-region: eu-north-1
+
+            - name: Login to Amazon ECR
+              id: login-ecr
+              uses: aws-actions/amazon-ecr-login@v1
+
+            - name: Build, tag, and push image to Amazon ECR
+              env:
+                  ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+                  ECR_REPOSITORY: ava_backend
+                  IMAGE_TAG: staging
+                  IMAGE_SHA: ${{ github.sha }}
+              run: |
+                  docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA .
+                  docker push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
