@@ -4,7 +4,7 @@ Anonymous Voting App -project
 
 ## Project structure
 
-The project is divided into frontend and backend folders which contain the corresponding npm projects and READMEs. Remember to also check those README.md:s for development environment instructions etc.
+The project is divided into frontend and backend folders which contain the corresponding npm projects and READMEs. Remember to also check those READMEs for development environment instructions etc.
 
 ## Code formatting
 
