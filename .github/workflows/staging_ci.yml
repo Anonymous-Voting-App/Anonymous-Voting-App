@@ -69,7 +69,7 @@ jobs:
 
             - name: Copy files to the S3 with the AWS CLI
               run: |
-                  aws s3 sync ./build s3://anonymous-voting-app-frontend-staging
+                  aws s3 sync ./build s3://staging.knowit-anonymous-voting-app.aws.cybercom.dev
 
     backend-test:
         name: Test backend
