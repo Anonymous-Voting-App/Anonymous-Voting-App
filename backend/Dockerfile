@@ -1,7 +1,7 @@
 FROM node:lts-slim
-WORKDIR /usr/src/app
-COPY package*.json ./
-RUN npm install --only=production
-COPY . ./
+WORKDIR /app
+COPY . .
+RUN npm install --production
 RUN npm run build
-CMD [ "npm", "run" , "start-production" ]
+EXPOSE 8080
+CMD [ "node", "./build/app.js" ]
