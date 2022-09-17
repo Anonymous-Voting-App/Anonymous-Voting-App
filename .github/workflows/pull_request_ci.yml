@@ -92,7 +92,7 @@ jobs:
 
             - name: Copy files to the S3 with the AWS CLI
               run: |
-                  aws s3 sync ./frontend/build s3://anonymous-voting-app-frontend-dev
+                  aws s3 sync frontend/build s3://anonymous-voting-app-frontend-dev
 
     backend-test:
         name: Test backend
@@ -151,4 +151,4 @@ jobs:
                   IMAGE_SHA: ${{ github.sha }}
               run: |
                   docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA .
-                  docker push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+                  docker push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
