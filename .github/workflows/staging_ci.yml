@@ -118,7 +118,7 @@ jobs:
 
     backend-deploy-staging:
         name: Deploy backend to staging
-        needs: backend-build
+        needs: backend-test
         runs-on: ubuntu-latest
 
         defaults:
