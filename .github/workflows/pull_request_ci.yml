@@ -1,7 +1,7 @@
-name: Staging CI
+name: Pull Request / Dev CI
 
 on:
-    push:
+    pull_request:
         branches:
             - dev
 
@@ -37,7 +37,7 @@ jobs:
             - run: npm run test:ci
             - uses: codecov/codecov-action@v3
               with:
-                  flags: staging,unit,frontend
+                  flags: dev,unit,frontend
                   fail_ci_if_error: true
 
     frontend-build:
@@ -59,11 +59,11 @@ jobs:
             - run: npm run build:ci
             - uses: actions/upload-artifact@main
               with:
-                  name: frontend-staging-build
+                  name: frontend-dev-build
                   path: frontend/build
 
-    frontend-deploy-staging:
-        name: Deploy frontend to staging
+    frontend-deploy-dev:
+        name: Deploy frontend to dev environment
         needs: frontend-build
         runs-on: ubuntu-latest
         permissions:
@@ -81,7 +81,7 @@ jobs:
             - name: Download Artifact
               uses: actions/download-artifact@main
               with:
-                  name: frontend-staging-build
+                  name: frontend-dev-build
                   path: frontend/build
 
             - name: Configure AWS credentials from Test account
@@ -92,7 +92,7 @@ jobs:
 
             - name: Copy files to the test website with the AWS CLI
               run: |
-                  aws s3 sync ./frontend/build s3://anonymous-voting-app-frontend-staging
+                  aws s3 sync ./frontend/build s3://anonymous-voting-app-frontend-dev
 
     backend-test:
         name: Test backend
@@ -113,11 +113,11 @@ jobs:
             - run: npm run test:coverage
             - uses: codecov/codecov-action@v3
               with:
-                  flags: staging,unit,backend
+                  flags: dev,unit,backend
                   fail_ci_if_error: true
 
-    backend-deploy-staging:
-        name: Deploy backend to staging
+    backend-deploy-dev:
+        name: Deploy backend to dev environment
         needs: backend-build
         runs-on: ubuntu-latest
 
@@ -144,7 +144,7 @@ jobs:
               env:
                   ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
                   ECR_REPOSITORY: ava_backend
-                  IMAGE_TAG: staging
+                  IMAGE_TAG: dev
                   IMAGE_SHA: ${{ github.sha }}
               run: |
                   docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA .
