@@ -87,7 +87,7 @@ jobs:
             - name: Configure AWS credentials from Test account
               uses: aws-actions/configure-aws-credentials@v1
               with:
-                  role-to-assume: ${{ secrets.AWS_STAGING_ROLE_TO_ASSUME }}
+                  role-to-assume: ${{ secrets.AWS_DEV_ROLE_TO_ASSUME }}
                   aws-region: eu-north-1
 
             - name: Copy files to the test website with the AWS CLI
@@ -133,7 +133,7 @@ jobs:
             - name: Configure AWS credentials
               uses: aws-actions/configure-aws-credentials@v1
               with:
-                  role-to-assume: ${{ secrets.AWS_STAGING_ROLE_TO_ASSUME }}
+                  role-to-assume: ${{ secrets.AWS_DEV_ROLE_TO_ASSUME }}
                   aws-region: eu-north-1
 
             - name: Login to Amazon ECR
