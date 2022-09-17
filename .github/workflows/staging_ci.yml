@@ -35,6 +35,10 @@ jobs:
                   cache: npm
             - run: npm ci
             - run: npm run test:ci
+            - uses: codecov/codecov-action@v3
+              with:
+                  flags: unit,frontend
+                  fail_ci_if_error: true
 
     frontend-build:
         name: Build frontend
@@ -106,7 +110,11 @@ jobs:
                   node-version: lts/*
                   cache: npm
             - run: npm ci
-            - run: npm run test:ci
+            - run: npm run test:coverage
+            - uses: codecov/codecov-action@v3
+              with:
+                  flags: unit,backend
+                  fail_ci_if_error: true
 
     backend-deploy-staging:
         name: Deploy backend to staging
