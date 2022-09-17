@@ -62,6 +62,16 @@ export const unauthorized = (req: Request, res: Response) => {
 };
 
 /**
+ * 403 Forbidden
+ */
+export const forbidden = (req: Request, res: Response) => {
+    return res.status(403).json({
+        code: 403,
+        message: 'Forbidden'
+    });
+};
+
+/**
  * 404 Not Found
  */
 export const notFound = (req: Request, res: Response) => {
