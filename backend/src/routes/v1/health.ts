@@ -1,4 +1,5 @@
-import { Request, Response, Router } from 'express';
+import { Router } from 'express';
+import { checkHealth } from '../../controllers/healthController';
 
 export const router = Router();
 
@@ -25,10 +26,4 @@ export const router = Router();
  *                  type: boolean
  *                  example: false
  */
-router.get('/', (req: Request, res: Response) => {
-    // TODO: When database implemented, add health check here!
-    return res.json({
-        server: true,
-        database: false
-    });
-});
+router.get('/', checkHealth);
