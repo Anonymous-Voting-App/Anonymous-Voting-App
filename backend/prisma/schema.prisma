@@ -1,0 +1,73 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Poll {
+  id                String      @id @default(uuid()) @db.Uuid
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  name              String
+  creatorId         String      @db.Uuid
+  creator           User?       @relation("PollUser", fields: [creatorId], references: [id])
+  adminLink         String
+  pollLink          String
+  resultLink        String
+  questions         Question[]  @relation(name: "PollQuestions")
+  isActive          Boolean     @default(true)
+}
+
+model Question {
+  id                String      @id @default(uuid()) @db.Uuid
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  pollId            String      @db.Uuid
+  poll              Poll        @relation(name: "PollQuestions", fields: [pollId], references: [id])
+  typeId            String      @db.Uuid
+  type              Type        @relation(name: "QuestionType", fields: [typeId], references: [id])
+  options           Option[]    @relation(name: "QuestionOptions")
+  votes             Vote[]      @relation(name: "QuestionVotes")
+}
+
+model Type {
+  id                String      @id @default(uuid()) @db.Uuid
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  questions         Question[]  @relation(name: "QuestionType")
+  type              String
+}
+
+model Option {
+  id                String      @id @default(uuid()) @db.Uuid
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  questionId        String      @db.Uuid
+  question          Question    @relation(name: "QuestionOptions", fields: [questionId], references: [id])
+  option            String
+}
+
+model Vote {
+  id                String      @id @default(uuid()) @db.Uuid
+  createdAt         DateTime    @default(now())
+  questionId        String      @db.Uuid
+  question          Question    @relation(name: "QuestionVotes", fields: [questionId], references: [id])
+  value             String
+}
+
+model User {
+  id                String      @id @default(uuid()) @db.Uuid
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  name              String
+  email             String
+  emailVerified     Boolean     @default(false)
+  password          String
+  polls             Poll[]      @relation(name: "PollUser")
+}
