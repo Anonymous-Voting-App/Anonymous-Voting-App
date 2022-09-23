@@ -3,3 +3,6 @@ coverage/
 
 # Ignore logs
 *.log
+
+# Dont upload .env
+*.env
