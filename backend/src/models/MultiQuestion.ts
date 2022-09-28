@@ -14,21 +14,21 @@ export default class MultiQuestion extends Question {
     _type: string = "multi";
 
     _subQuestions: { [ id: string ]: Question } = {  };
-	
-	/**  */
-	
-	subQuestions(): { [ id: string ]: Question } {
-		
-		return this._subQuestions;
-		
-	}
-	
+    
+    /**  */
+    
+    subQuestions(): { [ id: string ]: Question } {
+        
+        return this._subQuestions;
+        
+    }
+    
     /** Sets value of subQuestions. */
         
     setSubQuestions(subQuestions: { [ id: string ]: Question }): void {
         
         pre("argument subQuestions is of type object", typeof subQuestions === "object");
-	
+    
         this._subQuestions = subQuestions;
         
         post("_subQuestions is subQuestions", this._subQuestions === subQuestions);

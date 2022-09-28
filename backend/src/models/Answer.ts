@@ -31,119 +31,119 @@ export default class Answer {
     _id: string = "";
 
     _database: PrismaClient;
-	
-	/** Prisma database the instance is connected to. */
-	
-	database(): PrismaClient {
-		
-		return this._database;
-		
-	}
-	
+    
+    /** Prisma database the instance is connected to. */
+    
+    database(): PrismaClient {
+        
+        return this._database;
+        
+    }
+    
     /** Sets value of database. */
         
     setDatabase(database: PrismaClient): void {
         
         //pre("argument database is of type PrismaClient", database instanceof PrismaClient);
-	
+    
         this._database = database;
         
         post("_database is database", this._database === database);
         
     }
-	
-	/** Unique id of the answer. Same as in database. */
-	
-	id(): string {
-		
-		return this._id;
-		
-	}
-	
+    
+    /** Unique id of the answer. Same as in database. */
+    
+    id(): string {
+        
+        return this._id;
+        
+    }
+    
     /** Sets value of id. */
         
     setId(id: string): void {
         
         pre("argument id is of type string", typeof id === "string");
-	
+    
         this._id = id;
         
         post("_id is id", this._id === id);
         
     }
-	
-	/** Whether an answer object has been created in the database from this instance. */
-	
-	createdInDatabase(): boolean {
-		
-		return this._createdInDatabase;
-		
-	}
-	
-	/** Whether the instance has had its data populates from the database. */
-	
-	loadedFromDatabase(): boolean {
-		
-		return this._loadedFromDatabase;
-		
-	}
-	
-	/** The User that gave the answer. */
-	
-	answerer(): User {
-		
-		return this._answerer;
-		
-	}
-	
+    
+    /** Whether an answer object has been created in the database from this instance. */
+    
+    createdInDatabase(): boolean {
+        
+        return this._createdInDatabase;
+        
+    }
+    
+    /** Whether the instance has had its data populates from the database. */
+    
+    loadedFromDatabase(): boolean {
+        
+        return this._loadedFromDatabase;
+        
+    }
+    
+    /** The User that gave the answer. */
+    
+    answerer(): User {
+        
+        return this._answerer;
+        
+    }
+    
     /** Sets value of answerer. */
         
     setAnswerer(answerer: User): void {
         
         pre("argument answerer is of type User", answerer instanceof User);
-	
+    
         this._answerer = answerer;
         
         post("_answerer is answerer", this._answerer === answerer);
         
     }
-	
-	/** The actual answer data. Format of the answer string depends on 
+    
+    /** The actual answer data. Format of the answer string depends on 
      * the question type. Answer does not take into 
      * consideration whether the answer value itself is in a correct format 
      * or not.
      */
-	
-	value(): any {
-		
-		return this._value;
-		
-	}
-	
+    
+    value(): any {
+        
+        return this._value;
+        
+    }
+    
     /** Sets value of value. */
         
     setValue(value: any): void {
-	
+    
         this._value = value;
         
         post("_value is value", this._value === value);
         
     }
-	
-	/** Database id of the Question that was answered. */
-	
-	questionId(): string {
-		
-		return this._questionId;
-		
-	}
-	
+    
+    /** Database id of the Question that was answered. */
+    
+    questionId(): string {
+        
+        return this._questionId;
+        
+    }
+    
     /** Sets value of questionId. */
         
     setQuestionId(questionId: string): void {
         
         pre("argument questionId is of type string", typeof questionId === "string");
-	
+    
         this._questionId = questionId;
         
         post("_questionId is questionId", this._questionId === questionId);

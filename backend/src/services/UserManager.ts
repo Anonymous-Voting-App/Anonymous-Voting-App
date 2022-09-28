@@ -18,41 +18,41 @@ export default class UserManager {
     _database: PrismaClient;
 
     _users: { [ id: string ]: User } = {  };
-	
-	/** Users that are being managed. */
-	
-	users(): { [ id: string ]: User } {
-		
-		return this._users;
-		
-	}
-	
+    
+    /** Users that are being managed. */
+    
+    users(): { [ id: string ]: User } {
+        
+        return this._users;
+        
+    }
+    
     /** Sets value of users. */
         
     setUsers(users: { [ id: string ]: User }): void {
         
         pre("argument users is of type object", typeof users === "object");
-	
+    
         this._users = users;
         
         post("_users is users", this._users === users);
         
     }
-	
-	/** Database the user info is stored in. */
-	
-	database(): PrismaClient {
-		
-		return this._database;
-		
-	}
-	
+    
+    /** Database the user info is stored in. */
+    
+    database(): PrismaClient {
+        
+        return this._database;
+        
+    }
+    
     /** Sets value of database. */
         
     setDatabase(database: PrismaClient): void {
         
         /* pre("argument database is of type PrismaClient", database instanceof PrismaClient); */
-	
+    
         this._database = database;
         
         post("_database is database", this._database === database);
