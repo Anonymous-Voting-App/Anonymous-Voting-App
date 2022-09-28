@@ -1,5 +1,9 @@
 import { Router } from 'express';
-import { createPoll, answerPoll, fetchPoll } from '../../controllers/pollController';
+import {
+    createPoll,
+    answerPoll,
+    fetchPoll
+} from '../../controllers/pollController';
 
 export const router = Router();
 
@@ -8,13 +12,13 @@ export const router = Router();
  * @openapi
  * /api/poll/create:
  *  post:
- *    description: Creates a new poll from given information for specified user. 
- *                  A poll consists of questions and each question has sub-questions. 
+ *    description: Creates a new poll from given information for specified user.
+ *                  A poll consists of questions and each question has sub-questions.
  *                  The sub-questions correspond to the different choices a question has.
  *                  For now, the sub-question titles have to be unique in the poll due to how the database schema is currently set up.
  *                  Currently a test user "1eb1cfae-09e7-4456-85cd-e2edfff80544" can be set as the owner of new polls.
- *                  Descriptions are also not saved to the database currently due to the database schema. 
- *                  The type properties for the poll, questions and sub-questions need to be given, 
+ *                  Descriptions are also not saved to the database currently due to the database schema.
+ *                  The type properties for the poll, questions and sub-questions need to be given,
  *                  although they do nothing at the moment. The types can be set to be an empty string for example.
  *    produces:
  *      - application/json
@@ -152,13 +156,13 @@ export const router = Router();
  *                      pollId: "12345"
  *                      type: ""
  *                      subQuestions:
- *                        "232861a3-687d-4fe2-a2bc-e04962468676": 
+ *                        "232861a3-687d-4fe2-a2bc-e04962468676":
  *                          id: "232861a3-687d-4fe2-a2bc-e04962468676"
  *                          title: "Title of question."
  *                          description: "Description of the question."
  *                          pollId: "12345"
  *                          type: ""
- *                  
+ *
  */
 router.post('/create', createPoll);
 
@@ -167,9 +171,9 @@ router.post('/create', createPoll);
  * @openapi
  * /api/poll/answer:
  *  post:
- *    description: Answers an option of a question of a poll with given answer. The questionId should be the id 
- *                  of the question to answer. The subQuestionId property of the answer object should be the id 
- *                  of the sub-question the answer is for. Sub-questions are currently synonymous with question options. 
+ *    description: Answers an option of a question of a poll with given answer. The questionId should be the id
+ *                  of the question to answer. The subQuestionId property of the answer object should be the id
+ *                  of the sub-question the answer is for. Sub-questions are currently synonymous with question options.
  *                  The term sub-question is used in case different kinds of sub-questions are added later.
  *    produces:
  *      - application/json
@@ -231,11 +235,11 @@ router.post('/create', createPoll);
  *                  id: "e93f46d0-662c-4030-bd3a-7ae58bcf605e"
  *                  questionId: "403d1c8d-be0b-44cf-a855-a15e64b537c3"
  *                  value: "true"
- *                  
+ *
  */
- router.post('/answer', answerPoll);
+router.post('/answer', answerPoll);
 
- /**
+/**
  * Create poll
  * @openapi
  * /api/poll/fetch/{publicId}:
@@ -308,12 +312,12 @@ router.post('/create', createPoll);
  *                      pollId: "3ef8119f-cdaf-4d69-bf8e-bf0ef745cbc4"
  *                      type: ""
  *                      subQuestions:
- *                        "d9606f3a-974d-43f8-a20a-1ecd6edc8b59": 
+ *                        "d9606f3a-974d-43f8-a20a-1ecd6edc8b59":
  *                          id: "d9606f3a-974d-43f8-a20a-1ecd6edc8b59"
  *                          type: ""
  *                          title: "Title of sub-question."
  *                          description: "Description of sub-question."
  *                          pollId: "3ef8119f-cdaf-4d69-bf8e-bf0ef745cbc4"
- *                  
+ *
  */
-  router.get('/fetch/:publicId', fetchPoll);
+router.get('/fetch/:publicId', fetchPoll);
