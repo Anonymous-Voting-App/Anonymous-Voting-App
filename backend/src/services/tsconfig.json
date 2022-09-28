@@ -1,0 +1,11 @@
+{
+    "include": ["./*/*.ts", "*.ts"],
+    "exclude": ["**/*.unfinished.ts", "**/*.deprecated.ts", "./deprecated/*"],
+    "compilerOptions": {
+      "target": "es5",
+      "module": "commonjs",
+      "esModuleInterop": true,
+      "lib": ["es2016"],// ✅
+      // ...
+    }
+}
