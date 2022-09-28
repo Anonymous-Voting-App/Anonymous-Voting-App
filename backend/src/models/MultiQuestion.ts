@@ -6,7 +6,7 @@ import * as IPolling from "../models/IPolling";
 import { PrismaClient } from "@prisma/client";
 
 /**
- * 
+ * A Question that can have sub-questions.
  */
 
 export default class MultiQuestion extends Question {
@@ -15,7 +15,7 @@ export default class MultiQuestion extends Question {
 
     _subQuestions: { [ id: string ]: Question } = {  };
     
-    /**  */
+    /** Sub-questions of the instance. */
     
     subQuestions(): { [ id: string ]: Question } {
         
@@ -42,7 +42,7 @@ export default class MultiQuestion extends Question {
     }
 
     /**
-     * 
+     * Whether the instance has any sub-questions.
      */
     
     hasSubQuestions(  ): boolean {
@@ -52,7 +52,9 @@ export default class MultiQuestion extends Question {
     }
 
     /**
-     * 
+     * Adds all information about the MultiQuestion instance's 
+     * sub-questions into database and updates all the instance's sub-questions' information 
+     * afterwards to match the database.
      */
     
     async createSubQuestionsInDatabase(  ): Promise<void> {
@@ -72,7 +74,9 @@ export default class MultiQuestion extends Question {
     }
 
     /**
-     * 
+     * Adds all information about the MultiQuestion instance 
+     * into database and updates all the instance's information 
+     * afterwards to match the database.
      */
     
     async createNewInDatabase(  ): Promise<void> {
@@ -289,7 +293,7 @@ export default class MultiQuestion extends Question {
     } */
     
     /**
-     * 
+     * How many sub-questions the MultiQuestion has.
      */
     
      countSubQuestions(  ): number {
@@ -316,7 +320,8 @@ export default class MultiQuestion extends Question {
     }
     
     /**
-     * 
+     * Populates the instance with sub-question Question instances 
+     * according to given array of question request information.
      */
     
     setSubQuestionsFromRequest( subQuestions: Array<IPolling.QuestionRequest> ): void {

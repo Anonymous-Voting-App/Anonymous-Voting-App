@@ -35,7 +35,7 @@ export default class Question {
 
     _databaseData: { [ prop: string ]: any } = {  };
     
-    /**  */
+    /** Latest database data object. Updated whenever .setFromDatabaseData() is called. */
     
     databaseData(): { [ prop: string ]: any } {
         
@@ -210,7 +210,7 @@ export default class Question {
     }
     
     /**
-     * 
+     * Adds instance's information to database.
      */
     
     async createNewInDatabase(  ): Promise<void> {
@@ -228,7 +228,8 @@ export default class Question {
     }
 
     /**
-     * 
+     * Adds the question's information to the database as an option 
+     * into the option table.
      */
     
      async createNewInDatabaseAsOption( parentId: string ): Promise<void> {
@@ -344,7 +345,8 @@ export default class Question {
     }
     
     /**
-     * 
+     * Sets the instance's information from an option object 
+     * received from the option database table.
      */
     
      setFromOptionDatabaseData( optionData: {
@@ -512,7 +514,8 @@ export default class Question {
     }
     
     /**
-     * 
+     * A new object that can be added to database with this instance's information. 
+     * Has the form required for adding to the option table.
      */
     
      newDatabaseObjectAsOption( parentId: string ): { [ prop: string ]: any } {
@@ -528,7 +531,8 @@ export default class Question {
     }
     
     /**
-     * 
+     * Sets the instance's information from an object 
+     * receive from the option database table.
      */
     
      setFromOptionData( optionData: { option: string, questionId?: string, id: string } ): void {
