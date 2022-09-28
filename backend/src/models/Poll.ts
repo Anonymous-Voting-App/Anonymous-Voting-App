@@ -820,7 +820,8 @@ export default class Poll {
     }
     
     /**
-     * 
+     * Adds instance's information to database according to 
+     * a PollRequest request object and User, who is the owner of the poll.
      */
     
     async createInDatabaseFromRequest( request: IPolling.PollRequest, owner: User ): Promise<void> {
@@ -834,7 +835,7 @@ export default class Poll {
     }
     
     /**
-     * 
+     * Sets the instance's information from a PollRequest request object.
      */
     
     setFromRequest( request: IPolling.PollRequest, owner: User ): void {
@@ -848,7 +849,7 @@ export default class Poll {
     }
     
     /**
-     * 
+     * Generates new .privateId() and .publicId() for poll.
      */
     
     generateIds(  ): void {
