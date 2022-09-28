@@ -33,129 +33,129 @@ export default class User {
     _id: string = "";
 
     _createdInDatabase: boolean = false;
-	
-	/** Whether new user entry in database has been created from this instance. */
-	
-	createdInDatabase(): boolean {
-		
-		return this._createdInDatabase;
-		
-	}
-	
+    
+    /** Whether new user entry in database has been created from this instance. */
+    
+    createdInDatabase(): boolean {
+        
+        return this._createdInDatabase;
+        
+    }
+    
     /** Sets value of createdInDatabase. */
         
     setCreatedInDatabase(createdInDatabase: boolean): void {
         
         pre("argument createdInDatabase is of type boolean", typeof createdInDatabase === "boolean");
-	
+    
         this._createdInDatabase = createdInDatabase;
         
         post("_createdInDatabase is createdInDatabase", this._createdInDatabase === createdInDatabase);
         
     }
-	
-	/** Database id of user. */
-	
-	id(): string {
-		
-		return this._id;
-		
-	}
-	
+    
+    /** Database id of user. */
+    
+    id(): string {
+        
+        return this._id;
+        
+    }
+    
     /** Sets value of id. */
         
     setId(id: string): void {
         
         pre("argument id is of type string", typeof id === "string");
-	
+    
         this._id = id;
         
         post("_id is id", this._id === id);
         
     }
-	
-	/** Prisma database the instance is connected to. */
-	
-	database(): PrismaClient {
-		
-		return this._database;
-		
-	}
-	
+    
+    /** Prisma database the instance is connected to. */
+    
+    database(): PrismaClient {
+        
+        return this._database;
+        
+    }
+    
     /** Sets value of database. */
         
     setDatabase(database: PrismaClient): void {
         
         //pre("argument database is of type PrismaClient", database instanceof PrismaClient);
-	
+    
         this._database = database;
         
         post("_database is database", this._database === database);
         
     }
-	
-	/** Whether the user has been loaded from the database. */
-	
-	loadedFromDatabase(): boolean {
-		
-		return this._loadedFromDatabase;
-		
-	}
-	
-	/** Account id of user if user is registered. */
-	
-	accountId(): string {
-		
-		return this._accountId;
-		
-	}
-	
+    
+    /** Whether the user has been loaded from the database. */
+    
+    loadedFromDatabase(): boolean {
+        
+        return this._loadedFromDatabase;
+        
+    }
+    
+    /** Account id of user if user is registered. */
+    
+    accountId(): string {
+        
+        return this._accountId;
+        
+    }
+    
     /** Sets value of accountId. */
         
     setAccountId(accountId: string): void {
         
         pre("argument accountId is of type string", typeof accountId === "string");
-	
+    
         this._accountId = accountId;
         
         post("_accountId is accountId", this._accountId === accountId);
         
     }
-	
-	/** Possible cookie (active or inactive) the account has. */
-	
-	cookie(): string {
-		
-		return this._cookie;
-		
-	}
-	
+    
+    /** Possible cookie (active or inactive) the account has. */
+    
+    cookie(): string {
+        
+        return this._cookie;
+        
+    }
+    
     /** Sets value of cookie. */
         
     setCookie(cookie: string): void {
         
         pre("argument cookie is of type string", typeof cookie === "string");
-	
+    
         this._cookie = cookie;
         
         post("_cookie is cookie", this._cookie === cookie);
         
     }
-	
-	/** IP address of the user. Mostly needed for identifying anonymous users. */
-	
-	ip(): string {
-		
-		return this._ip;
-		
-	}
-	
+    
+    /** IP address of the user. Mostly needed for identifying anonymous users. */
+    
+    ip(): string {
+        
+        return this._ip;
+        
+    }
+    
     /** Sets value of ip. */
         
     setIp(ip: string): void {
         
         pre("argument ip is of type string", typeof ip === "string");
-	
+    
         this._ip = ip;
         
         post("_ip is ip", this._ip === ip);

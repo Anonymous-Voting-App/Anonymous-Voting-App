@@ -23,41 +23,41 @@ export default class VotingService {
     _userManager: UserManager;
 
     _database: PrismaClient;
-	
-	/** Database the VotingService uses. */
-	
-	database(): PrismaClient {
-		
-		return this._database;
-		
-	}
-	
+    
+    /** Database the VotingService uses. */
+    
+    database(): PrismaClient {
+        
+        return this._database;
+        
+    }
+    
     /** Sets value of database. */
         
     setDatabase(database: PrismaClient): void {
         
         /* pre("argument database is of type PrismaClient", database instanceof PrismaClient); */
-	
+    
         this._database = database;
         
         post("_database is database", this._database === database);
         
     }
-	
-	/** UserManager the voting service uses for accessing / editing the app's users. */
-	
-	userManager(): UserManager {
-		
-		return this._userManager;
-		
-	}
-	
+    
+    /** UserManager the voting service uses for accessing / editing the app's users. */
+    
+    userManager(): UserManager {
+        
+        return this._userManager;
+        
+    }
+    
     /** Sets value of userManager. */
         
     setUserManager(userManager: UserManager): void {
         
         pre("argument userManager is of type UserManager", userManager instanceof UserManager);
-	
+    
         this._userManager = userManager;
         
         post("_userManager is userManager", this._userManager === userManager);

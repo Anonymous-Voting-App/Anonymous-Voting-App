@@ -16,71 +16,71 @@ interface PrismaClient {
 export default class QuestionCollection {
     
     _database: PrismaClient;
-	
+    
     _questions: { [ id: string ]: Question } = {  };
     
     _pollId: string = "";
 
     _databaseData: Array<{ [ prop: string ]: any }> = [  ];
-	
-	/** 
+    
+    /** 
      * Latest data received from database corresponding to the 
      * instances in this collection. Updates each time 
      * .setFromDatabaseData() is called.
      */
-	
-	databaseData(): Array<{ [ prop: string ]: any }> {
-		
-		return this._databaseData;
-		
-	}
-	
+    
+    databaseData(): Array<{ [ prop: string ]: any }> {
+        
+        return this._databaseData;
+        
+    }
+    
     /** Sets value of databaseData. */
         
     setDatabaseData(databaseData: Array<{ [ prop: string ]: any }>): void {
         
         pre("argument databaseData is of type Array<object>", Array.isArray(databaseData));
-	
+    
         this._databaseData = databaseData;
         
         post("_databaseData is databaseData", this._databaseData === databaseData);
         
     }
-	
-	/** Questions in the collection. */
-	
-	questions(): { [ id: string ]: Question } {
-		
-		return this._questions;
-		
-	}
-	
+    
+    /** Questions in the collection. */
+    
+    questions(): { [ id: string ]: Question } {
+        
+        return this._questions;
+        
+    }
+    
     /** Sets value of questions. */
         
     setQuestions(questions: { [ id: string ]: Question }): void {
         
         pre("argument questions is of type object", typeof questions === "object");
-	
+    
         this._questions = questions;
         
         post("_questions is questions", this._questions === questions);
         
     }
 
-	/** Database the question collection is connected to. */
-	
-	database(): PrismaClient {
-		
-		return this._database;
-		
-	}
-	
+    /** Database the question collection is connected to. */
+    
+    database(): PrismaClient {
+        
+        return this._database;
+        
+    }
+    
     /** Sets value of database. */
         
     setDatabase(database: PrismaClient): void {
         
         // pre("argument database is of type PrismaClient", database instanceof PrismaClient);
-	
+    
         this._database = database;
         
         post("_database is database", this._database === database);

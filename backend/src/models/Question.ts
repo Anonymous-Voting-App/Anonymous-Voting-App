@@ -34,165 +34,165 @@ export default class Question {
     _answers: { [ id: string ]: Answer } = {  };
 
     _databaseData: { [ prop: string ]: any } = {  };
-	
-	/**  */
-	
-	databaseData(): { [ prop: string ]: any } {
-		
-		return this._databaseData;
-		
-	}
-	
+    
+    /**  */
+    
+    databaseData(): { [ prop: string ]: any } {
+        
+        return this._databaseData;
+        
+    }
+    
     /** Sets value of databaseData. */
         
     setDatabaseData(databaseData: { [ prop: string ]: any }): void {
         
         pre("argument databaseData is of type object", typeof databaseData === "object");
-	
+    
         this._databaseData = databaseData;
         
         post("_databaseData is databaseData", this._databaseData === databaseData);
         
     }
-	
-	/** Answers that have been given to the question. */
-	
-	answers(): { [ id: string ]: Answer } {
-		
-		return this._answers;
-		
-	}
-	
+    
+    /** Answers that have been given to the question. */
+    
+    answers(): { [ id: string ]: Answer } {
+        
+        return this._answers;
+        
+    }
+    
     /** Sets value of answers. */
         
     setAnswers(answers: { [ id: string ]: Answer }): void {
         
         pre("argument answers is of type object", typeof answers === "object");
-	
+    
         this._answers = answers;
         
         post("_answers is answers", this._answers === answers);
         
     }
-	
-	/** Prisma database the instance is connected to. */
-	
-	database(): PrismaClient {
-		
-		return this._database;
-		
-	}
-	
+    
+    /** Prisma database the instance is connected to. */
+    
+    database(): PrismaClient {
+        
+        return this._database;
+        
+    }
+    
     /** Sets value of database. */
         
     setDatabase(database: PrismaClient): void {
         
         //pre("argument database is of type PrismaClient", database instanceof PrismaClient);
-	
+    
         this._database = database;
         
         post("_database is database", this._database === database);
         
     }
-	
-	/** Unique database id of the poll the question is for. */
-	
-	pollId(): string {
-		
-		return this._pollId;
-		
-	}
-	
+    
+    /** Unique database id of the poll the question is for. */
+    
+    pollId(): string {
+        
+        return this._pollId;
+        
+    }
+    
     /** Sets value of pollId. */
         
     setPollId(pollId: string): void {
         
         pre("argument pollId is of type string", typeof pollId === "string");
-	
+    
         this._pollId = pollId;
         
         post("_pollId is pollId", this._pollId === pollId);
         
     }
-	
-	/** Unique database id of the question. */
-	
-	id(): string {
-		
-		return this._id;
-		
-	}
-	
+    
+    /** Unique database id of the question. */
+    
+    id(): string {
+        
+        return this._id;
+        
+    }
+    
     /** Sets value of id. */
         
     setId(id: string): void {
         
         pre("argument id is of type string", typeof id === "string");
-	
+    
         this._id = id;
         
         post("_id is id", this._id === id);
         
     }
-	
-	/** Type of the question. The Question class is a generic 
+    
+    /** Type of the question. The Question class is a generic 
      * question that can take any freeform answer string.
      */
-	
-	type(): string {
-		
-		return this._type;
-		
-	}
-	
+    
+    type(): string {
+        
+        return this._type;
+        
+    }
+    
     /** Sets value of type. */
         
     setType(type: string): void {
         
         pre("argument type is of type string", typeof type === "string");
-	
+    
         this._type = type;
         
         post("_type is type", this._type === type);
         
     }
-	
-	/** Description of the question describing the question 
+    
+    /** Description of the question describing the question 
      * to a user.
      */
-	
-	description(): string {
-		
-		return this._description;
-		
-	}
-	
+    
+    description(): string {
+        
+        return this._description;
+        
+    }
+    
     /** Sets value of description. */
         
     setDescription(description: string): void {
         
         pre("argument description is of type string", typeof description === "string");
-	
+    
         this._description = description;
         
         post("_description is description", this._description === description);
         
     }
-	
-	/** Title or name of the question. */
-	
-	title(): string {
-		
-		return this._title;
-		
-	}
-	
+    
+    /** Title or name of the question. */
+    
+    title(): string {
+        
+        return this._title;
+        
+    }
+    
     /** Sets value of title. */
         
     setTitle(title: string): void {
         
         pre("argument title is of type string", typeof title === "string");
-	
+    
         this._title = title;
         
         post("_title is title", this._title === title);

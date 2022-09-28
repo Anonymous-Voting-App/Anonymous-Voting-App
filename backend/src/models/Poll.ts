@@ -44,237 +44,237 @@ export default class Poll {
     _loadedFromDatabase: boolean = false;
 
     _createdInDatabase: boolean = false;
-	
-	/** Whether new database entry has been made from this instance. */
-	
-	createdInDatabase(): boolean {
-		
-		return this._createdInDatabase;
-		
-	}
-	
+    
+    /** Whether new database entry has been made from this instance. */
+    
+    createdInDatabase(): boolean {
+        
+        return this._createdInDatabase;
+        
+    }
+    
     /** Sets value of createdInDatabase. */
         
     setCreatedInDatabase(createdInDatabase: boolean): void {
         
         pre("argument createdInDatabase is of type boolean", typeof createdInDatabase === "boolean");
-	
+    
         this._createdInDatabase = createdInDatabase;
         
         post("_createdInDatabase is createdInDatabase", this._createdInDatabase === createdInDatabase);
         
     }
-	
-	/** 
+    
+    /** 
      * Whether Poll instance has been populated 
      * with data from database 
      */
-	
-	loadedFromDatabase(): boolean {
-		
-		return this._loadedFromDatabase;
-		
-	}
-	
+    
+    loadedFromDatabase(): boolean {
+        
+        return this._loadedFromDatabase;
+        
+    }
+    
     /** Sets value of loadedFromDatabase. */
         
     setLoadedFromDatabase(loadedFromDatabase: boolean): void {
         
         pre("argument loadedFromDatabase is of type boolean", typeof loadedFromDatabase === "boolean");
-	
+    
         this._loadedFromDatabase = loadedFromDatabase;
         
         post("_loadedFromDatabase is loadedFromDatabase", this._loadedFromDatabase === loadedFromDatabase);
         
     }
-	
-	/** Prisma database the instance is connected to. */
-	
-	database(): PrismaClient {
-		
-		return this._database;
-		
-	}
-	
+    
+    /** Prisma database the instance is connected to. */
+    
+    database(): PrismaClient {
+        
+        return this._database;
+        
+    }
+    
     /** Sets value of database. */
         
     setDatabase(database: PrismaClient): void {
         
         //pre("argument database is of type PrismaClient", database instanceof PrismaClient);
-	
+    
         this._database = database;
         
         post("_database is database", this._database === database);
         
     }
-	
-	/** Answers given to poll. */
-	
-	answers(): { [ id: string ]: Answer } {
-		
-		return this._answers;
-		
-	}
-	
+    
+    /** Answers given to poll. */
+    
+    answers(): { [ id: string ]: Answer } {
+        
+        return this._answers;
+        
+    }
+    
     /** Sets value of answers. */
         
     setAnswers(answers: { [ id: string ]: Answer }): void {
         
         pre("argument answers is of type object", typeof answers === "object");
-	
+    
         this._answers = answers;
         
         post("_answers is answers", this._answers === answers);
         
     }
-	
-	/** Questions that are part of poll. */
-	
-	questions(): { [ id: string ]: Question } {
-		
-		return this._questions;
-		
-	}
-	
+    
+    /** Questions that are part of poll. */
+    
+    questions(): { [ id: string ]: Question } {
+        
+        return this._questions;
+        
+    }
+    
     /** Sets value of questions. */
         
     setQuestions(questions: { [ id: string ]: Question }): void {
         
         pre("argument questions is of type object", typeof questions === "object");
-	
+    
         this._questions = questions;
         
         post("_questions is questions", this._questions === questions);
         
     }
-	
-	/** 
+    
+    /** 
      * Private id of the poll. Knowing the private id 
      * is meant to give access to editing the poll.
      */
-	
-	privateId(): string {
-		
-		return this._privateId;
-		
-	}
-	
+    
+    privateId(): string {
+        
+        return this._privateId;
+        
+    }
+    
     /** Sets value of privateId. */
         
     setPrivateId(privateId: string): void {
         
         pre("argument privateId is of type string", typeof privateId === "string");
-	
+    
         this._privateId = privateId;
         
         post("_privateId is privateId", this._privateId === privateId);
         
     }
-	
-	/** 
+    
+    /** 
      * Public id of the poll. Knowing 
      * the public id is meant to allow answering the poll.
      */
-	
-	publicId(): string {
-		
-		return this._publicId;
-		
-	}
-	
+    
+    publicId(): string {
+        
+        return this._publicId;
+        
+    }
+    
     /** Sets value of publicId. */
         
     setPublicId(publicId: string): void {
         
         pre("argument publicId is of type string", typeof publicId === "string");
-	
+    
         this._publicId = publicId;
         
         post("_publicId is publicId", this._publicId === publicId);
         
     }
-	
-	/** 
+    
+    /** 
      * Who owns the poll. Can be an unidentifiable owner 
      * since the poll can be edited just by knowing 
      * the private id.
      */
-	
-	owner(): User {
-		
-		return this._owner;
-		
-	}
-	
+    
+    owner(): User {
+        
+        return this._owner;
+        
+    }
+    
     /** Sets value of owner. */
         
     setOwner(owner: User): void {
         
         pre("argument owner is of type User", owner instanceof User );
-	
+    
         this._owner = owner;
         
         post("_owner is owner", this._owner === owner);
         
     }
-	
-	/** 
+    
+    /** 
      * A type the poll can have. Can be used to 
      * differentiate polls into types as desired.
      */
-	
-	type(): string {
-		
-		return this._type;
-		
-	}
-	
+    
+    type(): string {
+        
+        return this._type;
+        
+    }
+    
     /** Sets value of type. */
         
     setType(type: string): void {
         
         pre("argument type is of type string", typeof type === "string");
-	
+    
         this._type = type;
         
         post("_type is type", this._type === type);
         
     }
-	
-	/** Name of the poll. */
-	
-	name(): string {
-		
-		return this._name;
-		
-	}
-	
+    
+    /** Name of the poll. */
+    
+    name(): string {
+        
+        return this._name;
+        
+    }
+    
     /** Sets value of name. */
         
     setName(name: string): void {
         
         pre("argument name is of type string", typeof name === "string");
-	
+    
         this._name = name;
         
         post("_name is name", this._name === name);
         
     }
-	
-	/** Unique database id of the poll. */
-	
-	id(): string {
-		
-		return this._id;
-		
-	}
-	
+    
+    /** Unique database id of the poll. */
+    
+    id(): string {
+        
+        return this._id;
+        
+    }
+    
     /** Sets value of id. */
         
     setId(id: string): void {
         
         pre("argument id is of type string", typeof id === "string");
-	
+    
         this._id = id;
         
         post("_id is id", this._id === id);
