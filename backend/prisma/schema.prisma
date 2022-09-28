@@ -59,6 +59,7 @@ model Vote {
   questionId        String      @db.Uuid
   question          Question    @relation(name: "QuestionVotes", fields: [questionId], references: [id])
   value             String
+  voterId           String      @db.Uuid
 }
 
 model User {
