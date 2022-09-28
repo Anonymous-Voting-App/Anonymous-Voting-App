@@ -15,7 +15,7 @@ interface PrismaClient {
 
 export default class UserManager {
     
-    _database: PrismaClient;
+    _database!: PrismaClient;
 
     _users: { [ id: string ]: User } = {  };
     
@@ -79,7 +79,7 @@ export default class UserManager {
         
         cookie?: string
         
-    } ): Promise<User | void> {
+    } ): Promise<User | null> {
         
         pre("userOptions is of type object", typeof userOptions === "object");
         
@@ -164,7 +164,7 @@ export default class UserManager {
         
         accountId: string
         
-    } ): Promise<User | void> {
+    } ): Promise<User | null> {
         
         /* pre("userOptions is of type object", typeof userOptions === "object");
         
@@ -196,6 +196,8 @@ export default class UserManager {
             return user;
             
         }
+        
+        return null;
         
     }
     

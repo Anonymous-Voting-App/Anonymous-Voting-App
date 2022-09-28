@@ -169,7 +169,7 @@ export default class MultiQuestion extends Question {
 
         [ extra: string ]: any
         
-    }, answerer: User ): Promise<Answer> {
+    }, answerer: User ): Promise<null | Answer> {
         
         pre("answerData is of type object", typeof answerData === "object");
         
@@ -192,6 +192,8 @@ export default class MultiQuestion extends Question {
             return answer;
 
         }
+        
+        return null;
         
     }
 

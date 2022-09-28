@@ -29,7 +29,7 @@ export default class Question {
 
     _pollId: string = "";
 
-    _database: PrismaClient;
+    _database!: PrismaClient;
 
     _answers: { [ id: string ]: Answer } = {  };
 
@@ -380,7 +380,7 @@ export default class Question {
 
         [ extra: string ]: any,
         
-    }, answerer: User ): Promise<Answer> {
+    }, answerer: User ): Promise<Answer | null> {
         
         pre("answerData is of type object", typeof answerData === "object");
         

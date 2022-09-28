@@ -30,7 +30,7 @@ export default class Answer {
 
     _id: string = "";
 
-    _database: PrismaClient;
+    _database!: PrismaClient;
     
     /** Prisma database the instance is connected to. */
     
@@ -193,21 +193,27 @@ export default class Answer {
         
         this.setValue( answerData.value );
         
+        var answerer;
+
         if ( typeof answerData.voter === "object" ) {
             
-            var answerer = new User(  );
+            answerer = new User(  );
         
             answerer.setFromDatabaseData( answerData.voter );
             
         } else if ( typeof answerData.voterId == "string" ) {
             
-            var answerer = new User(  );
+            answerer = new User(  );
         
             answerer.setFromDatabaseData( { id: answerData.voterId } );
             
         }
 
-        this.setAnswerer( answerer );
+        if ( answerer !== undefined ) {
+            
+            this.setAnswerer( answerer );
+            
+        }
         
     }
     

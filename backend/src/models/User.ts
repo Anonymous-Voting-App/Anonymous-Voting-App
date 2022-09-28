@@ -28,7 +28,7 @@ export default class User {
 
     _loadedFromDatabase: boolean = false;
 
-    _database: PrismaClient;
+    _database!: PrismaClient;
 
     _id: string = "";
 

@@ -393,7 +393,7 @@ export default class Poll {
     
     findSelfInDatabaseQuery(  ): { [ prop: string ]: any } {
         
-        var subQueries = [  ];
+        var subQueries: Array<any> = [  ];
 
         var query = { OR: subQueries };
         
@@ -568,7 +568,7 @@ export default class Poll {
     
     setAnswersFromDatabaseData( questionsData: Array<any> ): void {
         
-        var answersData = [  ];
+        var answersData: Array<any> = [  ];
         
         for ( let i = 0; i < questionsData.length; i++ ) {
             
@@ -602,7 +602,7 @@ export default class Poll {
      */
     
     async answer( questionId: string, answerData: { [ prop: string ]: any },
-                        user: User ): Promise<Answer | void> {
+                        user: User ): Promise<Answer | null> {
         
         pre( "poll has question", this.questions(  )[ questionId ] instanceof Question );
         
@@ -621,6 +621,10 @@ export default class Poll {
             }
             
             return answer;
+            
+        } else {
+            
+            return null;
             
         }
         
@@ -749,7 +753,7 @@ export default class Poll {
     
      questionsDataObjs(  ): { [ id: string ]: IPolling.QuestionData } {
         
-        var result = {  };
+        var result: { [ prop: string ]: any } = {  };
         
         for ( let id in this.questions(  ) ) {
             
@@ -770,7 +774,7 @@ export default class Poll {
     
      answersDataObjs(  ): { [ id: string ]: IPolling.AnswerData } {
         
-        var result = {  };
+        var result: { [ prop: string ]: any } = {  };
         
         for ( let id in this.answers(  ) ) {
             
