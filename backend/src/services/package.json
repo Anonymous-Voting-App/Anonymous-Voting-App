@@ -1,17 +1,17 @@
 {
-  "name": "services",
-  "version": "1.0.0",
-  "description": "Services of the anonymous voting app",
-  "private": true,
-  "main": "main.js",
-  "scripts": {
-    "pretest": "tsc",
-    "test": "jest"
-  },
-  "author": "admin",
-  "license": "ISC",
-  "devDependencies": {
-    "jest": "^29.0.3",
-    "jest-mock-extended": "^3.0.1"
-  }
+    "name": "services",
+    "version": "1.0.0",
+    "description": "Services of the anonymous voting app",
+    "private": true,
+    "main": "main.js",
+    "scripts": {
+        "pretest": "tsc",
+        "test": "jest"
+    },
+    "author": "admin",
+    "license": "ISC",
+    "devDependencies": {
+        "jest": "^29.0.3",
+        "jest-mock-extended": "^3.0.1"
+    }
 }

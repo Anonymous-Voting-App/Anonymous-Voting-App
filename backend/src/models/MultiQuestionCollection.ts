@@ -1,14 +1,12 @@
-import { pre, post } from "../utils/designByContract";
-import MultiQuestion from "./MultiQuestion";
-import Question from "./Question";
-import QuestionCollection from "./QuestionCollection";
+import { pre, post } from '../utils/designByContract';
+import MultiQuestion from './MultiQuestion';
+import Question from './Question';
+import QuestionCollection from './QuestionCollection';
 
 /* import { PrismaClient } from '@prisma/client'; */
 
 interface PrismaClient {
-    
-    [ prop: string ]: any
-    
+    [prop: string]: any;
 }
 
 /**
@@ -16,17 +14,17 @@ interface PrismaClient {
  */
 
 export default class MultiQuestionCollection extends QuestionCollection {
-    
-    constructor( database: PrismaClient, questions: { [ id: string ]: MultiQuestion } ) {
-    
-        super( database, questions );
-    
+    constructor(
+        database: PrismaClient,
+        questions: { [id: string]: MultiQuestion }
+    ) {
+        super(database, questions);
     }
-    
+
     /**
-     * 
+     *
      */
-    
+
     /* newChoicesQuery(  ): Array<{ [ prop: string ]: any }> {
         
         var result = [  ];
@@ -48,35 +46,31 @@ export default class MultiQuestionCollection extends QuestionCollection {
     } */
 
     /**
-     * Populates collection with MultiQuestions according 
-     * to given array of data objects retrieved 
+     * Populates collection with MultiQuestions according
+     * to given array of data objects retrieved
      * from database.
      */
-    
-     setFromDatabaseObj( questionsData: Array<any> ): void {
 
-        super.setFromDatabaseObj( questionsData );
+    setFromDatabaseObj(questionsData: Array<any>): void {
+        super.setFromDatabaseObj(questionsData);
 
-        for ( let i = 0; i < questionsData.length; i++ ) {
-            
+        for (let i = 0; i < questionsData.length; i++) {
             var questionData = questionsData[i];
 
-            questionData.votes = [  ];
-            
-            var question = new MultiQuestion(  );
+            questionData.votes = [];
 
-            question.setFromDatabaseData( questionData );
+            var question = new MultiQuestion();
 
-            this.questions(  )[ questionData.id ] = question;
-            
+            question.setFromDatabaseData(questionData);
+
+            this.questions()[questionData.id] = question;
         }
-        
     }
 
     /**
-     * 
+     *
      */
-        
+
     /* setIdsFromDatabaseObj( questionsData: Array<any> ): void {
 
         super.setFromDatabaseObj( questionsData );
@@ -96,43 +90,38 @@ export default class MultiQuestionCollection extends QuestionCollection {
         }
         
     } */
-    
+
     /**
-     * Retrieves questions from database and 
+     * Retrieves questions from database and
      * populates the collection with according MultiQuestion instances.
      */
-    
-    async loadFromDatabase(  ): Promise<{ [ prop: string ]: any }> {
-        
-        pre("question collection is empty", Object.keys( this.questions(  ) ).length == 0);
 
-        var questionsData = ( await ( this.database(  ).question.findMany( 
-            { 
-                where: { 
+    async loadFromDatabase(): Promise<{ [prop: string]: any }> {
+        pre(
+            'question collection is empty',
+            Object.keys(this.questions()).length == 0
+        );
 
-                    pollId: this.pollId(  )
+        var questionsData = await this.database().question.findMany({
+            where: {
+                pollId: this.pollId()
+            },
 
-                },
-                
-                include: {
-                    
-                    options: true
-                    
-                }
+            include: {
+                options: true
             }
-        ) ) );
-        
-        this.setFromDatabaseObj( questionsData );
-        
+        });
+
+        this.setFromDatabaseObj(questionsData);
+
         return questionsData;
-        
     }
 
     /**
-     * 
+     *
      */
-    
-     /* async loadIdsFromDatabase(  ): Promise<{ [ prop: string ]: any }> {
+
+    /* async loadIdsFromDatabase(  ): Promise<{ [ prop: string ]: any }> {
 
         var questionsData = ( await ( this.database(  ).question.findMany( 
             { 
@@ -151,9 +140,9 @@ export default class MultiQuestionCollection extends QuestionCollection {
     } */
 
     /**
-     * 
+     *
      */
-    
+
     /* async createNewInDatabase(  ): Promise<{ [ prop: string ]: any }> {
 
         pre("database is set", typeof this.database(  ) === "object");
@@ -181,30 +170,28 @@ export default class MultiQuestionCollection extends QuestionCollection {
     } */
 
     /**
-     * Adds information to database according 
+     * Adds information to database according
      * to the information present in this collection's instances.
      */
-    
-     async createNewInDatabase(  ): Promise<void> {
 
-        pre("database is set", typeof this.database(  ) === "object");
+    async createNewInDatabase(): Promise<void> {
+        pre('database is set', typeof this.database() === 'object');
 
-        pre("there is at least one question", Object.keys( this.questions(  ) ).length > 0);
+        pre(
+            'there is at least one question',
+            Object.keys(this.questions()).length > 0
+        );
 
-        for ( let id in this.questions(  ) ) {
-            
-            let question = this.questions(  )[ id ];
-            
-            delete this.questions(  )[ id ];
+        for (let id in this.questions()) {
+            let question = this.questions()[id];
 
-            await question.createNewInDatabase(  );
+            delete this.questions()[id];
 
-            this.databaseData(  ).push( question.databaseData(  ) );
-            
-            this.questions(  )[ question.id(  ) ] = question;
+            await question.createNewInDatabase();
 
+            this.databaseData().push(question.databaseData());
+
+            this.questions()[question.id()] = question;
         }
-
     }
-    
 }

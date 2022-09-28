@@ -1,15 +1,13 @@
-"use strict"
+'use strict';
 
+describe('', () => {
+    var MultiQuestionCollection = require('.//MultiQuestionCollection').default;
+    var MultiQuestion = require('.//MultiQuestion').default;
+    var Question = require('.//Question').default;
+    var prisma = require('../utils/prismaHandler').default;
+    var Poll = require('.//Poll').default;
+    var User = require('.//User').default;
 
-describe( "", (  ) => {
-    
-    var MultiQuestionCollection = require( ".//MultiQuestionCollection" ).default;
-    var MultiQuestion = require( ".//MultiQuestion" ).default;
-    var Question = require( ".//Question" ).default;
-    var prisma = require( "../utils/prismaHandler" ).default;
-    var Poll = require( ".//Poll" ).default;
-    var User = require( ".//User" ).default;
-    
     /* test( "loadFromDatabase happy case", async (  ) => {
 
         var [ collection, pollId, userId, questionId ] = await createCollection(  );
@@ -24,125 +22,105 @@ describe( "", (  ) => {
 
     } ); */
 
-    test( "loadFromDatabase happy case", async (  ) => {
-        
-        var db = makeDb(  );
+    test('loadFromDatabase happy case', async () => {
+        var db = makeDb();
 
-        var collection = new MultiQuestionCollection( db );
+        var collection = new MultiQuestionCollection(db);
 
-        collection.setPollId( "p1" );
-        
-        await collection.loadFromDatabase(  );
-        
-        expect( Object.keys( collection.questions(  ) ) ).toEqual( [ "q1", "q2" ] );
+        collection.setPollId('p1');
 
-        var questions = Object.values( collection.questions(  ) );
-        
-        expect( questions[ 0 ].id(  ) ).toBe( "q1" );
+        await collection.loadFromDatabase();
 
-        expect( questions[ 1 ].id(  ) ).toBe( "q2" );
+        expect(Object.keys(collection.questions())).toEqual(['q1', 'q2']);
 
-    } );
-    
-    test( "loadFromDatabase no questions in database", async (  ) => {
-        
-        var db = makeDb(  );
+        var questions = Object.values(collection.questions());
 
-        var collection = new MultiQuestionCollection( db );
+        expect(questions[0].id()).toBe('q1');
 
-        collection.setPollId( "find-nothing" );
-        
-        await collection.loadFromDatabase(  );
-        
-        expect( collection.questions(  ) ).toEqual( {  } );
+        expect(questions[1].id()).toBe('q2');
+    });
 
-    } );
-    
-    test( "createNewInDatabase happy case", async (  ) => {
-        
-        var db = makeDb(  );
-        
+    test('loadFromDatabase no questions in database', async () => {
+        var db = makeDb();
+
+        var collection = new MultiQuestionCollection(db);
+
+        collection.setPollId('find-nothing');
+
+        await collection.loadFromDatabase();
+
+        expect(collection.questions()).toEqual({});
+    });
+
+    test('createNewInDatabase happy case', async () => {
+        var db = makeDb();
+
         var callNum = 0;
 
-        db.question.create = function ( query ) {
-            
+        db.question.create = function (query) {
             callNum++;
 
-            expect( query.data.pollId ).toBe( "p1" );
+            expect(query.data.pollId).toBe('p1');
 
-            if ( callNum === 1 ) {
-                
+            if (callNum === 1) {
                 return {
-                    
-                    id: "q1",
-                    
-                    votes: [  ],
-                    
-                    options: [  ],
-                    
-                    pollId: "p1"
-                    
+                    id: 'q1',
+
+                    votes: [],
+
+                    options: [],
+
+                    pollId: 'p1'
                 };
-                
             }
-            
         };
-        
+
         db.option = {
-            
-            create: function ( query ) {
-                
-                expect( query.data.questionId ).toBe( "q1" );
-                
-                expect( query.data.option ).toBe( "sub-title" );
-                
+            create: function (query) {
+                expect(query.data.questionId).toBe('q1');
+
+                expect(query.data.option).toBe('sub-title');
+
                 return {
-                    
-                    id: "s1",
-                    
-                    questionId: "q1",
-                    
-                    option: "sub-title"
-                    
+                    id: 's1',
+
+                    questionId: 'q1',
+
+                    option: 'sub-title'
                 };
-                
             }
-            
         };
 
-        var collection = new MultiQuestionCollection( db );
-        
-        var question = new MultiQuestion( db );
-        
-        question.setFromRequest( {
-            
-            title: "title",
-            
-            description: "description",
-            
-            subQuestions: [ {
-                
-                title: "sub-title",
-            
-                description: "sub-description",
-                
-            } ]
-            
-        } );
-        
-        collection.add( question );
-        
-        collection.setPollId( "p1" );
-        
-        await collection.createNewInDatabase(  );
-        
-        expect( Object.keys( collection.questions(  ) ) ).toEqual( [ "q1" ] );
-        
-        var question = collection.questions(  )[ "q1" ];
-        
-        expect( Object.keys( question.subQuestions(  ) ) ).toEqual( [ "s1" ] );
-        
-    } );
+        var collection = new MultiQuestionCollection(db);
+
+        var question = new MultiQuestion(db);
+
+        question.setFromRequest({
+            title: 'title',
+
+            description: 'description',
+
+            subQuestions: [
+                {
+                    title: 'sub-title',
+
+                    description: 'sub-description'
+                }
+            ]
+        });
+
+        collection.add(question);
+
+        collection.setPollId('p1');
+
+        await collection.createNewInDatabase();
+
+        expect(Object.keys(collection.questions())).toEqual(['q1']);
+
+        var question = collection.questions()['q1'];
+
+        expect(Object.keys(question.subQuestions())).toEqual(['s1']);
+    });
 
     /* test( "loadFromDatabase happy case", async (  ) => {
         
@@ -171,72 +149,54 @@ describe( "", (  ) => {
 
 
     } ); */
-    
-    function makeDb(  ) {
-        
-        var db = {  };
-        
+
+    function makeDb() {
+        var db = {};
+
         db.question = {
-            
-            findMany: function ( query ) {
-                
+            findMany: function (query) {
                 var result = [
-                    
                     {
-                        
-                        id: "q1",
-                        
-                        pollId: "p1",
-                        
-                        typeId: "t1"
-                        
+                        id: 'q1',
+
+                        pollId: 'p1',
+
+                        typeId: 't1'
                     },
-                    
+
                     {
-                        
-                        id: "q2",
-                        
-                        pollId: "p1",
-                        
-                        typeId: "t1"
-                        
+                        id: 'q2',
+
+                        pollId: 'p1',
+
+                        typeId: 't1'
                     }
-                    
                 ];
 
-                if ( typeof query.include === "object" && 
-                     query.include.options === true) {
-                    
-                    result[ 0 ].options = [
-                        
+                if (
+                    typeof query.include === 'object' &&
+                    query.include.options === true
+                ) {
+                    result[0].options = [
                         {
-                            
-                            id: "o1",
-                            
-                            questionId: "q1",
-                            
-                            option: "test-option"
-                            
+                            id: 'o1',
+
+                            questionId: 'q1',
+
+                            option: 'test-option'
                         }
-                        
                     ];
-                    
                 }
 
-                if ( query.where.pollId !== "find-nothing" ) {
-                    
+                if (query.where.pollId !== 'find-nothing') {
                     return result;
-                    
                 }
 
-                return [  ];
-                
+                return [];
             }
-            
         };
-        
+
         return db;
-        
     }
 
     /* async function removeFromDb( pollId, userId, questionId ) {
@@ -322,5 +282,4 @@ describe( "", (  ) => {
         return user;
         
     } */
-    
-} );
+});

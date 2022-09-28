@@ -1,100 +1,83 @@
-
 export interface UserData {
+    id: string;
 
-    id: string,
-    
-    ip?: string,
-    
-    cookie?: string,
-    
-    accountId?: string
-    
+    ip?: string;
+
+    cookie?: string;
+
+    accountId?: string;
 }
 
 export interface QuestionData {
-    
-    title: string,
-    
-    description: string,
-    
-    type: string,
-    
-    id: string,
-    
-    pollId: string,
-    
-    answers?: Array<AnswerData>
-    
+    title: string;
+
+    description: string;
+
+    type: string;
+
+    id: string;
+
+    pollId: string;
+
+    answers?: Array<AnswerData>;
 }
 
 export interface MultiQuestionData extends QuestionData {
-    
-    subQuestions: { [ id: string ]: QuestionData }
-    
+    subQuestions: { [id: string]: QuestionData };
 }
 
 export interface AnswerData {
-    
-    id: string,
-    
-    questionId: string,
-    
-    value: any,
-    
-    answerer: UserData
-    
+    id: string;
+
+    questionId: string;
+
+    value: any;
+
+    answerer: UserData;
 }
 
-export interface PollData { 
+export interface PollData {
+    id: string;
 
-    id: string,
+    name: string;
 
-    name: string,
+    type: string;
 
-    type: string,
+    publicId: string;
 
-    publicId: string,
-    
-    privateId?: string,
-    
-    owner?: UserData,
-    
-    questions: { [ id: string ]: QuestionData },
-    
-    answers?: { [ id: string ]: AnswerData }
+    privateId?: string;
 
+    owner?: UserData;
+
+    questions: { [id: string]: QuestionData };
+
+    answers?: { [id: string]: AnswerData };
 }
 
-export interface PollRequest { 
+export interface PollRequest {
+    name: string;
 
-    name: string,
+    type: string;
 
-    type: string,
-    
     owner: {
+        id: string;
 
-        id: string,
-        
-        ip: string,
-        
-        cookie: string,
-        
-        accountId: string
-        
-    },
-    
-    questions: Array<QuestionRequest>,
+        ip: string;
 
+        cookie: string;
+
+        accountId: string;
+    };
+
+    questions: Array<QuestionRequest>;
 }
 
 export interface QuestionRequest {
-            
-    title: string,
+    title: string;
 
-    description: string,
-    
-    type: string,
-    
-    subQuestions?: Array<QuestionRequest>
-    
+    description: string;
+
+    type: string;
+
+    subQuestions?: Array<QuestionRequest>;
 }
