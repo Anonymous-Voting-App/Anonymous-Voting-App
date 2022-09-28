@@ -100,7 +100,7 @@ export default class VotingService {
             
         }
 
-    } ): Promise<IPolling.PollData | void> {
+    } ): Promise<IPolling.PollData | null> {
         
         pre("pollOptions is of type object", typeof pollOptions === "object");
         
@@ -141,7 +141,7 @@ export default class VotingService {
      * If no such poll exists, return null.
      */
     
-    async getPollWithPublicId( publicId: string ): Promise<IPolling.PollData | void> {
+    async getPollWithPublicId( publicId: string ): Promise<IPolling.PollData | null> {
 
         pre("publicId is of type string", typeof publicId === "string");
 
@@ -191,7 +191,7 @@ export default class VotingService {
             
         }
         
-    } ): Promise<IPolling.AnswerData | void> {
+    } ): Promise<IPolling.AnswerData | null> {
         
         pre("answerData is of type object", typeof answerData === "object");
         
@@ -201,7 +201,7 @@ export default class VotingService {
         
         // pre("answerData.answerer is of type object", typeof answerData.answerer === "object");
 
-        var user: User | void;
+        var user: User | null;
 
         /* if ( !( await this.userManager(  ).userExists( answerData.answerer ) ) ) {
             
