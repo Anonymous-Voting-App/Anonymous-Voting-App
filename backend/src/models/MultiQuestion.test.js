@@ -38,30 +38,23 @@ describe('', () => {
     });
 
     test('answer happy case', async () => {
-
         var db = testDb.makeTestDb();
 
         db.vote = {
-            
-            create: function ( query ) {
-                
+            create: function (query) {
                 return {
-                    
-                    id: "a1",
-                    
-                    questionId: "q1",
-                    
-                    value: "true"
-                    
+                    id: 'a1',
+
+                    questionId: 'q1',
+
+                    value: 'true'
                 };
-                
             }
-            
         };
 
         var question = new MultiQuestion();
 
-        question.setId( "q1" );
+        question.setId('q1');
 
         var subQuestion = new Question();
 
@@ -86,7 +79,7 @@ describe('', () => {
 
         expect(answer instanceof Answer).toBe(true);
 
-        expect(answer.value()).toBe("true");
+        expect(answer.value()).toBe('true');
 
         expect(answer.questionId()).toBe('q1');
 
@@ -172,7 +165,6 @@ describe('', () => {
                     questionId: 'id',
 
                     option: 'option'
-
                 }
             ]
         });
@@ -192,8 +184,8 @@ describe('', () => {
         var subQuestion = question.subQuestions()['sub-id'];
 
         expect(subQuestion.id()).toBe('sub-id');
-        
-        expect( subQuestion.title(  ) ).toBe( "option" );
+
+        expect(subQuestion.title()).toBe('option');
 
         /* expect( subQuestion.title(  ) ).toBe( "sub-title" );
         
@@ -235,7 +227,6 @@ describe('', () => {
             title: "title", */
 
             pollId: 'pollId'
-            
         });
     });
 
