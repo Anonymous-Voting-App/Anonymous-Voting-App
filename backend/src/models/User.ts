@@ -1,10 +1,6 @@
 import { pre, post } from '../utils/designByContract';
-import * as IPolling from '../models/IPolling';
-/* import { PrismaClient } from '@prisma/client'; */
-
-interface PrismaClient {
-    [prop: string]: any;
-}
+import * as IUser from './IUser';
+import { PrismaClient } from '@prisma/client';
 
 /**
  * A user of the anonymous voting app.
@@ -15,30 +11,21 @@ interface PrismaClient {
  * The same User class is used for registered users
  * and anonymous users.
  */
-
 export default class User {
-    _ip: string = '';
-
-    _cookie: string = '';
-
-    _accountId: string = '';
-
-    _loadedFromDatabase: boolean = false;
-
+    _ip = '';
+    _cookie = '';
+    _accountId = '';
+    _loadedFromDatabase = false;
     _database!: PrismaClient;
-
-    _id: string = '';
-
-    _createdInDatabase: boolean = false;
+    _id = '';
+    _createdInDatabase = false;
 
     /** Whether new user entry in database has been created from this instance. */
-
     createdInDatabase(): boolean {
         return this._createdInDatabase;
     }
 
     /** Sets value of createdInDatabase. */
-
     setCreatedInDatabase(createdInDatabase: boolean): void {
         pre(
             'argument createdInDatabase is of type boolean',
@@ -54,13 +41,11 @@ export default class User {
     }
 
     /** Database id of user. */
-
     id(): string {
         return this._id;
     }
 
     /** Sets value of id. */
-
     setId(id: string): void {
         pre('argument id is of type string', typeof id === 'string');
 
@@ -70,35 +55,28 @@ export default class User {
     }
 
     /** Prisma database the instance is connected to. */
-
     database(): PrismaClient {
         return this._database;
     }
 
     /** Sets value of database. */
-
     setDatabase(database: PrismaClient): void {
-        //pre("argument database is of type PrismaClient", database instanceof PrismaClient);
-
         this._database = database;
 
         post('_database is database', this._database === database);
     }
 
     /** Whether the user has been loaded from the database. */
-
     loadedFromDatabase(): boolean {
         return this._loadedFromDatabase;
     }
 
     /** Account id of user if user is registered. */
-
     accountId(): string {
         return this._accountId;
     }
 
     /** Sets value of accountId. */
-
     setAccountId(accountId: string): void {
         pre(
             'argument accountId is of type string',
@@ -111,13 +89,11 @@ export default class User {
     }
 
     /** Possible cookie (active or inactive) the account has. */
-
     cookie(): string {
         return this._cookie;
     }
 
     /** Sets value of cookie. */
-
     setCookie(cookie: string): void {
         pre('argument cookie is of type string', typeof cookie === 'string');
 
@@ -127,13 +103,11 @@ export default class User {
     }
 
     /** IP address of the user. Mostly needed for identifying anonymous users. */
-
     ip(): string {
         return this._ip;
     }
 
     /** Sets value of ip. */
-
     setIp(ip: string): void {
         pre('argument ip is of type string', typeof ip === 'string');
 
@@ -145,54 +119,19 @@ export default class User {
     /**
      * New Prisma query object for finding the user in the database.
      */
-
-    findSelfInDatabaseQuery(): { [prop: string]: any } {
-        var orArr = [];
-
-        /* if ( this.ip(  ).length > 0 ) {
-            
-            orArr.push( { ip: this.ip(  ) } );
-            
-        }
-        
-        if ( this.cookie(  ).length > 0 ) {
-            
-            orArr.push( { cookie: this.cookie(  ) } );
-            
-        }
-        
-        if ( this.accountId(  ).length > 0 ) {
-            
-            orArr.push( { accountId: this.accountId(  ) } );
-            
-        } */
-
-        if (this.accountId().length > 0) {
-            orArr.push({ id: this.accountId() });
-        }
-
+    findSelfInDatabaseQuery(): IUser.FindSelfDatabaseQuery {
+        // For now this should be enough - Joonas Hiltunen 02.10.2022
         return {
             where: {
-                OR: orArr
+                id: this.accountId()
             }
         };
     }
 
-    constructor() {}
-
     /**
      * Sets the user object's values from given data returned by the database.
      */
-
-    setFromDatabaseData(userData: {
-        id: string;
-
-        ip?: string;
-
-        cookie?: string;
-
-        accountId?: string;
-    }): void {
+    setFromDatabaseData(userData: IUser.UserDataFromDatabase): void {
         pre('userData is of type object', typeof userData === 'object');
 
         pre('userData.id is of type string', typeof userData.id === 'string');
@@ -204,9 +143,8 @@ export default class User {
      * Whether poll with the same id can be found in the
      * Prisma database.
      */
-
     async existsInDatabase(): Promise<boolean> {
-        var result = false;
+        let result = false;
 
         if (
             this.id().length > 0 ||
@@ -227,9 +165,8 @@ export default class User {
      * Makes new object in Prisma database from the values
      * of the properties of this instance.
      */
-
     async createNewInDatabase(): Promise<void> {
-        var data = await this._database.user.create({
+        const data = await this._database.user.create({
             data: this.newDatabaseObject()
         });
 
@@ -242,13 +179,10 @@ export default class User {
      * A new Prisma-compatible object used for when creating a
      * database entry for the user.
      */
-
-    newDatabaseObject(): any {
+    newDatabaseObject(): IUser.NewUserDatabaseObject {
         return {
             name: 'dummy-name',
-
             email: 'dummy-email',
-
             password: 'dummy-password'
         };
     }
@@ -259,7 +193,6 @@ export default class User {
      * If the user was found in the database, then
      * .loadedFromDatabase() becomes true.
      */
-
     async loadFromDatabase(): Promise<void> {
         pre(
             'either id, ip, cookie or accountId is set',
@@ -269,7 +202,7 @@ export default class User {
                 this.accountId().length > 0
         );
 
-        var data = await this._database.user.findFirst(
+        const data = await this._database.user.findFirst(
             this.findSelfInDatabaseQuery()
         );
 
@@ -285,28 +218,22 @@ export default class User {
      * The user can be identified if they have either a
      * cookie, ip or account id set.
      */
-
     isIdentifiable(): boolean {
-        return true;
-
-        var result = false;
-
         if (this.ip().length > 0) {
-            result = true;
+            return true;
         } else if (this.accountId().length > 0) {
-            result = true;
+            return true;
         } else if (this.cookie().length > 0) {
-            result = true;
+            return true;
         }
 
-        return result;
+        return false;
     }
 
     /**
      * A data object of the user's non-sensitive public information.
      */
-
-    publicDataObj(): IPolling.UserData {
+    publicDataObj(): IUser.UserDataFromDatabase {
         return {
             id: this.id()
         };
@@ -316,7 +243,6 @@ export default class User {
      * Whether user has an id that is according
      * to the v4 uuid standard.
      */
-
     hasV4Uuid(): boolean {
         return this.id().length === 32 || this.id().length === 36;
     }

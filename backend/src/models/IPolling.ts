@@ -1,24 +1,12 @@
-export interface UserData {
-    id: string;
-
-    ip?: string;
-
-    cookie?: string;
-
-    accountId?: string;
-}
+import * as IQuestion from './IQuestion';
+import * as IUser from './IUser';
 
 export interface QuestionData {
     title: string;
-
     description: string;
-
     type: string;
-
     id: string;
-
     pollId: string;
-
     answers?: Array<AnswerData>;
 }
 
@@ -28,56 +16,30 @@ export interface MultiQuestionData extends QuestionData {
 
 export interface AnswerData {
     id: string;
-
     questionId: string;
-
     value: any;
-
-    answerer: UserData;
+    answerer: IUser.UserDataFromDatabase;
 }
 
 export interface PollData {
     id: string;
-
     name: string;
-
     type: string;
-
     publicId: string;
-
     privateId?: string;
-
-    owner?: UserData;
-
+    owner?: IUser.UserDataFromDatabase;
     questions: { [id: string]: QuestionData };
-
     answers?: { [id: string]: AnswerData };
 }
 
 export interface PollRequest {
     name: string;
-
     type: string;
-
     owner: {
         id: string;
-
         ip: string;
-
         cookie: string;
-
         accountId: string;
     };
-
-    questions: Array<QuestionRequest>;
-}
-
-export interface QuestionRequest {
-    title: string;
-
-    description: string;
-
-    type: string;
-
-    subQuestions?: Array<QuestionRequest>;
+    questions: Array<IQuestion.QuestionRequest>;
 }
