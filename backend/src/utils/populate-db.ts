@@ -1,33 +1,27 @@
-import prisma from '../utils/prismaHandler';
+import prisma from './prismaHandler';
 
 run();
 
 async function run() {
-    var user = await prisma.user.create({
+    const user = await prisma.user.create({
         data: {
             name: 'name',
-
             email: 'asdf',
-
             password: 'password'
         }
     });
 
-    var poll = await prisma.poll.create({
+    const poll = await prisma.poll.create({
         data: {
             name: 'name',
-
             adminLink: 'adminLink',
-
             pollLink: 'pollLink',
-
             resultLink: '',
-
             creatorId: user.id
         }
     });
 
-    var type = await prisma.type.create({
+    const type = await prisma.type.create({
         data: {
             type: 'test'
         }
@@ -36,7 +30,6 @@ async function run() {
     await prisma.question.create({
         data: {
             pollId: poll.id,
-
             typeId: type.id
         }
     });

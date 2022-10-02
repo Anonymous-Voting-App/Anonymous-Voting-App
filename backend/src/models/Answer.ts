@@ -1,11 +1,8 @@
 import { pre, post } from '../utils/designByContract';
 import User from './User';
-import * as IPolling from '../models/IPolling';
-/* import { PrismaClient } from '@prisma/client'; */
-
-interface PrismaClient {
-    [prop: string]: any;
-}
+import * as IPolling from './IPolling';
+import * as IAnswer from './IAnswer';
+import { PrismaClient } from '@prisma/client';
 
 /**
  * An answer to a Question. Has the id of the question it
@@ -13,46 +10,32 @@ interface PrismaClient {
  * The actual answer data is stored in string property .value().
  * Can be connected to Prisma database.
  */
-
 export default class Answer {
-    _questionId: string = '';
-
+    _questionId = '';
     _value: any = '';
-
     _answerer!: User;
-
-    _loadedFromDatabase: boolean = false;
-
-    _createdInDatabase: boolean = false;
-
-    _id: string = '';
-
+    _loadedFromDatabase = false;
+    _createdInDatabase = false;
+    _id = '';
     _database!: PrismaClient;
 
     /** Prisma database the instance is connected to. */
-
     database(): PrismaClient {
         return this._database;
     }
 
     /** Sets value of database. */
-
     setDatabase(database: PrismaClient): void {
-        //pre("argument database is of type PrismaClient", database instanceof PrismaClient);
-
         this._database = database;
-
         post('_database is database', this._database === database);
     }
 
     /** Unique id of the answer. Same as in database. */
-
     id(): string {
         return this._id;
     }
 
     /** Sets value of id. */
-
     setId(id: string): void {
         pre('argument id is of type string', typeof id === 'string');
 
@@ -62,25 +45,21 @@ export default class Answer {
     }
 
     /** Whether an answer object has been created in the database from this instance. */
-
     createdInDatabase(): boolean {
         return this._createdInDatabase;
     }
 
     /** Whether the instance has had its data populates from the database. */
-
     loadedFromDatabase(): boolean {
         return this._loadedFromDatabase;
     }
 
     /** The User that gave the answer. */
-
     answerer(): User {
         return this._answerer;
     }
 
     /** Sets value of answerer. */
-
     setAnswerer(answerer: User): void {
         pre('argument answerer is of type User', answerer instanceof User);
 
@@ -94,13 +73,11 @@ export default class Answer {
      * consideration whether the answer value itself is in a correct format
      * or not.
      */
-
     value(): any {
         return this._value;
     }
 
     /** Sets value of value. */
-
     setValue(value: any): void {
         this._value = value;
 
@@ -108,13 +85,11 @@ export default class Answer {
     }
 
     /** Database id of the Question that was answered. */
-
     questionId(): string {
         return this._questionId;
     }
 
     /** Sets value of questionId. */
-
     setQuestionId(questionId: string): void {
         pre(
             'argument questionId is of type string',
@@ -126,24 +101,11 @@ export default class Answer {
         post('_questionId is questionId', this._questionId === questionId);
     }
 
-    constructor() {}
-
     /**
      * Sets the instance properties from an object
      * received from the Prisma database.
      */
-
-    setFromDatabaseData(answerData: {
-        id: string;
-
-        questionId: string;
-
-        voterId: string;
-
-        voter?: any;
-
-        value: string;
-    }): void {
+    setFromDatabaseData(answerData: IAnswer.AnswerData): void {
         pre('answerData is of type object', typeof answerData === 'object');
 
         pre(
@@ -161,25 +123,17 @@ export default class Answer {
             typeof answerData.value === 'string'
         );
 
-        // pre("answerData.voterId is of type string", typeof answerData.voterId === "string");
-
-        /* pre("answerData.voter is of type object", typeof answerData.voter === "object"); */
-
         this.setId(answerData.id);
-
         this.setQuestionId(answerData.questionId);
-
         this.setValue(answerData.value);
 
-        var answerer;
+        let answerer;
 
         if (typeof answerData.voter === 'object') {
             answerer = new User();
-
             answerer.setFromDatabaseData(answerData.voter);
         } else if (typeof answerData.voterId == 'string') {
             answerer = new User();
-
             answerer.setFromDatabaseData({ id: answerData.voterId });
         }
 
@@ -192,14 +146,12 @@ export default class Answer {
      * Makes new object in Prisma database from the values
      * of the properties of this instance.
      */
-
     async createNewInDatabase(): Promise<void> {
-        var data = await this._database.vote.create({
+        const data = await this._database.vote.create({
             data: this.newDatabaseObject()
         });
 
         this.setFromDatabaseData(data);
-
         this._createdInDatabase = true;
     }
 
@@ -207,21 +159,15 @@ export default class Answer {
      * New object that can be added to Prisma database. Constructed from the values
      * of the properties of this instance.
      */
-
-    newDatabaseObject(): any {
+    newDatabaseObject(): IAnswer.NewAnswerData {
         pre('questionId is set', this.questionId().length > 0);
-
         pre('answerer is set', this.answerer() instanceof User);
-
         pre('answerer is identifiable', this.answerer().isIdentifiable());
-
         pre('answerer id is set', this.answerer().id().length > 0);
 
         return {
             questionId: this.questionId(),
-
             value: this.value().toString(),
-
             voterId: this.answerer().id()
         };
     }
@@ -234,11 +180,8 @@ export default class Answer {
     privateDataObj(): IPolling.AnswerData {
         return {
             id: this.id(),
-
             questionId: this.questionId(),
-
             value: this.value(),
-
             answerer: this.answerer().publicDataObj()
         };
     }

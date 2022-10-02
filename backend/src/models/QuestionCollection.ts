@@ -1,23 +1,15 @@
 import { pre, post } from '../utils/designByContract';
 import Question from './Question';
-
-/* import { PrismaClient } from '@prisma/client'; */
-
-interface PrismaClient {
-    [prop: string]: any;
-}
+import * as IQuestionCollection from './IQuestionCollection';
+import { PrismaClient } from '@prisma/client';
 
 /**
  * Collection of Question instances.
  */
-
 export default class QuestionCollection {
     _database: PrismaClient;
-
     _questions: { [id: string]: Question } = {};
-
-    _pollId: string = '';
-
+    _pollId = '';
     _databaseData: Array<{ [prop: string]: any }> = [];
 
     /**
@@ -25,13 +17,11 @@ export default class QuestionCollection {
      * instances in this collection. Updates each time
      * .setFromDatabaseData() is called.
      */
-
     databaseData(): Array<{ [prop: string]: any }> {
         return this._databaseData;
     }
 
     /** Sets value of databaseData. */
-
     setDatabaseData(databaseData: Array<{ [prop: string]: any }>): void {
         pre(
             'argument databaseData is of type Array<object>',
@@ -47,13 +37,11 @@ export default class QuestionCollection {
     }
 
     /** Questions in the collection. */
-
     questions(): { [id: string]: Question } {
         return this._questions;
     }
 
     /** Sets value of questions. */
-
     setQuestions(questions: { [id: string]: Question }): void {
         pre(
             'argument questions is of type object',
@@ -66,16 +54,12 @@ export default class QuestionCollection {
     }
 
     /** Database the question collection is connected to. */
-
     database(): PrismaClient {
         return this._database;
     }
 
     /** Sets value of database. */
-
     setDatabase(database: PrismaClient): void {
-        // pre("argument database is of type PrismaClient", database instanceof PrismaClient);
-
         this._database = database;
 
         post('_database is database', this._database === database);
@@ -88,7 +72,6 @@ export default class QuestionCollection {
         pre('database is of type object', typeof database === 'object');
 
         this._database = database;
-
         this._questions = questions;
     }
 
@@ -97,7 +80,6 @@ export default class QuestionCollection {
      * Id of question is used as key for when adding to
      * .questions().
      */
-
     add(question: Question): void {
         pre('question is of type Question', question instanceof Question);
 
@@ -109,15 +91,14 @@ export default class QuestionCollection {
      * to data given in array of database objects for
      * questions.
      */
-
-    setFromDatabaseObj(questionsData: Array<any>): void {
+    setFromDatabaseObj(
+        questionsData: Array<IQuestionCollection.QuestionData>
+    ): void {
         for (let i = 0; i < questionsData.length; i++) {
-            var questionData = questionsData[i];
-
+            const questionData = questionsData[i];
             questionData.votes = [];
 
-            var question = new Question();
-
+            const question = new Question();
             question.setFromDatabaseData(questionData);
 
             this.questions()[questionData.id] = question;
@@ -128,16 +109,14 @@ export default class QuestionCollection {
      * Loads questions into collection from
      * database by querying with pollId.
      */
-
     async loadFromDatabase(): Promise<{ [prop: string]: any }> {
-        var questionsData = await this.database().question.findMany({
+        const questionsData = await this.database().question.findMany({
             where: {
                 pollId: this.pollId()
             }
         });
 
         this.setQuestions({});
-
         this.setFromDatabaseObj(questionsData);
 
         return questionsData;
@@ -147,7 +126,6 @@ export default class QuestionCollection {
      * Creates database entries from instances
      * in this collection.
      */
-
     async createNewInDatabase(): Promise<void> {
         pre('database is set', typeof this.database() === 'object');
 
@@ -160,7 +138,7 @@ export default class QuestionCollection {
             data: this.newDatabaseObject()
         });
 
-        var questionsData = await this.database().question.findMany({
+        const questionsData = await this.database().question.findMany({
             where: {
                 pollId: this.pollId()
             }
@@ -169,31 +147,24 @@ export default class QuestionCollection {
         this.setQuestions({});
 
         for (let i = 0; i < questionsData.length; i++) {
-            var questionData = questionsData[i];
+            const questionData = questionsData[i];
 
-            questionData.votes = [];
-
-            var question = new Question();
-
+            const question = new Question();
             question.setFromDatabaseData(questionData);
 
             this.questions()[questionData.id] = question;
         }
-
-        return questionsData;
     }
 
     /**
      * Array of collection's question objects that can
      * be added to database.
      */
+    newDatabaseObject(): Array<IQuestionCollection.NewQuestionData> {
+        const result = [];
 
-    newDatabaseObject(): Array<{ [prop: string]: any }> {
-        var result = [];
-
-        for (let id in this.questions()) {
-            let question = this.questions()[id];
-
+        for (const id in this.questions()) {
+            const question = this.questions()[id];
             result.push(question.newDatabaseObject());
         }
 
@@ -204,15 +175,13 @@ export default class QuestionCollection {
      * Sets pollId for collection as well
      * as all Questions in collection.
      */
-
     setPollId(pollId: string): void {
         pre('pollId is of type string', typeof pollId === 'string');
 
         this._pollId = pollId;
 
-        for (let id in this.questions()) {
-            let question = this.questions()[id];
-
+        for (const id in this.questions()) {
+            const question = this.questions()[id];
             question.setPollId(pollId);
         }
     }
@@ -222,7 +191,6 @@ export default class QuestionCollection {
      * returns the pollId of the first question found.
      * If not, returns the static pollId property of the collection.
      */
-
     pollId(): string {
         if (Object.keys(this.questions()).length > 0) {
             return this.questions()[Object.keys(this.questions())[0]].pollId();

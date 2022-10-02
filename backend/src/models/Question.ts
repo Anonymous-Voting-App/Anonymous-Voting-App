@@ -1,12 +1,9 @@
 import { pre, post } from '../utils/designByContract';
 import User from './/User';
 import Answer from './Answer';
-import * as IPolling from '../models/IPolling';
-/* import { PrismaClient } from '@prisma/client'; */
-
-interface PrismaClient {
-    [prop: string]: any;
-}
+import * as IPolling from './IPolling';
+import * as IQuestion from './IQuestion';
+import { PrismaClient } from '@prisma/client';
 
 /**
  * A question that a Poll can have. Connected to Prisma database.
@@ -14,32 +11,22 @@ interface PrismaClient {
  * A user can .answer() the question to give their answer to it,
  * modifying the database.
  */
-
 export default class Question {
-    _title: string = '';
-
-    _description: string = '';
-
-    _type: string = '';
-
-    _id: string = '';
-
-    _pollId: string = '';
-
+    _title = '';
+    _description = '';
+    _type = '';
+    _id = '';
+    _pollId = '';
     _database!: PrismaClient;
-
     _answers: { [id: string]: Answer } = {};
-
     _databaseData: { [prop: string]: any } = {};
 
     /** Latest database data object. Updated whenever .setFromDatabaseData() is called. */
-
     databaseData(): { [prop: string]: any } {
         return this._databaseData;
     }
 
     /** Sets value of databaseData. */
-
     setDatabaseData(databaseData: { [prop: string]: any }): void {
         pre(
             'argument databaseData is of type object',
@@ -55,13 +42,11 @@ export default class Question {
     }
 
     /** Answers that have been given to the question. */
-
     answers(): { [id: string]: Answer } {
         return this._answers;
     }
 
     /** Sets value of answers. */
-
     setAnswers(answers: { [id: string]: Answer }): void {
         pre('argument answers is of type object', typeof answers === 'object');
 
@@ -71,13 +56,11 @@ export default class Question {
     }
 
     /** Prisma database the instance is connected to. */
-
     database(): PrismaClient {
         return this._database;
     }
 
     /** Sets value of database. */
-
     setDatabase(database: PrismaClient): void {
         //pre("argument database is of type PrismaClient", database instanceof PrismaClient);
 
@@ -87,13 +70,11 @@ export default class Question {
     }
 
     /** Unique database id of the poll the question is for. */
-
     pollId(): string {
         return this._pollId;
     }
 
     /** Sets value of pollId. */
-
     setPollId(pollId: string): void {
         pre('argument pollId is of type string', typeof pollId === 'string');
 
@@ -103,13 +84,11 @@ export default class Question {
     }
 
     /** Unique database id of the question. */
-
     id(): string {
         return this._id;
     }
 
     /** Sets value of id. */
-
     setId(id: string): void {
         pre('argument id is of type string', typeof id === 'string');
 
@@ -121,13 +100,11 @@ export default class Question {
     /** Type of the question. The Question class is a generic
      * question that can take any freeform answer string.
      */
-
     type(): string {
         return this._type;
     }
 
     /** Sets value of type. */
-
     setType(type: string): void {
         pre('argument type is of type string', typeof type === 'string');
 
@@ -139,13 +116,11 @@ export default class Question {
     /** Description of the question describing the question
      * to a user.
      */
-
     description(): string {
         return this._description;
     }
 
     /** Sets value of description. */
-
     setDescription(description: string): void {
         pre(
             'argument description is of type string',
@@ -158,13 +133,11 @@ export default class Question {
     }
 
     /** Title or name of the question. */
-
     title(): string {
         return this._title;
     }
 
     /** Sets value of title. */
-
     setTitle(title: string): void {
         pre('argument title is of type string', typeof title === 'string');
 
@@ -182,11 +155,10 @@ export default class Question {
     /**
      * Adds instance's information to database.
      */
-
     async createNewInDatabase(): Promise<void> {
         pre('pollId is set', this.pollId().length > 0);
 
-        var data = await this._database.question.create({
+        const data = await this._database.question.create({
             data: this.newDatabaseObject()
         });
 
@@ -197,13 +169,12 @@ export default class Question {
      * Adds the question's information to the database as an option
      * into the option table.
      */
-
     async createNewInDatabaseAsOption(parentId: string): Promise<void> {
         pre('parentId is of type string', typeof parentId === 'string');
 
         pre('question is new', this.id().length == 0);
 
-        var data = await this._database.option.create({
+        const data = await this._database.option.create({
             data: this.newDatabaseObjectAsOption(parentId)
         });
 
@@ -214,14 +185,12 @@ export default class Question {
      * Makes new object from the instance's info that can
      * be added to Prisma database.
      */
-
-    newDatabaseObject(): { [prop: string]: any } {
+    newDatabaseObject(): IQuestion.NewQuestionData {
         return {
             // A test type that is in the database already.
             // The schema demands some kind of typeId
             // even though question type are not currently used for anything.
             typeId: '7b76d1c6-8f40-4509-8317-ce444892b1ee',
-
             pollId: this.pollId()
         };
     }
@@ -230,22 +199,7 @@ export default class Question {
      * Sets instance's properties from given question object
      * received from the database.
      */
-
-    setFromDatabaseData(questionData: {
-        id: string;
-
-        title?: string;
-
-        description?: string;
-
-        pollId: string;
-
-        type?: string;
-
-        votes?: Array<any>;
-
-        [extra: string]: any;
-    }): void {
+    setFromDatabaseData(questionData: IQuestion.QuestionData): void {
         pre('questionData is of type object', typeof questionData === 'object');
 
         pre(
@@ -277,9 +231,8 @@ export default class Question {
 
         if (Array.isArray(questionData.votes)) {
             for (let i = 0; i < questionData.votes.length; i++) {
-                var answerData = questionData.votes[i];
-
-                var answer = new Answer();
+                const answerData = questionData.votes[i];
+                const answer = new Answer();
 
                 answer.setFromDatabaseData(answerData);
 
@@ -296,12 +249,7 @@ export default class Question {
      * Sets the instance's information from an option object
      * received from the option database table.
      */
-
-    setFromOptionDatabaseData(optionData: {
-        id: string;
-
-        questionId: string;
-    }): void {
+    setFromOptionDatabaseData(optionData: IQuestion.OptionData): void {
         pre('optionData is of type object', typeof optionData === 'object');
 
         pre(
@@ -325,28 +273,19 @@ export default class Question {
      * If given answer data is not of acceptable format for the question,
      * does nothing and returns undefined.
      */
-
     async answer(
-        answerData: {
-            answer: any;
-
-            [extra: string]: any;
-        },
+        answerData: IQuestion.AnswerData,
         answerer: User
     ): Promise<Answer | null> {
         pre('answerData is of type object', typeof answerData === 'object');
-
         pre('answerer is of type User', answerer instanceof User);
 
         if (this.answerDataIsAcceptable(answerData)) {
-            var answer = new Answer();
+            const answer = new Answer();
 
             answer.setDatabase(this._database);
-
             answer.setQuestionId(this.id());
-
             answer.setValue(answerData.answer);
-
             answer.setAnswerer(answerer);
 
             await answer.createNewInDatabase();
@@ -364,13 +303,8 @@ export default class Question {
      * treating the answer instance in the database
      * through the 'option' table.
      */
-
     async answerAsOption(
-        answerData: {
-            answer: any;
-
-            [extra: string]: any;
-        },
+        answerData: IQuestion.AnswerData,
         answerer: User,
         parentId: string
     ): Promise<Answer> {
@@ -379,14 +313,11 @@ export default class Question {
         pre('answerer is of type User', answerer instanceof User);
 
         if (this.answerDataIsAcceptable(answerData)) {
-            var answer = new Answer();
+            const answer = new Answer();
 
             answer.setDatabase(this._database);
-
             answer.setQuestionId(parentId);
-
             answer.setValue(answerData.answer);
-
             answer.setAnswerer(answerer);
 
             await answer.createNewInDatabase();
@@ -408,12 +339,7 @@ export default class Question {
      * answerData.answer is also left up to inheriting sub-classes to restrict
      * if they so wish.
      */
-
-    answerDataIsAcceptable(answerData: {
-        answer: any;
-
-        [extra: string]: any;
-    }): boolean {
+    answerDataIsAcceptable(answerData: IQuestion.AnswerData): boolean {
         pre('answerData is of type object', typeof answerData === 'object');
 
         return answerData.answer !== undefined;
@@ -422,17 +348,12 @@ export default class Question {
     /**
      * A data object of the question's non-sensitive public information.
      */
-
     publicDataObj(): IPolling.QuestionData {
         return {
             id: this.id(),
-
             title: this.title(),
-
             description: this.description(),
-
             type: this.type(),
-
             pollId: this.pollId()
         };
     }
@@ -441,10 +362,8 @@ export default class Question {
      * Populates the Question's fields data from
      * given data object representing information for a new question.
      */
-
-    setFromRequest(request: IPolling.QuestionRequest): void {
+    setFromRequest(request: IQuestion.QuestionRequest): void {
         this.setTitle(request.title);
-
         this.setDescription(request.description);
     }
 
@@ -452,11 +371,9 @@ export default class Question {
      * A new object that can be added to database with this instance's information.
      * Has the form required for adding to the option table.
      */
-
-    newDatabaseObjectAsOption(parentId: string): { [prop: string]: any } {
+    newDatabaseObjectAsOption(parentId: string): IQuestion.NewOptionData {
         return {
             option: this.title(),
-
             questionId: parentId
         };
     }
@@ -465,12 +382,7 @@ export default class Question {
      * Sets the instance's information from an object
      * receive from the option database table.
      */
-
-    setFromOptionData(optionData: {
-        option: string;
-        questionId?: string;
-        id: string;
-    }): void {
+    setFromOptionData(optionData: IQuestion.QuestionDataOptions): void {
         pre('optionData is of type object', typeof optionData === 'object');
 
         pre(
@@ -484,7 +396,6 @@ export default class Question {
         );
 
         this.setTitle(optionData.option);
-
         this.setId(optionData.id);
     }
 }

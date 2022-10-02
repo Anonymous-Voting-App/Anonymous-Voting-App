@@ -95,74 +95,72 @@ export const router = Router();
  *            schema:
  *              type: object
  *              properties:
- *                data:
- *                  type: object
- *                  properties:
- *                    id:
- *                      type: string
- *                    name:
- *                      type: string
- *                    publicId:
- *                      type: string
- *                    privateId:
- *                      type: string
- *                    type:
- *                      type: string
- *                    owner:
+ *                type: object
+ *                properties:
+ *                  id:
+ *                    type: string
+ *                  name:
+ *                    type: string
+ *                  publicId:
+ *                    type: string
+ *                  privateId:
+ *                    type: string
+ *                    format: uuid
+ *                  type:
+ *                    type: string
+ *                  owner:
+ *                    type: object
+ *                    properties:
+ *                      id:
+ *                        type: string
+ *                  questions:
+ *                    type: object
+ *                    additionalProperties:
  *                      type: object
  *                      properties:
  *                        id:
  *                          type: string
- *                    questions:
- *                      type: object
- *                      additionalProperties:
- *                        type: object
- *                        properties:
- *                          id:
- *                            type: string
- *                          title:
- *                            type: string
- *                          description:
- *                            type: string
- *                          pollId:
- *                            type: string
- *                          type:
- *                            type: string
- *                          subQuestions:
- *                            type: object
- *                            additionalProperties:
- *                              id:
- *                                type: string
- *                              title:
- *                                type: string
- *                              description:
- *                                type: string
- *                              type:
- *                                type: string
+ *                        title:
+ *                          type: string
+ *                        description:
+ *                          type: string
+ *                        pollId:
+ *                          type: string
+ *                        type:
+ *                          type: string
+ *                        subQuestions:
+ *                          type: object
+ *                          additionalProperties:
+ *                            id:
+ *                              type: string
+ *                            title:
+ *                              type: string
+ *                            description:
+ *                              type: string
+ *                            type:
+ *                              type: string
  *              example:
- *                data:
- *                  id: "12345"
- *                  name: "Name of poll."
- *                  publicId: "qmpheuvkmu"
- *                  privateId: "rqrhashrzg"
- *                  type: ""
- *                  owner:
- *                    id: "1eb1cfae-09e7-4456-85cd-e2edfff80544"
- *                  questions:
- *                    "403d1c8d-be0b-44cf-a855-a15e64b537c3":
- *                      id: "403d1c8d-be0b-44cf-a855-a15e64b537c3"
- *                      title: "Title of question."
- *                      description: "Description of the question."
- *                      pollId: "12345"
- *                      type: ""
- *                      subQuestions:
- *                        "232861a3-687d-4fe2-a2bc-e04962468676":
- *                          id: "232861a3-687d-4fe2-a2bc-e04962468676"
- *                          title: "Title of question."
- *                          description: "Description of the question."
- *                          pollId: "12345"
- *                          type: ""
- *
+ *                id: "12345"
+ *                name: "Name of poll."
+ *                publicId: "6dac8ce7-19ba-45de-9610-1d352b02614a"
+ *                privateId: "40527383-f6ba-4dba-9317-59ac7c0a0b7f"
+ *                type: ""
+ *                owner:
+ *                  id: "1eb1cfae-09e7-4456-85cd-e2edfff80544"
+ *                questions:
+ *                  "403d1c8d-be0b-44cf-a855-a15e64b537c3":
+ *                    id: "403d1c8d-be0b-44cf-a855-a15e64b537c3"
+ *                    title: "Title of question."
+ *                    description: "Description of the question."
+ *                    pollId: "12345"
+ *                    type: ""
+ *                    subQuestions:
+ *                      "232861a3-687d-4fe2-a2bc-e04962468676":
+ *                        id: "232861a3-687d-4fe2-a2bc-e04962468676"
+ *                        title: "Title of question."
+ *                        description: "Description of the question."
+ *                        pollId: "12345"
+ *                        type: ""
  */
 router.post('/create', createPoll);
 
@@ -192,6 +190,7 @@ router.post('/create', createPoll);
  *                description: Id of the question to answer.
  *              publicId:
  *                type: string
+ *                format: uuid
  *                required: true
  *                description: Public id of the poll to answer.
  *              answer:
@@ -209,7 +208,7 @@ router.post('/create', createPoll);
  *                    description: Answer to the question's option, true / false string.
  *          example:
  *            questionId: "403d1c8d-be0b-44cf-a855-a15e64b537c3"
- *            publicId: "qmpheuvkmu"
+ *            publicId: "1baa179c-d6bb-4f23-9e3b-d76285e23d65"
  *            answer:
  *              subQuestionId: "8198ae35-0a06-4e86-93b3-109d0f337036"
  *              answer: "true"
@@ -221,20 +220,18 @@ router.post('/create', createPoll);
  *            schema:
  *              type: object
  *              properties:
- *                data:
- *                  type: object
- *                  properties:
- *                    id:
- *                      type: string
- *                    questionId:
- *                      type: string
- *                    value:
- *                      type: string
+ *                type: object
+ *                properties:
+ *                  id:
+ *                    type: string
+ *                  questionId:
+ *                    type: string
+ *                  value:
+ *                    type: string
  *              example:
- *                data:
- *                  id: "e93f46d0-662c-4030-bd3a-7ae58bcf605e"
- *                  questionId: "403d1c8d-be0b-44cf-a855-a15e64b537c3"
- *                  value: "true"
+ *                id: "e93f46d0-662c-4030-bd3a-7ae58bcf605e"
+ *                questionId: "403d1c8d-be0b-44cf-a855-a15e64b537c3"
+ *                value: "true"
  *
  */
 router.post('/answer', answerPoll);
@@ -252,6 +249,7 @@ router.post('/answer', answerPoll);
  *        name: publicId
  *        required: true
  *        type: string
+ *        format: uuid
  *        description: publicId of the poll to fetch.
  *    responses:
  *      200:
@@ -261,63 +259,62 @@ router.post('/answer', answerPoll);
  *            schema:
  *              type: object
  *              properties:
- *                data:
- *                  type: object
- *                  properties:
- *                    id:
- *                      type: string
- *                    name:
- *                      type: string
- *                    publicId:
- *                      type: string
- *                    type:
- *                      type: string
- *                    questions:
- *                      type: object
- *                      additionalProperties:
- *                        type: object
- *                        properties:
- *                          id:
- *                            type: string
- *                          title:
- *                            type: string
- *                          description:
- *                            type: string
- *                          pollId:
- *                            type: string
- *                          type:
- *                            type: string
- *                          subQuestions:
- *                            type: object
- *                            additionalProperties:
- *                              id:
- *                                type: string
- *                              title:
- *                                type: string
- *                              description:
- *                                type: string
- *                              type:
- *                                type: string
- *              example:
- *                data:
- *                  id: "3ef8119f-cdaf-4d69-bf8e-bf0ef745cbc4"
- *                  name: "Name of poll."
- *                  publicId: "qmpheuvkmu"
- *                  type: ""
+ *                type: object
+ *                properties:
+ *                  id:
+ *                    type: string
+ *                  name:
+ *                    type: string
+ *                  publicId:
+ *                    type: string
+ *                    format: uuid
+ *                  type:
+ *                    type: string
  *                  questions:
- *                    "f9a01044-cd66-4eab-b7c6-a7071c1e9dae":
- *                      id: "f9a01044-cd66-4eab-b7c6-a7071c1e9dae"
- *                      title: "Title of question."
- *                      description: "Description of the question."
- *                      pollId: "3ef8119f-cdaf-4d69-bf8e-bf0ef745cbc4"
- *                      type: ""
- *                      subQuestions:
- *                        "d9606f3a-974d-43f8-a20a-1ecd6edc8b59":
- *                          id: "d9606f3a-974d-43f8-a20a-1ecd6edc8b59"
- *                          type: ""
- *                          title: "Title of sub-question."
- *                          description: "Description of sub-question."
- *                          pollId: "3ef8119f-cdaf-4d69-bf8e-bf0ef745cbc4"
+ *                    type: object
+ *                    additionalProperties:
+ *                      type: object
+ *                      properties:
+ *                        id:
+ *                          type: string
+ *                        title:
+ *                          type: string
+ *                        description:
+ *                          type: string
+ *                        pollId:
+ *                          type: string
+ *                        type:
+ *                          type: string
+ *                        subQuestions:
+ *                          type: object
+ *                          additionalProperties:
+ *                            id:
+ *                              type: string
+ *                            title:
+ *                              type: string
+ *                            description:
+ *                              type: string
+ *                            type:
+ *                              type: string
+ *              example:
+ *                id: "3ef8119f-cdaf-4d69-bf8e-bf0ef745cbc4"
+ *                name: "Name of poll."
+ *                publicId: "e19330ee-2115-4c2f-91bc-3916c621a7b9"
+ *                type: ""
+ *                questions:
+ *                  "f9a01044-cd66-4eab-b7c6-a7071c1e9dae":
+ *                    id: "f9a01044-cd66-4eab-b7c6-a7071c1e9dae"
+ *                    title: "Title of question."
+ *                    description: "Description of the question."
+ *                    pollId: "3ef8119f-cdaf-4d69-bf8e-bf0ef745cbc4"
+ *                    type: ""
+ *                    subQuestions:
+ *                      "d9606f3a-974d-43f8-a20a-1ecd6edc8b59":
+ *                        id: "d9606f3a-974d-43f8-a20a-1ecd6edc8b59"
+ *                        type: ""
+ *                        title: "Title of sub-question."
+ *                        description: "Description of sub-question."
+ *                        pollId: "3ef8119f-cdaf-4d69-bf8e-bf0ef745cbc4"
  *
  */
 router.get('/fetch/:publicId', fetchPoll);
