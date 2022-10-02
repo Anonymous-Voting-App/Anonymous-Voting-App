@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import logo from '../logo.svg';
 import './App.scss';
+import { Header } from './Header';
+import PollCreationPage from './PollCreationPage';
 
 function App() {
     // Just testing, this can be removed :)
@@ -28,15 +30,8 @@ function App() {
 
     return (
         <div className="App">
-            <header className="App-header">
-                <img src={logo} className="App-logo" alt="logo" />
-                <p>
-                    Backend {backendStatus ? 'connected' : 'not connected'}
-                    <br />
-                    Database {databaseStatus ? 'connected' : 'not connected'}
-                </p>
-                <button onClick={testBackend}>Check connection</button>
-            </header>
+           <Header></Header>
+           <PollCreationPage></PollCreationPage>
         </div>
     );
 }
