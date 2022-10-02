@@ -6,7 +6,7 @@
 
 ## Foreword
 
-This is a basic guideline for developing the backend, it contains nothing major but it's just simple document where I 
+This is a basic guideline for developing the backend, it contains nothing major but it's just simple document where I
 list how some basic stuff should be implemented.
 
 I should have specified these guidelines earlier but as I forgot I'll do it now :)
@@ -32,7 +32,7 @@ Read more from here [https://eslint.org/docs/latest/rules/no-var](https://eslint
 ## Interfaces
 
 When developing with TypeScript, prefer using separate interfaces instead of defining the type in the function definition.
-This makes it easier to understand the project. 
+This makes it easier to understand the project.
 
 ## REST API endpoints
 
@@ -42,11 +42,9 @@ To maintain consistent HTTP response style, use the responses found in the `util
 
 ## Prefer ES6 features over ES5
 
-This includes, for example, arrow functions and import instead of require. 
+This includes, for example, arrow functions and import instead of require.
 
 ## No console.log
 
 The only Logger that should be used outside of your personal development environment
 is the Winston logger which can be imported from `utils/logger.ts`-file.
-
-
