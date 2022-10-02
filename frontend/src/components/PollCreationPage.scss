@@ -7,16 +7,13 @@
   }
   
 
-    .MuiContainer-root{
+.MuiContainer-root{
         margin-top: 100px;
         display: flex !important;
         flex-direction: column;
         justify-content: center;
         align-items: center;
-    }
-
-
-
+}
 
 .page-heading{
     display: flex;
@@ -36,6 +33,7 @@
          }
     }
 }
+
 .poll-name{
     margin-top:4.3rem;
     .MuiInputBase-root{
@@ -47,9 +45,7 @@
     }
 }
 
-
 .add-ques-btn{
-   
     border-radius : 20px !important;
     width: 16.25rem !important;
     color:$main-color !important;
@@ -60,9 +56,7 @@
         font-size: 2.5rem; 
      }
 
-
-
-.MuiSvgIcon-root{
+   .MuiSvgIcon-root{
     margin-right:0.625rem
 }
 }
@@ -78,6 +72,7 @@
         font-size: 2.5rem; 
      }
     }
+
 .question-container{
     display: flex;
     justify-content: center;
