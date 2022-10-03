@@ -27,9 +27,13 @@ jobs:
         name: Check for changes
         runs-on: ubuntu-latest
         needs: scan-code
+        outputs:
+            backend: ${{ steps.filter.outputs.backend }}
+            frontend: ${{ steps.filter.outputs.frontend }}
         steps:
+            - uses: actions/checkout@main
             - uses: dorny/paths-filter@v2
-              id: changes
+              id: filter
               with:
                   filters: |
                       backend:
