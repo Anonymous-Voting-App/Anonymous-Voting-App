@@ -42,7 +42,7 @@ jobs:
                       - 'frontend/**'
 
     check-style-frontend:
-        name: Check code style
+        name: Check frontend code style
         needs: check-for-changes
         if: ${{ needs.check-for-changes.outputs.frontend == 'true' }}
         runs-on: ubuntu-latest
@@ -57,7 +57,7 @@ jobs:
             - run: npm run eslint:frontend -- --max-warnings=0
 
     check-style-backend:
-        name: Check code style
+        name: Check backend code style
         needs: check-for-changes
         if: ${{ needs.check-for-changes.outputs.frontend == 'true' }}
         runs-on: ubuntu-latest
