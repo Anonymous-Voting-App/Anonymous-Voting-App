@@ -23,10 +23,25 @@ jobs:
                   GITHUB_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
                   GITGUARDIAN_API_KEY: ${{ secrets.GITGUARDIAN_API_KEY }}
 
-    check-style:
-        name: Check code style
+    check-for-changes:
+        name: Check for changes
         runs-on: ubuntu-latest
         needs: scan-code
+        steps:
+            - uses: dorny/paths-filter@v2
+              id: changes
+              with:
+                  filters: |
+                      backend:
+                      - 'backend/**'
+                      frontend:
+                      - 'frontend/**'
+
+    check-style-frontend:
+        name: Check code style
+        if: steps.changes.outputs.frontend == 'true'
+        runs-on: ubuntu-latest
+        needs: check-for-changes
         steps:
             - uses: actions/checkout@main
             - uses: actions/setup-node@main
@@ -34,12 +49,28 @@ jobs:
                   node-version: lts/*
                   cache: npm
             - run: npm ci
-            - run: npm run check-style
+            - run: npm run prettier:frontend
+            - run: npm run eslint:frontend -- --max-warnings=0
+
+    check-style-backend:
+        name: Check code style
+        if: steps.changes.outputs.backend == 'true'
+        runs-on: ubuntu-latest
+        needs: check-for-changes
+        steps:
+            - uses: actions/checkout@main
+            - uses: actions/setup-node@main
+              with:
+                  node-version: lts/*
+                  cache: npm
+            - run: npm ci
+            - run: npm run prettier:backend
+            - run: npm run eslint:backend -- --max-warnings=0
 
     frontend-test:
         name: Test frontend
         runs-on: ubuntu-latest
-        needs: check-style
+        needs: check-style-frontend
 
         defaults:
             run:
@@ -92,7 +123,7 @@ jobs:
 
     backend-test:
         name: Test backend
-        needs: check-style
+        needs: check-style-backend
         runs-on: ubuntu-latest
 
         defaults:
