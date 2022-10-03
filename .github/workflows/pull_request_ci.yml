@@ -54,7 +54,7 @@ jobs:
                   cache: npm
             - run: npm ci
             - run: npm run prettier:frontend
-            - run: npm run eslint:frontend -- --max-warnings=0
+            - run: npm run eslint:frontend
 
     check-style-backend:
         name: Check backend code style
@@ -69,7 +69,7 @@ jobs:
                   cache: npm
             - run: npm ci
             - run: npm run prettier:backend
-            - run: npm run eslint:backend -- --max-warnings=0
+            - run: npm run eslint:backend
 
     frontend-test:
         name: Test frontend
