@@ -1,72 +1,71 @@
 @import '../styles/colors';
 
 @mixin for-phone-only {
-    @media (max-width: 599px) { @content; }
-  }
-  
+    @media (max-width: 599px) {
+        @content;
+    }
+}
 
-.question-wrapper{
-    margin-top:4.5rem;
+.question-wrapper {
+    margin-top: 4.5rem;
     display: flex !important;
-       flex-direction: column !important;
+    flex-direction: column !important;
     align-items: center;
 }
 
-.type-dropdown{
+.type-dropdown {
     // .css-1sumxir-MuiFormLabel-root-MuiInputLabel-root.Mui-focused {
     //     display: none;
     // }
-    .MuiFormLabel-root{
-        left:4.25rem;
+    .MuiFormLabel-root {
+        left: 4.25rem;
     }
-    .MuiInputBase-root{
+    .MuiInputBase-root {
         background-color: $btn-background-color;
         border-radius: 1.25rem;
         min-width: 16.25rem;
-        border:1px solid $main-color;
-        .MuiSvgIcon-root{
-            left:1.875rem;
+        border: 1px solid $main-color;
+        .MuiSvgIcon-root {
+            left: 1.875rem;
         }
     }
-    
 }
 
-.question-field{
-    .MuiInputBase-root{
+.question-field {
+    .MuiInputBase-root {
         min-width: 16.25rem;
-        border-radius:1.25rem;
-        height:2.5rem;
-        border:1px solid $main-color;
-        margin-top:1.25rem;
+        border-radius: 1.25rem;
+        height: 2.5rem;
+        border: 1px solid $main-color;
+        margin-top: 1.25rem;
         margin-bottom: 1.25rem;
     }
 }
 
-.option-field{
-    .MuiInputBase-root{
+.option-field {
+    .MuiInputBase-root {
         width: 14.5rem;
-        border-radius:1.25rem;
-        height:2.5rem;
-        border:1px solid $main-color;
+        border-radius: 1.25rem;
+        height: 2.5rem;
+        border: 1px solid $main-color;
         margin-bottom: 0.625rem;
     }
 }
 
-.add-option-btn{
- margin-top:none;  
- border-radius : 20px !important;
- width: 14.5rem!important;
- margin-top:0;
- color:$main-color !important;
- background-color: $btn-background-color !important;
- text-transform: none !important;
- border:2px solid $main-color !important;
- @include for-phone-only {    
-     font-size: 2.5rem; 
-  }
+.add-option-btn {
+    margin-top: none;
+    border-radius: 20px !important;
+    width: 14.5rem !important;
+    margin-top: 0;
+    color: $main-color !important;
+    background-color: $btn-background-color !important;
+    text-transform: none !important;
+    border: 2px solid $main-color !important;
+    @include for-phone-only {
+        font-size: 2.5rem;
+    }
 
-.MuiSvgIcon-root{
- margin-right:0.625rem
-}
-
+    .MuiSvgIcon-root {
+        margin-right: 0.625rem;
+    }
 }
