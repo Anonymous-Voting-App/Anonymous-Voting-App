@@ -19,9 +19,17 @@ To utilize code formatting on commit, run `npm install` in the project root fold
 
 ## Project deployment
 
-The project deployment is spread to two different branches:
+The project deployment is spread to three different versions:
 
--   Main: Production code => When code is pushed to `main`, it will go to production
--   Dev: Staging code => When code is pushed to `dev`, it will go to staging environment
-
-When PR is created to merge code to `dev`-branch, the code will be build and set to development environment.
+-   Production
+    -   When code is pushed to `main`, it will be deployed to production environment
+    -   Website URL: TBD
+    -   API URL: TBD
+-   Staging
+    -   When code is pushed to `dev`, it will be deployed to staging environment
+    -   Website URL: [https://d2l9c7s1roosdj.cloudfront.net/](https://d2l9c7s1roosdj.cloudfront.net/)
+    -   API URL: [https://d2l9c7s1roosdj.cloudfront.net/api/](https://d2l9c7s1roosdj.cloudfront.net/api/)
+-   Dev
+    -   When PR is created against `dev`, the code of the PR will be deployed to dev environment
+    -   Website URL: [http://dev.knowit-anonymous-voting-app.aws.cybercom.dev.s3-website.eu-north-1.amazonaws.com/](http://dev.knowit-anonymous-voting-app.aws.cybercom.dev.s3-website.eu-north-1.amazonaws.com/)
+    -   API URL: [http://dev.knowit-anonymous-voting-app.aws.cybercom.dev.s3-website.eu-north-1.amazonaws.com/api/](http://dev.knowit-anonymous-voting-app.aws.cybercom.dev.s3-website.eu-north-1.amazonaws.com/api/)
