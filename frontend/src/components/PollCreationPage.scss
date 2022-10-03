@@ -1,79 +1,78 @@
 @import '../styles/colors';
 
-
-
 @mixin for-phone-only {
-    @media (max-width: 599px) { @content; }
-  }
-  
-
-.MuiContainer-root{
-        margin-top: 100px;
-        display: flex !important;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
+    @media (max-width: 599px) {
+        @content;
+    }
 }
 
-.page-heading{
+.MuiContainer-root {
+    margin-top: 100px;
+    display: flex !important;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.page-heading {
     display: flex;
     justify-content: center;
-    .MuiTypography-root{
-        font-size: 2.5rem; 
-        @include for-phone-only {    
-            font-size: 2rem; 
-         }
+    .MuiTypography-root {
+        font-size: 2.5rem;
+        @include for-phone-only {
+            font-size: 2rem;
+        }
     }
-  
+
     .MuiSvgIcon-root {
-        transform : rotate(90deg);
-        font-size: 3rem; 
-        @include for-phone-only {    
-            font-size: 2.5rem; 
-         }
+        transform: rotate(90deg);
+        font-size: 3rem;
+        @include for-phone-only {
+            font-size: 2.5rem;
+        }
     }
 }
 
-.poll-name{
-    margin-top:4.3rem;
-    .MuiInputBase-root{
-        border-bottom:2px solid $main-color;
+.poll-name {
+    margin-top: 4.3rem;
+    .MuiInputBase-root {
+        border-bottom: 2px solid $main-color;
     }
-    .MuiFormLabel-root{
-        width:100%;
-        color:$placeholder-text-color;
+    .MuiFormLabel-root {
+        width: 100%;
+        color: $placeholder-text-color;
     }
 }
 
-.add-ques-btn{
-    border-radius : 20px !important;
+.add-ques-btn {
+    border-radius: 20px !important;
     width: 16.25rem !important;
-    color:$main-color !important;
+    color: $main-color !important;
     background-color: $btn-background-color !important;
     text-transform: none !important;
-    border:2px solid $main-color !important;
-    @include for-phone-only {    
-        font-size: 2.5rem; 
-     }
-
-   .MuiSvgIcon-root{
-    margin-right:0.625rem
-}
-}
-
-.submit-poll-btn{
-    border-radius : 20px !important;
-    width: 16.25rem !important;
-    color:$background-color !important;
-    background-color: $main-color !important;
-    text-transform: none !important;
-    border:2px solid $main-color !important;
-    @include for-phone-only {    
-        font-size: 2.5rem; 
-     }
+    border: 2px solid $main-color !important;
+    @include for-phone-only {
+        font-size: 2.5rem;
     }
 
-.question-container{
+    .MuiSvgIcon-root {
+        margin-right: 0.625rem;
+    }
+}
+
+.submit-poll-btn {
+    border-radius: 20px !important;
+    width: 16.25rem !important;
+    color: $background-color !important;
+    background-color: $main-color !important;
+    text-transform: none !important;
+    border: 2px solid $main-color !important;
+    @include for-phone-only {
+        font-size: 2.5rem;
+    }
+}
+
+.question-container {
     display: flex;
     justify-content: center;
     flex-direction: column;

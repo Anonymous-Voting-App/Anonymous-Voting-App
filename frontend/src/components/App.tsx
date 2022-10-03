@@ -30,8 +30,8 @@ function App() {
 
     return (
         <div className="App">
-           <Header></Header>
-           <PollCreationPage></PollCreationPage>
+            <Header></Header>
+            <PollCreationPage></PollCreationPage>
         </div>
     );
 }
