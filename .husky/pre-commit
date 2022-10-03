@@ -2,5 +2,6 @@
 . "$(dirname -- "$0")/_/husky.sh"
 
 npm run lint
+npm run eslint
 cd frontend && npm test -- --watchAll=false
 cd ../backend && npm test -- --watchAll=false

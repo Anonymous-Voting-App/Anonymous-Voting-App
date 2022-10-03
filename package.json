@@ -5,7 +5,12 @@
     "scripts": {
         "prepare": "husky install",
         "lint": "lint-staged",
-        "check-style": "prettier --check ."
+        "prettier": "prettier --check .",
+        "prettier:backend": "prettier --check ./backend",
+        "prettier:frontend": "prettier --check ./frontend",
+        "eslint": "eslint .",
+        "eslint:backend": "eslint ./backend",
+        "eslint:frontend": "eslint ./frontend"
     },
     "lint-staged": {
         "*.{js,jsx,ts,tsx,json,css,scss,md,html,yml}": [
@@ -15,6 +20,7 @@
     "author": "",
     "license": "MIT",
     "devDependencies": {
+        "eslint": "^8.24.0",
         "husky": "^8.0.0",
         "lint-staged": "^13.0.3",
         "prettier": "^2.7.1"
