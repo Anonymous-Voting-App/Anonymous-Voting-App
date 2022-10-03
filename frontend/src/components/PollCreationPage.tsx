@@ -1,5 +1,5 @@
 import { Container, Typography, TextField, Button } from '@mui/material';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { ArrowRightAlt, AddCircleOutline } from '@mui/icons-material';
 import './PollCreationPage.scss';
 import QuestionComponent from './QuestionComponent';
