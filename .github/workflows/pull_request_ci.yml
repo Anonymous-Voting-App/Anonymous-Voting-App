@@ -39,7 +39,7 @@ jobs:
 
     check-style-frontend:
         name: Check code style
-        if: steps.changes.outputs.frontend == 'true'
+        if: check-for-changes.steps.changes.outputs.frontend == 'true'
         runs-on: ubuntu-latest
         needs: check-for-changes
         steps:
@@ -54,7 +54,7 @@ jobs:
 
     check-style-backend:
         name: Check code style
-        if: steps.changes.outputs.backend == 'true'
+        if: check-for-changes.steps.changes.outputs.backend == 'true'
         runs-on: ubuntu-latest
         needs: check-for-changes
         steps:
