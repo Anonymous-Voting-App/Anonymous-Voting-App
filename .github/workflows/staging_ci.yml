@@ -26,7 +26,6 @@ jobs:
     check-for-changes:
         name: Check for changes
         runs-on: ubuntu-latest
-        needs: scan-code
         outputs:
             backend: ${{ steps.filter.outputs.backend }}
             frontend: ${{ steps.filter.outputs.frontend }}
@@ -43,8 +42,7 @@ jobs:
 
     check-style-frontend:
         name: Check frontend code style
-        needs: check-for-changes
-        if: ${{ needs.check-for-changes.outputs.frontend == 'true' }}
+        needs: [scan-code, check-for-changes]
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@main
@@ -54,13 +52,16 @@ jobs:
                   cache: npm
             - run: npm ci
             - run: npm run prettier:frontend
-            - run: npm run eslint:frontend
 
-    check-style-backend:
-        name: Check backend code style
-        needs: check-for-changes
-        if: ${{ needs.check-for-changes.outputs.frontend == 'true' }}
+    frontend-lint:
+        name: Lint frontend
+        needs: check-style-frontend
         runs-on: ubuntu-latest
+
+        defaults:
+            run:
+                working-directory: frontend
+
         steps:
             - uses: actions/checkout@main
             - uses: actions/setup-node@main
@@ -68,13 +69,12 @@ jobs:
                   node-version: lts/*
                   cache: npm
             - run: npm ci
-            - run: npm run prettier:backend
-            - run: npm run eslint:backend
+            - run: npm run lint
 
     frontend-test:
         name: Test frontend
         runs-on: ubuntu-latest
-        needs: check-style-frontend
+        needs: frontend-lint
 
         defaults:
             run:
@@ -97,6 +97,7 @@ jobs:
     frontend-deploy-staging:
         name: Deploy frontend to staging environment
         needs: frontend-test
+        if: ${{ needs.check-for-changes.outputs.frontend == 'true' }}
         runs-on: ubuntu-latest
         permissions:
             id-token: write
@@ -125,9 +126,40 @@ jobs:
               run: |
                   aws s3 sync ./build s3://staging.knowit-anonymous-voting-app.aws.cybercom.dev
 
+    check-style-backend:
+        name: Check backend code style
+        needs: [scan-code, check-for-changes]
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@main
+            - uses: actions/setup-node@main
+              with:
+                  node-version: lts/*
+                  cache: npm
+            - run: npm ci
+            - run: npm run prettier:backend
+
+    backend-lint:
+        name: Lint backend
+        needs: check-style-backend
+        runs-on: ubuntu-latest
+
+        defaults:
+            run:
+                working-directory: backend
+
+        steps:
+            - uses: actions/checkout@main
+            - uses: actions/setup-node@main
+              with:
+                  node-version: lts/*
+                  cache: npm
+            - run: npm ci
+            - run: npm run lint
+
     backend-test:
         name: Test backend
-        needs: check-style-backend
+        needs: backend-lint
         runs-on: ubuntu-latest
 
         defaults:
@@ -151,6 +183,7 @@ jobs:
     backend-deploy-staging:
         name: Deploy backend to staging environment
         needs: backend-test
+        if: ${{ needs.check-for-changes.outputs.backend == 'true' }}
         runs-on: ubuntu-latest
         permissions:
             id-token: write

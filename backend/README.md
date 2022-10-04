@@ -26,4 +26,4 @@ Contains some HTTP responses in common format that should be used.
 
 ### Logger
 
-Logger contains definitions for winston, a logging library, that should be used. Just import Logger to use.
+Logger contains definitions for winston, a logging library, that should be used. Just import `Logger` to use.
