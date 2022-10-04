@@ -24,6 +24,7 @@
         "start": "react-scripts start",
         "build": "react-scripts build",
         "build:ci": "CI=true npm run build",
+        "lint": "eslint .",
         "test": "react-scripts test",
         "test:ci": "CI=true npm test -- --watchAll=false --coverage",
         "eject": "react-scripts eject"
