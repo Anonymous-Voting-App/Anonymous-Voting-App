@@ -2,7 +2,8 @@ import { Router } from 'express';
 import {
     createPoll,
     answerPoll,
-    fetchPoll
+    fetchPublicPoll,
+    fetchPrivatePoll
 } from '../../controllers/pollController';
 
 export const router = Router();
@@ -239,7 +240,7 @@ router.post('/answer', answerPoll);
 /**
  * Create poll
  * @openapi
- * /api/poll/fetch/{publicId}:
+ * /api/poll/publicPoll/{publicId}:
  *  get:
  *    description: Fetches a poll's public information using a publicId of the poll.
  *    produces:
@@ -317,4 +318,107 @@ router.post('/answer', answerPoll);
  *                        pollId: "3ef8119f-cdaf-4d69-bf8e-bf0ef745cbc4"
  *
  */
-router.get('/fetch/:publicId', fetchPoll);
+router.get('/publicPoll/:publicId', fetchPublicPoll);
+
+/**
+ * Create poll
+ * @openapi
+ * /api/poll/privatePoll/{privateId}:
+ *  get:
+ *    description: Fetches a poll's private information using a privateId of the poll for the admin view.
+ *    produces:
+ *      - application/json
+ *    parameters:
+ *      - in: path
+ *        name: privateId
+ *        required: true
+ *        type: string
+ *        format: uuid
+ *        description: privateId of the poll to fetch.
+ *    responses:
+ *      200:
+ *        description: Private information about a poll.
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                type: object
+ *                properties:
+ *                  id:
+ *                    type: string
+ *                  name:
+ *                    type: string
+ *                  publicId:
+ *                    type: string
+ *                    format: uuid
+ *                  privateId:
+ *                    type: string
+ *                    format: uuid
+ *                  type:
+ *                    type: string
+ *                  questions:
+ *                    type: object
+ *                    additionalProperties:
+ *                      type: object
+ *                      properties:
+ *                        id:
+ *                          type: string
+ *                        title:
+ *                          type: string
+ *                        description:
+ *                          type: string
+ *                        pollId:
+ *                          type: string
+ *                        type:
+ *                          type: string
+ *                        subQuestions:
+ *                          type: object
+ *                          additionalProperties:
+ *                            id:
+ *                              type: string
+ *                            title:
+ *                              type: string
+ *                            description:
+ *                              type: string
+ *                            type:
+ *                              type: string
+ *                  answers:
+ *                    type: object
+ *                    additionalProperties:
+ *                      type: object
+ *                      properties:
+ *                        id:
+ *                          type: string
+ *                        questionId:
+ *                          type: string
+ *                        value:
+ *                          type: string
+ *              example:
+ *                id: "d250c36c-f4b8-48aa-ad49-84fee79e720f"
+ *                name: "Name of poll."
+ *                publicId: "91fe768a-1645-472f-aaae-184a208cd15c"
+ *                privateId: "4c68018d-817b-45c3-865f-aa017d96b973"
+ *                type: ""
+ *                questions:
+ *                  "f9a01044-cd66-4eab-b7c6-a7071c1e9dae":
+ *                    id: "f9a01044-cd66-4eab-b7c6-a7071c1e9dae"
+ *                    title: "Title of question."
+ *                    description: "Description of the question."
+ *                    pollId: "d250c36c-f4b8-48aa-ad49-84fee79e720f"
+ *                    type: ""
+ *                    subQuestions:
+ *                      "d9606f3a-974d-43f8-a20a-1ecd6edc8b59":
+ *                        id: "d9606f3a-974d-43f8-a20a-1ecd6edc8b59"
+ *                        type: ""
+ *                        title: "Title of sub-question."
+ *                        description: "Description of sub-question."
+ *                        pollId: "d250c36c-f4b8-48aa-ad49-84fee79e720f"
+ *                answers:
+ *                  "bc05786f-769b-4462-86ee-8740de8eb341":
+ *                    id: "bc05786f-769b-4462-86ee-8740de8eb341"
+ *                    questionId: "f9a01044-cd66-4eab-b7c6-a7071c1e9dae"
+ *                    value: "true"
+ *
+ */
+router.get('/privatePoll/:privateId', fetchPrivatePoll);
