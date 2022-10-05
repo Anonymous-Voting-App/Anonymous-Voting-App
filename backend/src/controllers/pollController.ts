@@ -43,7 +43,7 @@ export const answerPoll = async (req: Request, res: Response) => {
     return await callService('answerPoll', req, res);
 };
 
-export const fetchPoll = async (req: Request, res: Response) => {
+export const fetchPublicPoll = async (req: Request, res: Response) => {
     try {
         req.body = req.params.publicId;
     } catch (e) {
@@ -51,4 +51,14 @@ export const fetchPoll = async (req: Request, res: Response) => {
     }
 
     return await callService('getPollWithPublicId', req, res);
+};
+
+export const fetchPrivatePoll = async (req: Request, res: Response) => {
+    try {
+        req.body = req.params.privateId;
+    } catch (e) {
+        return responses.badRequest(req, res);
+    }
+
+    return await callService('getPollWithPrivateId', req, res);
 };

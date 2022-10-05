@@ -355,7 +355,8 @@ export default class Poll {
             include: {
                 questions: {
                     include: {
-                        options: true
+                        options: true,
+                        votes: true
                     }
                 }
             }

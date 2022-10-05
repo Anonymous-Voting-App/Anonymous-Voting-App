@@ -128,6 +128,28 @@ export default class VotingService {
     }
 
     /**
+     * Returns a poll having given public id.
+     * If no such poll exists, return null.
+     */
+    async getPollWithPrivateId(
+        privateId: string
+    ): Promise<IPolling.PollData | null> {
+        pre('privateId is of type string', typeof privateId === 'string');
+
+        const poll = new Poll(this.database());
+
+        poll.setPrivateId(privateId);
+
+        if (await poll.existsInDatabase()) {
+            await poll.loadFromDatabase();
+
+            return poll.privateDataObj();
+        }
+
+        return null;
+    }
+
+    /**
      * Answers a poll that has given publicId.
      * If poll was answered successfully, returns created answer
      * info. If not, returns null.
