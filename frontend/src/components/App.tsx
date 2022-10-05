@@ -1,5 +1,6 @@
 import React from 'react';
 import './App.scss';
+import './NavBar.scss';
 import NavBar from './NavBar';
 import PollCreationPage from './PollCreationPage';
 //import PollAnsweringPage from './PollAnsweringPage';
