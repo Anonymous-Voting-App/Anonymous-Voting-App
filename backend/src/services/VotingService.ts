@@ -128,7 +128,7 @@ export default class VotingService {
     }
 
     /**
-     * Returns a poll having given public id.
+     * Returns a poll having given private id.
      * If no such poll exists, return null.
      */
     async getPollWithPrivateId(
