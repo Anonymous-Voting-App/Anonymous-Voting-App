@@ -97,7 +97,7 @@ jobs:
     frontend-deploy-dev:
         name: Deploy frontend to dev environment
         needs: frontend-test
-        if: ${{ needs.check-for-changes.outputs.frontend == 'true' || contains(github.event.head_commit.message, 'ci force') }}
+        if: ${{ needs.check-for-changes.outputs.frontend == 'true' }} || contains(github.event.head_commit.message, 'ci deploy')
         runs-on: ubuntu-latest
         permissions:
             id-token: write
@@ -183,7 +183,7 @@ jobs:
     backend-deploy-dev:
         name: Deploy backend to dev environment
         needs: backend-test
-        if: ${{ needs.check-for-changes.outputs.backend == 'true' || contains(github.event.head_commit.message, 'ci force') }}
+        if: ${{ needs.check-for-changes.outputs.backend == 'true' }} || contains(github.event.head_commit.message, 'ci deploy')
         runs-on: ubuntu-latest
         permissions:
             id-token: write
