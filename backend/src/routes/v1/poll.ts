@@ -3,7 +3,8 @@ import {
     createPoll,
     answerPoll,
     fetchPublicPoll,
-    fetchPrivatePoll
+    fetchPrivatePoll,
+    getPollAnswers
 } from '../../controllers/pollController';
 
 export const router = Router();
@@ -164,6 +165,28 @@ export const router = Router();
  *                        type: ""
  */
 router.post('/', createPoll);
+
+/**
+ * Get answers of a poll
+ * @openapi
+ * /api/poll/{publicId}/answers:
+ *  get:
+ *    description: Pre-defined dummy endpoint. Get public answer data of the poll.
+ *    produces:
+ *      - application/json
+ *    parameters:
+ *      - in: path
+ *        name: publicId
+ *        required: true
+ *        type: string
+ *        format: uuid
+ *        description: publicId of the poll to answer.
+ *    responses:
+ *      200:
+ *        description: Information about the answers to the poll.
+ *
+ */
+router.get('/:publicId/answers', getPollAnswers);
 
 /**
  * Answer poll
