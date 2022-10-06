@@ -40,6 +40,12 @@ export const createPoll = async (req: Request, res: Response) => {
 };
 
 export const answerPoll = async (req: Request, res: Response) => {
+    try {
+        req.body.publicId = req.params.publicId;
+    } catch (e) {
+        return responses.badRequest(req, res);
+    }
+
     return await callService('answerPoll', req, res);
 };
 

@@ -24,6 +24,6 @@ export const router = Router();
  *                  example: true
  *                database:
  *                  type: boolean
- *                  example: false
+ *                  example: true
  */
 router.get('/', checkHealth);

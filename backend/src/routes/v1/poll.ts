@@ -11,7 +11,7 @@ export const router = Router();
 /**
  * Create poll
  * @openapi
- * /api/poll/create:
+ * /api/poll:
  *  post:
  *    description: Creates a new poll from given information for specified user.
  *                  A poll consists of questions and each question has sub-questions.
@@ -163,12 +163,12 @@ export const router = Router();
  *                        pollId: "12345"
  *                        type: ""
  */
-router.post('/create', createPoll);
+router.post('/', createPoll);
 
 /**
  * Answer poll
  * @openapi
- * /api/poll/answer:
+ * /api/poll/{publicId}/answers:
  *  post:
  *    description: Answers an option of a question of a poll with given answer. The questionId should be the id
  *                  of the question to answer. The subQuestionId property of the answer object should be the id
@@ -176,6 +176,13 @@ router.post('/create', createPoll);
  *                  The term sub-question is used in case different kinds of sub-questions are added later.
  *    produces:
  *      - application/json
+ *    parameters:
+ *      - in: path
+ *        name: publicId
+ *        required: true
+ *        type: string
+ *        format: uuid
+ *        description: publicId of the poll to answer.
  *    requestBody:
  *      content:
  *        application/json:
@@ -189,11 +196,6 @@ router.post('/create', createPoll);
  *                type: string
  *                required: true
  *                description: Id of the question to answer.
- *              publicId:
- *                type: string
- *                format: uuid
- *                required: true
- *                description: Public id of the poll to answer.
  *              answer:
  *                type: object
  *                required: true
@@ -209,7 +211,6 @@ router.post('/create', createPoll);
  *                    description: Answer to the question's option, true / false string.
  *          example:
  *            questionId: "403d1c8d-be0b-44cf-a855-a15e64b537c3"
- *            publicId: "1baa179c-d6bb-4f23-9e3b-d76285e23d65"
  *            answer:
  *              subQuestionId: "8198ae35-0a06-4e86-93b3-109d0f337036"
  *              answer: "true"
@@ -235,12 +236,12 @@ router.post('/create', createPoll);
  *                value: "true"
  *
  */
-router.post('/answer', answerPoll);
+router.post('/:publicId/answers', answerPoll);
 
 /**
- * Create poll
+ * Gets polls public information
  * @openapi
- * /api/poll/publicPoll/{publicId}:
+ * /api/poll/{publicId}:
  *  get:
  *    description: Fetches a poll's public information using a publicId of the poll.
  *    produces:
@@ -318,12 +319,12 @@ router.post('/answer', answerPoll);
  *                        pollId: "3ef8119f-cdaf-4d69-bf8e-bf0ef745cbc4"
  *
  */
-router.get('/publicPoll/:publicId', fetchPublicPoll);
+router.get('/:publicId', fetchPublicPoll);
 
 /**
- * Create poll
+ * Gets polls info for admin view
  * @openapi
- * /api/poll/privatePoll/{privateId}:
+ * /api/poll/admin/{privateId}:
  *  get:
  *    description: Fetches a poll's private information using a privateId of the poll for the admin view.
  *    produces:
@@ -421,4 +422,4 @@ router.get('/publicPoll/:publicId', fetchPublicPoll);
  *                    value: "true"
  *
  */
-router.get('/privatePoll/:privateId', fetchPrivatePoll);
+router.get('/admin/:privateId', fetchPrivatePoll);
