@@ -102,7 +102,7 @@ function PollCreationPage() {
     };
 
     const cancelHandler = () => {
-        console.log('Cancel');
+        window.location.reload();
     };
 
     return (
