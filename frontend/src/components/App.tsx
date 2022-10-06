@@ -2,6 +2,7 @@ import React from 'react';
 import './App.scss';
 import { Header } from './Header';
 import PollCreationPage from './PollCreationPage';
+//import PollAnsweringPage from './PollAnsweringPage';
 
 function App() {
     // Just testing, this can be removed :)
@@ -30,7 +31,10 @@ function App() {
     return (
         <div className="App">
             <Header></Header>
+            {/*For now since we don't have routing, comment out the components
+            you don't want to see.*/}
             <PollCreationPage></PollCreationPage>
+            {/*<PollAnsweringPage></PollAnsweringPage>*/}
         </div>
     );
 }

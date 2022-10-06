@@ -1,0 +1,62 @@
+@import '../styles/colors';
+
+@mixin for-phone-only {
+    @media (max-width: 599px) {
+        @content;
+    }
+}
+
+.MuiContainer-root {
+    margin-top: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.questionType {
+    font-weight: 600;
+}
+
+.questionTitle {
+    padding-top: 80px;
+    font-size: 40px;
+}
+
+.answerContainer {
+    margin-top: 30px;
+}
+
+.questionPage {
+    padding-top: 105px;
+}
+
+.buttonsContainer {
+    display: flex;
+    gap: 48px;
+}
+
+.button {
+    margin-top: 52px;
+    border-radius: 20px;
+    width: 16.25rem;
+    color: $main-color;
+    font-weight: bold;
+    text-transform: none;
+    background-color: $melon;
+    border: 2px solid $main-color;
+    gap: 10px;
+    @include for-phone-only {
+        font-size: 2.5rem;
+    }
+}
+
+.previousQuestionButton {
+    @extend .button;
+    background-color: $melon;
+}
+
+.nextQuestionButton {
+    @extend .button;
+    background-color: $mint;
+}
