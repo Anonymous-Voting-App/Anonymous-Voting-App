@@ -159,7 +159,6 @@ function PollCreationPage() {
                 variant="contained"
                 onClick={cancelHandler}
                 className="cancel-poll-btn"
-                sx={{ mt: '1rem', width: 200 }}
             >
                 {' '}
                 Cancel{' '}
