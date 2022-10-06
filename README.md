@@ -11,7 +11,7 @@ The project is divided into frontend and backend folders which contain the corre
 
 ## Code formatting
 
-To utilize code formatting on commit, run `npm install` in the project root folder
+To utilize code formatting and linting on commit, run `npm install` in the project root folder and in both `frontend` and `backend` folders!
 
 ## Branch protection
 
