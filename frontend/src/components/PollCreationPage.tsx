@@ -101,6 +101,10 @@ function PollCreationPage() {
         console.log(questions, pollName);
     };
 
+    const cancelHandler = () => {
+        console.log('Cancel');
+    };
+
     return (
         <Container className="main-wrapper">
             <div className="page-heading">
@@ -150,6 +154,15 @@ function PollCreationPage() {
             >
                 {' '}
                 Submit Poll{' '}
+            </Button>
+            <Button
+                variant="contained"
+                onClick={cancelHandler}
+                className="cancel-poll-btn"
+                sx={{ mt: '1rem', width: 200 }}
+            >
+                {' '}
+                Cancel{' '}
             </Button>
         </Container>
     );
