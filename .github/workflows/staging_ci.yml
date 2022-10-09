@@ -200,6 +200,7 @@ jobs:
             ECS_CLUSTER: AVABackendStagingCluster
             ECS_TASK_DEFINITION: .aws/staging_task_definition.json
             CONTAINER_NAME: AVABackendStagingContainer
+            DATABASE_URL: ${{ secrets.STAGING_DB_URL }}
 
         steps:
             # Checks out the repository
@@ -241,3 +242,12 @@ jobs:
                   service: ${{ env.ECS_SERVICE }}
                   cluster: ${{ env.ECS_CLUSTER }}
                   wait-for-service-stability: false
+
+            - name: Setup node
+              uses: actions/setup-node@main
+              with:
+                  node-version: lts/*
+                  cache: npm
+            - run: npx prisma migrate deploy
+              env:
+                  DATABASE_URL: ${{ env.DATABASE_URL }}
