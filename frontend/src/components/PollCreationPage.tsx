@@ -16,7 +16,7 @@ function PollCreationPage() {
      */
     const addQuestion = () => {
         setShowQuesContainer(true);
-
+        // console.log(questions,'after questions added')
         //    condition check to handle empty question type,
         //    if empty dont increment array
         const isEmpty =
@@ -118,6 +118,7 @@ function PollCreationPage() {
                     label="Poll name"
                     variant="standard"
                     onChange={(event) => setPollName(event.target.value)}
+                    inputProps={{ 'data-testid': 'poll-name-field' }}
                 />
             </div>
 
@@ -147,6 +148,7 @@ function PollCreationPage() {
                 Add a question
             </Button>
             <Button
+                type="submit"
                 variant="contained"
                 onClick={submitHandler}
                 className="submit-poll-btn"
