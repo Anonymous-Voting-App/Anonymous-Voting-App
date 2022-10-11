@@ -1,0 +1,417 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Anonymous Voting App - Backend API",
+        "description": "This is a Swagger documentation for Anonymous Voting App\n",
+        "license": {
+            "name": "MIT License",
+            "url": "https://github.com/Anonymous-Voting-App/Anonymous-Voting-App/blob/dev/LICENSE"
+        },
+        "version": "1.0.0"
+    },
+    "externalDocs": {
+        "description": "Repository",
+        "url": "https://github.com/Anonymous-Voting-App/Anonymous-Voting-App"
+    },
+    "servers": [
+        {
+            "url": "https://d2l9c7s1roosdj.cloudfront.net/"
+        }
+    ],
+    "tags": [
+        {
+            "name": "Poll admin",
+            "description": "Adminstration endpoints for polls"
+        },
+        {
+            "name": "Poll public",
+            "description": "Public endpoints for polls"
+        },
+        {
+            "name": "Maintenance",
+            "description": "Health check"
+        }
+    ],
+    "paths": {
+        "/api/poll": {
+            "post": {
+                "tags": ["Poll public"],
+                "description": "Creates a new poll from given information for specified user. A poll consists of questions and each question has sub-questions. The sub-questions correspond to the different choices a question has. For now, the sub-question titles have to be unique in the poll due to how the database schema is currently set up.\n\nCurrently a test user \"1eb1cfae-09e7-4456-85cd-e2edfff80544\" can be set as the owner of new polls. Descriptions are also not saved to the database currently due to the database schema. The type properties for the poll, questions and sub-questions need to be given, although they do nothing at the moment. The types can be set to be an empty string for example.\n",
+                "responses": {
+                    "201": {
+                        "description": "Poll created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PollPrivateInfo"
+                                }
+                            }
+                        }
+                    }
+                },
+                "requestBody": {
+                    "description": "Create a new poll",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AddPoll"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/poll/{publicId}": {
+            "get": {
+                "tags": ["Poll public"],
+                "description": "Fetches a poll's public information using a publicId of the poll.\n",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "publicId",
+                        "description": "publicId of the poll to get.",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Public information about poll.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PollPublicInfo"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Poll not found"
+                    }
+                }
+            }
+        },
+        "/api/poll/{publicId}/answers": {
+            "get": {
+                "tags": ["Poll public"],
+                "description": "Future endpoint. Get public answer data of the poll.\n",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "publicId",
+                        "description": "publicId of the poll to get.",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Information about the answers to the poll."
+                    },
+                    "404": {
+                        "description": "Poll not found"
+                    }
+                }
+            },
+            "post": {
+                "tags": ["Poll public"],
+                "description": "Answers an option of a question of a poll with given answer. The questionId should be the id of the question to answer. The subQuestionId property of the answer object should be the id of the sub-question the answer is for. Sub-questions are currently synonymous with question options. The term sub-question is used in case different kinds of sub-questions are added later.\n",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "publicId",
+                        "description": "publicId of the poll to get.",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Information about the answer that was created.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Answer"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Poll not found"
+                    }
+                }
+            }
+        },
+        "/api/poll/admin/{privateId}": {
+            "get": {
+                "tags": ["Poll admin"],
+                "description": "Fetches a poll's private information using a privateId of the poll for the admin view.\n",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "privateId",
+                        "description": "privateId of the poll to get.",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Private information about poll.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/PollPrivateInfo"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "answers": {
+                                                    "$ref": "#/components/schemas/Answer"
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Poll not found"
+                    }
+                }
+            }
+        },
+        "/api/health": {
+            "get": {
+                "tags": ["Maintenance"],
+                "description": "Health check of API and database connection\n",
+                "responses": {
+                    "200": {
+                        "description": "Ok",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "server": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "database": {
+                                            "type": "boolean",
+                                            "example": true
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "AddPoll": {
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "Name of the poll"
+                    },
+                    "type": {
+                        "type": "string"
+                    },
+                    "owner": {
+                        "type": "object",
+                        "properties": {
+                            "accountId": {
+                                "type": "string",
+                                "format": "uuid"
+                            }
+                        }
+                    },
+                    "questions": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "title": {
+                                    "type": "string",
+                                    "example": "Title of question"
+                                },
+                                "description": {
+                                    "type": "string",
+                                    "example": "Description of question"
+                                },
+                                "type": {
+                                    "type": "string"
+                                },
+                                "subQuestions": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "title": {
+                                                "type": "string",
+                                                "example": "Title of sub-question"
+                                            },
+                                            "description": {
+                                                "type": "string",
+                                                "example": "Description of sub-question"
+                                            },
+                                            "type": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "PollPrivateInfo": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Name of the poll"
+                    },
+                    "publicId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "privateId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "owner": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "string",
+                                "format": "uuid"
+                            }
+                        }
+                    },
+                    "questions": {
+                        "type": "array",
+                        "items": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/components/schemas/Question"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "subQuestions": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Question"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "PollPublicInfo": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Name of the poll"
+                    },
+                    "publicId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "questions": {
+                        "type": "array",
+                        "items": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/components/schemas/Question"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "subQuestions": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Question"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "Answer": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "questionId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "value": {
+                        "type": "string",
+                        "example": true
+                    }
+                }
+            },
+            "Question": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "title": {
+                        "type": "string",
+                        "example": "Title of the sub-question"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Description of the sub-question"
+                    },
+                    "pollId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "type": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    }
+}
