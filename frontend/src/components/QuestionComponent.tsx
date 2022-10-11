@@ -13,8 +13,8 @@ import {
     RemoveCircleOutline
 } from '@mui/icons-material';
 import InputAdornment from '@mui/material/InputAdornment';
-
 import './QuestionComponent.scss';
+// import { QUESTION_TYPES } from './constants';
 
 function QuestionComponent(props: any) {
     const [showOptionBtn, setShowOptionBtn] = useState(false);
@@ -83,13 +83,12 @@ function QuestionComponent(props: any) {
                     sx={{ m: 1, minWidth: 120 }}
                     size="small"
                 >
-                    <InputLabel id="demo-select-small">
-                        Question type
-                    </InputLabel>
+                    <InputLabel id="select-ques-type">Question type</InputLabel>
                     <Select
+                        data-testid="ques-type-field"
                         IconComponent={KeyboardArrowDown}
-                        labelId="demo-select-small"
-                        id="demo-select-small"
+                        labelId="select-ques-type"
+                        id="select-ques-type"
                         value={props.ques.type}
                         label="Question Type"
                         onChange={(event) => onTypeChange(event.target.value)}
@@ -97,8 +96,11 @@ function QuestionComponent(props: any) {
                         <MenuItem value={''}>
                             <em>None</em>
                         </MenuItem>
-                        <MenuItem value={'radioBtn'}>Pick One</MenuItem>
-                        <MenuItem value={'checkBox'}>Multiple choice</MenuItem>
+                        {/* {QUESTION_TYPES.map(item => {
+                            return <MenuItem value={item.value}>{item.type}</MenuItem>;
+                        })} */}
+                        <MenuItem value={'radioBtn'}>Pick one</MenuItem>
+                        <MenuItem value={'checkBox'}>Multi - choice</MenuItem>
                     </Select>
                 </FormControl>
                 <TextField
@@ -109,20 +111,28 @@ function QuestionComponent(props: any) {
                     type="text"
                     value={props.ques.text}
                     variant="outlined"
+                    inputProps={{ 'data-testid': 'question-field' }}
                 />
                 {showOptionBtn ? (
                     <>
                         {quesOptions.map((quesOption, index) => (
                             <TextField
+                                inputProps={{
+                                    'data-testid': `option-field-${index}`
+                                }}
                                 className="option-field"
                                 InputProps={{
                                     startAdornment: (
                                         <InputAdornment position="start">
-                                            <RemoveCircleOutline
+                                            <span
+                                                className="adornment-span"
+                                                data-testid={`option-delete-${index}`}
                                                 onClick={() =>
                                                     removeOption(index)
                                                 }
-                                            />
+                                            >
+                                                <RemoveCircleOutline />
+                                            </span>
                                         </InputAdornment>
                                     )
                                 }}
