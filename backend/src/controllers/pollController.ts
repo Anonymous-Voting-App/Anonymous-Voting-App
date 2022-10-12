@@ -15,7 +15,10 @@ async function callService(
         // Would there be better way to do this? - Joonas Hiltunen 01.10.2022
         const poll = await (service as any)[method](req.body);
 
-        if (typeof poll === 'object') {
+        // Poll not found
+        if (poll === null) {
+            return responses.notFound(req, res);
+        } else if (typeof poll === 'object') {
             return responses.ok(req, res, poll);
         }
 
