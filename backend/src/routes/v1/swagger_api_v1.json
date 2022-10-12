@@ -149,6 +149,17 @@
                     "404": {
                         "description": "Poll not found"
                     }
+                },
+                "requestBody": {
+                    "description": "Post an answer to a poll",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AddAnswer"
+                            }
+                        }
+                    }
                 }
             }
         },
@@ -363,6 +374,26 @@
                                     }
                                 }
                             ]
+                        }
+                    }
+                }
+            },
+            "AddAnswer": {
+                "properties": {
+                    "questionId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "answer": {
+                        "type": "object",
+                        "properties": {
+                            "subQuestionId": {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            "answer": {
+                                "type": "string"
+                            }
                         }
                     }
                 }
