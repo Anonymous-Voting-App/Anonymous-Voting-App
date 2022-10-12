@@ -174,19 +174,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "allOf": [
-                                        {
-                                            "$ref": "#/components/schemas/PollPrivateInfo"
-                                        },
-                                        {
-                                            "type": "object",
-                                            "properties": {
-                                                "answers": {
-                                                    "$ref": "#/components/schemas/Answer"
-                                                }
-                                            }
-                                        }
-                                    ]
+                                    "$ref": "#/components/schemas/PollPrivateInfo"
                                 }
                             }
                         }
@@ -332,6 +320,12 @@
                                     }
                                 }
                             ]
+                        }
+                    },
+                    "answers": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Answer"
                         }
                     }
                 }
