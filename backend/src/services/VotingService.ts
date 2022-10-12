@@ -192,8 +192,6 @@ export default class VotingService {
             if (answer instanceof Answer) {
                 return answer.privateDataObj();
             }
-        } else {
-            throw new Error('Poll with given public id not found.');
         }
 
         return null;
