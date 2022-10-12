@@ -27,16 +27,16 @@ describe('VotingService', () => {
                 type: 'type',
                 publicId: 'publicId',
                 privateId: 'privateId',
-                questions: {
-                    q1: {
+                questions: [
+                    {
                         title: '',
                         description: '',
                         type: 'question-type',
                         id: 'q1',
                         pollId: '1'
                     }
-                },
-                answers: {}
+                ],
+                answers: []
             };
 
             Poll.prototype.createInDatabaseFromRequest = jest
@@ -152,7 +152,7 @@ describe('VotingService', () => {
             const service = new VotingService(prismaMock);
 
             try {
-                await service.answerPoll({
+                const poll = await service.answerPoll({
                     publicId: '1',
                     questionId: 'q1',
                     answer: {
@@ -165,15 +165,9 @@ describe('VotingService', () => {
                     }
                 });
 
-                fail('Poll did exist');
+                expect(poll).toBeNull();
             } catch (e: unknown) {
-                if (e instanceof Error) {
-                    expect(e.message).toBe(
-                        'Poll with given public id not found.'
-                    );
-                } else {
-                    fail('Other kind of error');
-                }
+                fail('Error');
             }
         });
     });
@@ -189,15 +183,15 @@ describe('VotingService', () => {
                 name: 'name',
                 publicId: 'publicId',
                 type: 'type',
-                questions: {
-                    q1: {
+                questions: [
+                    {
                         title: '',
                         description: '',
                         type: 'question-type',
                         id: 'q1',
                         pollId: '1'
                     }
-                }
+                ]
             });
 
             const service = new VotingService(prismaMock);
@@ -238,18 +232,18 @@ describe('VotingService', () => {
         }
 
         expect(poll?.type).toBe('type');
-        expect(poll?.questions).toEqual({
-            q1: {
+        expect(poll?.questions).toEqual([
+            {
                 title: '',
                 description: '',
                 type: 'question-type',
                 id: 'q1',
                 pollId: '1'
             }
-        });
+        ]);
 
         if (isPrivate) {
-            expect(poll?.answers).toEqual({});
+            expect(poll?.answers).toEqual([]);
         }
     };
 });

@@ -11,7 +11,7 @@ export interface QuestionData {
 }
 
 export interface MultiQuestionData extends QuestionData {
-    subQuestions: { [id: string]: QuestionData };
+    subQuestions: QuestionData[];
 }
 
 export interface AnswerData {
@@ -28,8 +28,8 @@ export interface PollData {
     publicId: string;
     privateId?: string;
     owner?: IUser.UserDataFromDatabase;
-    questions: { [id: string]: QuestionData };
-    answers?: { [id: string]: AnswerData };
+    questions: QuestionData[];
+    answers?: AnswerData[];
 }
 
 export interface PollRequest {

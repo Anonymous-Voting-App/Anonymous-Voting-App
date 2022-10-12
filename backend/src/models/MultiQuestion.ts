@@ -175,11 +175,11 @@ export default class MultiQuestion extends Question {
     publicDataObj(): IPolling.MultiQuestionData {
         const result = super.publicDataObj() as IPolling.MultiQuestionData;
 
-        result.subQuestions = {};
+        result.subQuestions = [];
 
         for (const id in this.subQuestions()) {
             const question = this.subQuestions()[id];
-            result.subQuestions[question.id()] = question.publicDataObj();
+            result.subQuestions.push(question.publicDataObj());
         }
 
         return result;
