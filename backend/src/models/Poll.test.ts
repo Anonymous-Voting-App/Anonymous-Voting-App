@@ -2,6 +2,7 @@ import { prismaMock } from '../utils/prisma_singleton';
 import Poll from './Poll';
 import Question from './Question';
 import User from './User';
+import * as IPoll from './IPoll';
 
 describe('Poll', () => {
     beforeEach(() => {
@@ -117,11 +118,10 @@ describe('Poll', () => {
         test('Set data from database data', () => {
             const poll = new Poll(prismaMock);
 
-            poll.setFromDatabaseData(dummyDatabaseData);
+            poll.setFromDatabaseData(dummyDatabaseData as IPoll.DatabaseData);
 
             expect(poll.id()).toBe('1');
             expect(poll.name()).toBe('name');
-            expect(poll.type()).toBe('type');
             expect(poll.publicId()).toBe('publicId');
             expect(poll.privateId()).toBe('privateId');
 
@@ -150,7 +150,6 @@ describe('Poll', () => {
             expect(poll.loadedFromDatabase()).toBe(true);
             expect(poll.id()).toBe('1');
             expect(poll.name()).toBe('name');
-            expect(poll.type()).toBe('type');
             expect(poll.publicId()).toBe('publicId');
             expect(poll.privateId()).toBe('privateId');
 
@@ -213,7 +212,7 @@ describe('Poll', () => {
         test('Create new database object for poll', () => {
             const poll = new Poll(prismaMock);
 
-            poll.setFromDatabaseData(dummyDatabaseData);
+            poll.setFromDatabaseData(dummyDatabaseData as IPoll.DatabaseData);
             poll.owner().setId('d1b44abe-b336-497d-8148-11166b7c2489');
 
             const data = poll.newDatabaseObject();

@@ -4,6 +4,7 @@ import Poll from '../models/Poll';
 import Answer from '../models/Answer';
 import * as IPolling from '../models/IPolling';
 import * as IVotingService from './IVotingService';
+import * as IUserManager from './IUserManager';
 import UserManager from './/UserManager';
 import { PrismaClient } from '@prisma/client';
 
@@ -42,6 +43,59 @@ export default class VotingService {
         this._userManager = userManager;
 
         post('_userManager is userManager', this._userManager === userManager);
+    }
+
+    /**
+     * New Poll instance with given publicId and loaded
+     * from database.
+     */
+
+    async _loadPollWithPublicId(publicId: string): Promise<Poll> {
+        const poll = new Poll(this.database());
+
+        poll.setPublicId(publicId);
+
+        await poll.loadFromDatabase();
+
+        return poll;
+    }
+
+    /**
+     * User retrieved from database with given user data
+     * if one exists. Throws error if user not found.
+     */
+
+    async _tryGettingUser(userData: IUserManager.UserOptions): Promise<User> {
+        // Currently returns just the same dummy user for any answer request.
+        const user = await this.userManager().getUser(userData);
+
+        if (!(user instanceof User)) {
+            throw new Error('User not found.');
+        }
+
+        return user;
+    }
+
+    /**
+     * Answers a poll when poll is already assumed to exist.
+     */
+
+    async _answerExistingPoll(
+        poll: Poll,
+        answerData: IVotingService.AnswerData,
+        user: User
+    ): Promise<IPolling.AnswerData> {
+        const answer = await poll.answer(
+            answerData.questionId,
+            answerData.answer,
+            user as User
+        );
+
+        if (!(answer instanceof Answer)) {
+            throw new Error('Error: Poll could not be answered.');
+        }
+
+        return answer.privateDataObj();
     }
 
     constructor(database: PrismaClient) {
@@ -169,31 +223,14 @@ export default class VotingService {
             typeof answerData.answer === 'object'
         );
 
-        // Currently returns just the same dummy user for any answer request.
-        const user = await this.userManager().getUser(answerData.answerer);
+        const user = await this._tryGettingUser(answerData.answerer);
 
-        if (!(user instanceof User)) {
-            throw new Error('User not found.');
-        }
-
-        const poll = new Poll(this.database());
-
-        poll.setPublicId(answerData.publicId);
-
-        await poll.loadFromDatabase();
+        const poll = await this._loadPollWithPublicId(answerData.publicId);
 
         if (poll.loadedFromDatabase()) {
-            const answer = await poll.answer(
-                answerData.questionId,
-                answerData.answer,
-                user as User
-            );
-
-            if (answer instanceof Answer) {
-                return answer.privateDataObj();
-            }
+            return await this._answerExistingPoll(poll, answerData, user);
+        } else {
+            throw new Error('Poll with given public id not found.');
         }
-
-        return null;
     }
 }

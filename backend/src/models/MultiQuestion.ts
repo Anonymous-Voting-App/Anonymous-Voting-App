@@ -3,6 +3,7 @@ import Answer from './Answer';
 import Question from './Question';
 import User from './User';
 import * as IPolling from './IPolling';
+import * as IQuestion from './IQuestion';
 import * as IMultiQuestion from './IMultiQuestion';
 import { PrismaClient } from '@prisma/client';
 
@@ -12,6 +13,98 @@ import { PrismaClient } from '@prisma/client';
 export default class MultiQuestion extends Question {
     _type = 'multi';
     _subQuestions: { [id: string]: Question } = {};
+
+    /**
+     * Makes new Question instances with data according to given
+     * array of question database objects.
+     */
+    _setSubQuestionsFromDatabaseOptions(
+        options: Array<IQuestion.QuestionDataOptions>
+    ): void {
+        for (let i = 0; i < options.length; i++) {
+            const optionData = options[i];
+            const subQuestion = new Question();
+
+            subQuestion.setFromOptionData(optionData);
+
+            this.subQuestions()[subQuestion.id()] = subQuestion;
+        }
+    }
+
+    /**
+     * Gives an answer to a sub-question of the multi-question.
+     */
+    async _answerSubQuestion(
+        subQuestion: Question,
+        answerData: IMultiQuestion.AnswerData,
+        answerer: User
+    ): Promise<Answer> {
+        const answer = await subQuestion.answerAsOption(
+            answerData.answer,
+            answerer,
+            this.id()
+        );
+
+        this.answers()[answer.id()] = answer;
+
+        return answer;
+    }
+
+    /**
+     * Answer the multi-question with data assumed
+     * to be in acceptable format.
+     */
+    async _answerWithAcceptableData(
+        answerData: IMultiQuestion.AnswerData,
+        answerer: User
+    ): Promise<Answer> {
+        const subQuestion = this.subQuestions()[answerData.subQuestionId];
+
+        subQuestion.setDatabase(this.database());
+
+        const answer = await this._answerSubQuestion(
+            subQuestion,
+            answerData,
+            answerer
+        );
+
+        return answer;
+    }
+
+    /**
+     * Whether answer data is acceptable
+     * to sub-question of multi-question.
+     */
+
+    _subQuestionAnswerDataIsAcceptable(
+        subQuestionId: string,
+        answer: IQuestion.AnswerData
+    ): boolean {
+        let result = false;
+
+        const subQuestion = this.subQuestions()[subQuestionId];
+
+        if (subQuestion instanceof Question) {
+            result = subQuestion.answerDataIsAcceptable(answer);
+        }
+
+        return result;
+    }
+
+    /**
+     * Makes new Question instance from given request data object
+     * and adds it as a sub-question.
+     */
+    _setSubQuestionFromRequest(
+        subQuestionData: IMultiQuestion.QuestionRequest
+    ): void {
+        const subQuestion = new Question();
+
+        subQuestion.setDatabase(this.database());
+        subQuestion.setFromRequest(subQuestionData);
+
+        this.subQuestions()[subQuestion.id()] = subQuestion;
+    }
 
     /** Sub-questions of the instance. */
     subQuestions(): { [id: string]: Question } {
@@ -86,18 +179,11 @@ export default class MultiQuestion extends Question {
      * Sets instance's properties from given question object
      * received from the database.
      */
-    setFromDatabaseData(questionData: IMultiQuestion.QuestionData): void {
+    setFromDatabaseData(questionData: IMultiQuestion.DatabaseData): void {
         super.setFromDatabaseData(questionData);
 
         if (Array.isArray(questionData.options)) {
-            for (let i = 0; i < questionData.options.length; i++) {
-                const optionData = questionData.options[i];
-                const subQuestion = new Question();
-
-                subQuestion.setFromOptionData(optionData);
-
-                this.subQuestions()[subQuestion.id()] = subQuestion;
-            }
+            this._setSubQuestionsFromDatabaseOptions(questionData.options);
         }
     }
 
@@ -113,29 +199,19 @@ export default class MultiQuestion extends Question {
     async answer(
         answerData: IMultiQuestion.AnswerData,
         answerer: User
-    ): Promise<null | Answer> {
+    ): Promise<Answer> {
         pre('answerData is of type object', typeof answerData === 'object');
         pre('answerer is of type User', answerer instanceof User);
+        pre(
+            'sub-question with given id exists',
+            Object.keys(this.subQuestions()).includes(answerData.subQuestionId)
+        );
 
         if (this.answerDataIsAcceptable(answerData)) {
-            const subQuestion = this.subQuestions()[answerData.subQuestionId];
-
-            subQuestion.setDatabase(this.database());
-
-            const answer = await subQuestion.answerAsOption(
-                answerData.answer,
-                answerer,
-                this.id()
-            );
-
-            if (answer instanceof Answer) {
-                this.answers()[answer.id()] = answer;
-            }
-
-            return answer;
+            return await this._answerWithAcceptableData(answerData, answerer);
         }
 
-        return null;
+        throw new Error('Error: Invalid answer data.');
     }
 
     /**
@@ -150,7 +226,6 @@ export default class MultiQuestion extends Question {
      */
     answerDataIsAcceptable(answerData: IMultiQuestion.AnswerData): boolean {
         pre('answerData is of type object', typeof answerData === 'object');
-
         pre(
             'answerData.answer is of type object',
             typeof answerData.answer === 'object'
@@ -159,11 +234,10 @@ export default class MultiQuestion extends Question {
         let result = false;
 
         if (typeof answerData.subQuestionId === 'string') {
-            const subQuestion = this.subQuestions()[answerData.subQuestionId];
-
-            if (subQuestion instanceof Question) {
-                result = subQuestion.answerDataIsAcceptable(answerData.answer);
-            }
+            result = this._subQuestionAnswerDataIsAcceptable(
+                answerData.subQuestionId,
+                answerData.answer
+            );
         }
 
         return result;
@@ -214,13 +288,7 @@ export default class MultiQuestion extends Question {
         pre('subQuestions is of type Array', Array.isArray(subQuestions));
 
         for (let i = 0; i < subQuestions.length; i++) {
-            const subQuestionData = subQuestions[i];
-            const subQuestion = new Question();
-
-            subQuestion.setDatabase(this.database());
-            subQuestion.setFromRequest(subQuestionData);
-
-            this.subQuestions()[subQuestion.id()] = subQuestion;
+            this._setSubQuestionFromRequest(subQuestions[i]);
         }
     }
 }

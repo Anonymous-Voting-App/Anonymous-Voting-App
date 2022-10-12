@@ -2,6 +2,7 @@ import { pre, post } from '../utils/designByContract';
 import User from './User';
 import * as IPolling from './IPolling';
 import * as IAnswer from './IAnswer';
+import * as IUser from './IUser';
 import { PrismaClient } from '@prisma/client';
 
 /**
@@ -12,12 +13,61 @@ import { PrismaClient } from '@prisma/client';
  */
 export default class Answer {
     _questionId = '';
-    _value: any = '';
+    _value: string | number | boolean | object = '';
     _answerer!: User;
     _loadedFromDatabase = false;
     _createdInDatabase = false;
     _id = '';
     _database!: PrismaClient;
+
+    /**
+     * Sets fields from given database data that are not optional.
+     */
+    _setMandatoriesFromDatabaseData(answerData: IAnswer.DatabaseData): void {
+        this.setId(answerData.id);
+        this.setQuestionId(answerData.questionId);
+        this.setValue(answerData.value);
+    }
+
+    /**
+     * Makes a new User from given database data object for user.
+     */
+    _makeAnswerer(answererData: IUser.DatabaseData): User {
+        const answerer = new User();
+
+        answerer.setFromDatabaseData(answererData);
+
+        return answerer;
+    }
+
+    /**
+     * Makes a new User from given answer database data object.
+     */
+    _makeAnswererFromDatabaseData(
+        answerData: IAnswer.DatabaseData
+    ): User | undefined {
+        let answerer: User | undefined;
+
+        if (typeof answerData.voter === 'object') {
+            answerer = this._makeAnswerer(answerData.voter);
+        } else if (typeof answerData.voterId == 'string') {
+            answerer = this._makeAnswerer({ id: answerData.voterId });
+        }
+
+        return answerer;
+    }
+
+    /**
+     * Sets own optional fields from given database data object.
+     */
+    _setOptionalsFromDatabaseData(answerData: IAnswer.DatabaseData): void {
+        const answerer: User | undefined =
+            this._makeAnswererFromDatabaseData(answerData);
+
+        if (answerer !== undefined) {
+            this.setAnswerer(answerer);
+        }
+    }
 
     /** Prisma database the instance is connected to. */
     database(): PrismaClient {
@@ -73,12 +123,12 @@ export default class Answer {
      * consideration whether the answer value itself is in a correct format
      * or not.
      */
-    value(): any {
+    value(): string | number | boolean | object {
         return this._value;
     }
 
     /** Sets value of value. */
-    setValue(value: any): void {
+    setValue(value: string | number | boolean | object): void {
         this._value = value;
 
         post('_value is value', this._value === value);
@@ -105,41 +155,24 @@ export default class Answer {
      * Sets the instance properties from an object
      * received from the Prisma database.
      */
-    setFromDatabaseData(answerData: IAnswer.AnswerData): void {
+    setFromDatabaseData(answerData: IAnswer.DatabaseData): void {
         pre('answerData is of type object', typeof answerData === 'object');
-
         pre(
             'answerData.id is of type string',
             typeof answerData.id === 'string'
         );
-
         pre(
             'answerData.questionId is of type string',
             typeof answerData.questionId === 'string'
         );
-
         pre(
             'answerData.value is of type string',
             typeof answerData.value === 'string'
         );
 
-        this.setId(answerData.id);
-        this.setQuestionId(answerData.questionId);
-        this.setValue(answerData.value);
+        this._setMandatoriesFromDatabaseData(answerData);
 
-        let answerer;
-
-        if (typeof answerData.voter === 'object') {
-            answerer = new User();
-            answerer.setFromDatabaseData(answerData.voter);
-        } else if (typeof answerData.voterId == 'string') {
-            answerer = new User();
-            answerer.setFromDatabaseData({ id: answerData.voterId });
-        }
-
-        if (answerer !== undefined) {
-            this.setAnswerer(answerer);
-        }
+        this._setOptionalsFromDatabaseData(answerData);
     }
 
     /**

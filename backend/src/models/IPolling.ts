@@ -17,8 +17,8 @@ export interface MultiQuestionData extends QuestionData {
 export interface AnswerData {
     id: string;
     questionId: string;
-    value: any;
-    answerer: IUser.UserDataFromDatabase;
+    value: string | number | boolean | object;
+    answerer: IUser.DatabaseData;
 }
 
 export interface PollData {
@@ -27,7 +27,7 @@ export interface PollData {
     type: string;
     publicId: string;
     privateId?: string;
-    owner?: IUser.UserDataFromDatabase;
+    owner?: IUser.DatabaseData;
     questions: QuestionData[];
     answers?: AnswerData[];
 }

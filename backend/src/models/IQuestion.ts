@@ -1,5 +1,7 @@
+import * as IAnswer from './IAnswer';
+
 export interface AnswerData {
-    answer: any;
+    answer: string | number | boolean | object;
     [extra: string]: unknown;
 }
 
@@ -18,13 +20,13 @@ export interface OptionData {
     questionId: string;
 }
 
-export interface QuestionData {
+export interface DatabaseData {
     id: string;
     title?: string;
     description?: string;
     pollId: string;
     type?: string;
-    votes?: Array<any>;
+    votes?: Array<IAnswer.DatabaseData>;
     [extra: string]: unknown;
 }
 
