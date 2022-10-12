@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     TextField,
     Button,
@@ -10,16 +10,21 @@ import {
 import {
     KeyboardArrowDown,
     AddCircleOutline,
-    RemoveCircleOutline
+    RemoveCircleOutline,
+    HighlightOff
 } from '@mui/icons-material';
 import InputAdornment from '@mui/material/InputAdornment';
 import './QuestionComponent.scss';
 // import { QUESTION_TYPES } from './constants';
 
 function QuestionComponent(props: any) {
+    console.log(props);
     const [showOptionBtn, setShowOptionBtn] = useState(false);
     const [quesOptions, setQuesOptions] = useState(['', '']);
     const [inputWidth, setInputWidth] = useState('260px');
+    useEffect(() => {
+        setQuesOptions(props.ques.options);
+    }, [props.ques.options]);
 
     /**
      * Function to pass entered question text to pollcreation page(parent)
@@ -75,6 +80,13 @@ function QuestionComponent(props: any) {
         props.optionInputHandler(newOptions, props.ind);
     };
 
+    const removeQuestion = () => {
+        props.questionRemovalHandler(props.ind);
+        console.log(props, 'props after ques removal');
+        console.log(props.ques.options, 'from new ques array');
+        setQuesOptions(props.ques.options);
+    };
+
     return (
         <>
             <div className="question-wrapper">
@@ -112,6 +124,15 @@ function QuestionComponent(props: any) {
                     value={props.ques.text}
                     variant="outlined"
                     inputProps={{ 'data-testid': 'question-field' }}
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <HighlightOff
+                                    onClick={() => removeQuestion()}
+                                />
+                            </InputAdornment>
+                        )
+                    }}
                 />
                 {showOptionBtn ? (
                     <>

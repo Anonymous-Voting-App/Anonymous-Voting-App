@@ -1,4 +1,11 @@
-import { Container, Typography, TextField, Button } from '@mui/material';
+import {
+    Container,
+    Typography,
+    TextField,
+    Button,
+    FormControlLabel,
+    Switch
+} from '@mui/material';
 import React, { useState } from 'react';
 import { ArrowRightAlt, AddCircleOutline } from '@mui/icons-material';
 import './PollCreationPage.scss';
@@ -10,7 +17,7 @@ function PollCreationPage() {
         { text: '', type: '', options: [''] }
     ]);
     const [pollName, setPollName] = useState('');
-
+    const [showCount, setShowCount] = useState(false);
     /**
      * Function to add empty object to array when add question btn is clicked
      */
@@ -24,6 +31,7 @@ function PollCreationPage() {
                 (question) =>
                     question.text === '' ||
                     question.type === '' ||
+                    question.options.length < 2 ||
                     (question.options.findIndex((option) => option === '') ===
                     -1
                         ? false
@@ -56,13 +64,22 @@ function PollCreationPage() {
         setQuestions(newQuestions);
     };
 
+    const onQuestionRemove = (index: number) => {
+        const updatedQuestions = questions.filter((item, i) => {
+            return i !== index;
+        });
+        console.log(updatedQuestions);
+        setQuestions(updatedQuestions);
+        console.log(questions, 'is it updated');
+    };
+
     /**
      * Function to update question array with question options
      * @param newOptions - array of options for the question
      * @param index - index of question in the array
      */
     const onOptionInput = (newOptions: [string], index: number) => {
-        const newQuestions = questions.map((question, questionIndex) => {
+        const newQuestionList = questions.map((question, questionIndex) => {
             if (questionIndex === index) {
                 return {
                     text: question.text,
@@ -72,7 +89,8 @@ function PollCreationPage() {
             }
             return question;
         });
-        setQuestions(newQuestions);
+        console.log(newQuestionList);
+        setQuestions(newQuestionList);
     };
 
     /**
@@ -98,13 +116,16 @@ function PollCreationPage() {
      * Function to handle the submit event
      */
     const submitHandler = () => {
-        console.log(questions, pollName);
+        console.log(questions, pollName, showCount);
     };
 
     const cancelHandler = () => {
         window.location.reload();
     };
 
+    const handleVoteCount = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setShowCount(event.target.checked);
+    };
     return (
         <Container className="main-wrapper">
             <div className="page-heading">
@@ -121,38 +142,49 @@ function PollCreationPage() {
                     inputProps={{ 'data-testid': 'poll-name-field' }}
                 />
             </div>
+            <div>
+                {showQuesContainer ? (
+                    <div className="question-container">
+                        {questions.map((question, index) => (
+                            <div key={index}>
+                                <QuestionComponent
+                                    ques={question}
+                                    ind={index}
+                                    typeChangehandler={onTypeChange}
+                                    questionInputHandler={onQuestionInput}
+                                    questionRemovalHandler={onQuestionRemove}
+                                    optionInputHandler={onOptionInput}
+                                ></QuestionComponent>
+                            </div>
+                        ))}
+                    </div>
+                ) : null}
 
-            {showQuesContainer ? (
-                <div className="question-container">
-                    {questions.map((question, index) => (
-                        <div key={index}>
-                            <QuestionComponent
-                                ques={question}
-                                ind={index}
-                                typeChangehandler={onTypeChange}
-                                questionInputHandler={onQuestionInput}
-                                optionInputHandler={onOptionInput}
-                            ></QuestionComponent>
-                        </div>
-                    ))}
-                </div>
-            ) : null}
-
-            <Button
-                className="add-ques-btn"
-                onClick={addQuestion}
-                sx={{ mt: '4.5rem', width: 200 }}
-                variant="outlined"
-            >
-                <AddCircleOutline />
-                Add a question
-            </Button>
+                <Button
+                    className="add-ques-btn"
+                    onClick={addQuestion}
+                    sx={{ mt: '4.5rem', width: 200 }}
+                    variant="outlined"
+                >
+                    <AddCircleOutline />
+                    Add a question
+                </Button>
+            </div>
+            <FormControlLabel
+                className="vote-count-toggle-btn"
+                control={
+                    <Switch checked={showCount} onChange={handleVoteCount} />
+                }
+                label="Show vote count:"
+                labelPlacement="start"
+                sx={{ mt: '6.25rem', width: 200 }}
+            />
             <Button
                 type="submit"
                 variant="contained"
                 onClick={submitHandler}
                 className="submit-poll-btn"
-                sx={{ mt: '4.5rem', width: 200 }}
+                sx={{ mt: '1.125rem', width: 200 }}
             >
                 {' '}
                 Submit Poll{' '}

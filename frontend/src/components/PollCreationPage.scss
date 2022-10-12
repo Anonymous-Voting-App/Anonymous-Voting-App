@@ -48,7 +48,7 @@
     border-radius: 20px !important;
     width: 16.25rem !important;
     color: $main-color !important;
-    background-color: $btn-background-color !important;
+    background-color: $mint !important;
     text-transform: none !important;
     border: 2px solid $main-color !important;
     @include for-phone-only {
@@ -89,4 +89,17 @@
     display: flex;
     justify-content: center;
     flex-direction: column;
+}
+
+.vote-count-toggle-btn {
+    display: flex !important;
+    justify-content: center !important;
+    margin: 6.25rem 0 0 0 !important;
+    .Mui-checked {
+        color: $black !important;
+    }
+    .MuiSwitch-track {
+        border: 1px solid $black !important;
+        background-color: $toggle-background-color !important;
+    }
 }
