@@ -86,17 +86,21 @@ describe('MultiQuestion', () => {
 
             const user = makeAnswerer();
 
-            const answer = await question.answer(
-                {
-                    subQuestionId: 'does-not-exist',
-                    answer: {
-                        answer: true
-                    }
-                },
-                user
-            );
-
-            expect(answer).toBeNull();
+            try {
+                await question.answer(
+                    {
+                        subQuestionId: 'does-not-exist',
+                        answer: {
+                            answer: true
+                        }
+                    },
+                    user
+                );
+            } catch (e) {
+                if (e instanceof Error) {
+                    expect(e.message).toBe('sub-question with given id exists');
+                }
+            }
         });
     });
 

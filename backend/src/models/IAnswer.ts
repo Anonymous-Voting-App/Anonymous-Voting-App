@@ -1,8 +1,10 @@
-export interface AnswerData {
+import * as IUser from './IUser';
+
+export interface DatabaseData {
     id: string;
     questionId: string;
     voterId: string;
-    voter?: any;
+    voter?: IUser.DatabaseData;
     value: string;
 }
 

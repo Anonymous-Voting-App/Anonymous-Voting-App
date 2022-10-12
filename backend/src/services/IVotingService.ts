@@ -2,8 +2,8 @@ export interface AnswerData {
     publicId: string;
     questionId: string;
     answer: {
-        answer: any;
-        [extra: string]: any;
+        answer: number | string | object | boolean;
+        [extra: string]: unknown;
     };
     answerer: {
         ip: string;

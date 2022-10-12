@@ -4,7 +4,7 @@ export interface FindSelfDatabaseQuery {
     };
 }
 
-export interface UserDataFromDatabase {
+export interface DatabaseData {
     id: string;
     ip?: string;
     cookie?: string;

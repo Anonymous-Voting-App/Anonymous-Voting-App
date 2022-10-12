@@ -1,1 +1,5 @@
-export * from './IQuestion';
+export interface FindSelfInDbQuery {
+    where: {
+        pollId: string;
+    };
+}
