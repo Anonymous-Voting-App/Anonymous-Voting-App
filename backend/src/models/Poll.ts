@@ -561,13 +561,13 @@ export default class Poll {
     /**
      * Poll's questions as non-sensitive public data objects.
      */
-    questionsDataObjs(): { [id: string]: IPolling.QuestionData } {
-        const result: { [prop: string]: any } = {};
+    questionsDataObjs(): IPolling.QuestionData[] {
+        const result: IPolling.QuestionData[] = [];
 
         for (const id in this.questions()) {
             const question = this.questions()[id];
 
-            result[question.id()] = question.publicDataObj();
+            result.push(question.publicDataObj());
         }
 
         return result;
@@ -577,13 +577,13 @@ export default class Poll {
      * Poll's answers as data objects. Contain sensitive information.
      * Contains the information of who the answerers are.
      */
-    answersDataObjs(): { [id: string]: IPolling.AnswerData } {
-        const result: { [prop: string]: any } = {};
+    answersDataObjs(): IPolling.AnswerData[] {
+        const result: IPolling.AnswerData[] = [];
 
         for (const id in this.answers()) {
             const answer = this.answers()[id];
 
-            result[answer.id()] = answer.privateDataObj();
+            result.push(answer.privateDataObj());
         }
 
         return result;
