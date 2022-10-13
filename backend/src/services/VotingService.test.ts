@@ -212,6 +212,35 @@ describe('VotingService', () => {
         });
     });
 
+    describe('getPollAnswers', () => {
+        test('getPollAnswers for existing poll', async () => {
+            const mockAnswerDataObjs = [
+                {
+                    id: 'id',
+                    questionId: 'question-id',
+                    value: 'true',
+                    answerer: { id: 'answerer-id' }
+                }
+            ];
+
+            Poll.prototype.existsInDatabase = jest
+                .fn()
+                .mockReturnValueOnce(true);
+            Poll.prototype.setPublicId = jest.fn();
+            Poll.prototype.loadFromDatabase = jest.fn();
+            Poll.prototype.answersDataObjs = jest
+                .fn()
+                .mockReturnValueOnce(mockAnswerDataObjs);
+
+            const service = new VotingService(prismaMock);
+
+            const answers = await service.getPollAnswers('test-id');
+
+            expect(answers).toEqual({ answers: mockAnswerDataObjs });
+            expect(Poll.prototype.setPublicId).toHaveBeenCalledWith('test-id');
+        });
+    });
+
     const createMockUser = () => {
         const user = new User();
         user.setDatabase(prismaMock);

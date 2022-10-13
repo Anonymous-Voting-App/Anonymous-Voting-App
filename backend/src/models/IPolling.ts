@@ -21,6 +21,10 @@ export interface AnswerData {
     answerer: IUser.DatabaseData;
 }
 
+export interface AnswersData {
+    answers: Array<AnswerData>;
+}
+
 export interface PollData {
     id: string;
     name: string;
