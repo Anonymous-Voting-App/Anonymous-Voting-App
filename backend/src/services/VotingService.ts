@@ -232,5 +232,7 @@ export default class VotingService {
         } else {
             throw new Error('Poll with given public id not found.');
         }
+
+        return null;
     }
 }

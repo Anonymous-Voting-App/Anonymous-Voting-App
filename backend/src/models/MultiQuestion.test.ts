@@ -40,9 +40,14 @@ describe('MultiQuestion', () => {
     });
 
     describe('answer', () => {
-        test('Successfully answer multi question', async () => {
+        test.todo('Successfully answer multi question');
+
+        test.skip('Successfully answer multi question', async () => {
             const user = makeAnswerer();
 
+            // The test is not actually testing anything at the moment
+            // since it manually sets the functions to return the expected values.
+            // - Joonas Halinen 2022.10.13
             Answer.prototype.value = jest.fn().mockReturnValue('true');
             Answer.prototype.questionId = jest.fn().mockReturnValue('q1');
             Answer.prototype.answerer = jest.fn().mockReturnValue(user);
