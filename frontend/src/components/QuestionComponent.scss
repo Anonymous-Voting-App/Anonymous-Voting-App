@@ -14,14 +14,19 @@
     border-radius: 20px !important;
     border: 1px solid $black;
     padding: 1.25rem;
+    background-color: $background-color !important;
 }
 
 .type-dropdown {
-    // .css-1sumxir-MuiFormLabel-root-MuiInputLabel-root.Mui-focused {
-    //     display: none;
-    // }
     .MuiFormLabel-root {
         left: 4.25rem;
+    }
+    .MuiOutlinedInput-notchedOutline {
+        border: none;
+    }
+
+    .MuiInputLabel-shrink {
+        display: none;
     }
 
     .MuiInputBase-root {
@@ -40,10 +45,21 @@
     .MuiInputBase-root {
         min-width: 16.25rem;
         border-radius: 1.25rem;
-        height: 2.5rem;
+        min-height: 2.5rem;
         border: 1px solid $main-color;
         margin-top: 1.25rem;
         margin-bottom: 1.25rem;
+    }
+
+    .MuiOutlinedInput-notchedOutline {
+        border: none;
+    }
+
+    .adornment-span {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
     }
 }
 
@@ -55,11 +71,15 @@
         border: 1px solid $main-color;
         margin-bottom: 0.625rem;
     }
+    .MuiOutlinedInput-notchedOutline {
+        border: none;
+    }
 
     .adornment-span {
         display: flex;
         justify-content: center;
         align-items: center;
+        cursor: pointer;
     }
 }
 

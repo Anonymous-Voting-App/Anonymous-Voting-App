@@ -7,7 +7,7 @@
 }
 
 .MuiContainer-root {
-    margin-top: 100px;
+    margin-top: 6.25rem;
     display: flex !important;
     flex-direction: column;
     justify-content: center;
@@ -17,8 +17,10 @@
 .page-heading {
     display: flex;
     justify-content: center;
+
     .MuiTypography-root {
         font-size: 2.5rem;
+
         @include for-phone-only {
             font-size: 2rem;
         }
@@ -27,6 +29,7 @@
     .MuiSvgIcon-root {
         transform: rotate(90deg);
         font-size: 3rem;
+
         @include for-phone-only {
             font-size: 2.5rem;
         }
@@ -35,12 +38,26 @@
 
 .poll-name {
     margin-top: 4.3rem;
-    .MuiInputBase-root {
-        border-bottom: 2px solid $main-color;
+
+    .MuiInputLabel-shrink {
+        position: absolute;
+        left: 1rem;
     }
+    .MuiInputBase-root {
+        border-bottom: 1px solid $main-color;
+
+        &.MuiInput-underline:after {
+            border-bottom: black !important;
+        }
+    }
+
     .MuiFormLabel-root {
         width: 100%;
         color: $placeholder-text-color;
+    }
+
+    .Mui-focused {
+        color: $placeholder-text-color !important;
     }
 }
 
@@ -51,6 +68,7 @@
     background-color: $mint !important;
     text-transform: none !important;
     border: 2px solid $main-color !important;
+
     @include for-phone-only {
         font-size: 2.5rem;
     }
@@ -67,6 +85,7 @@
     background-color: $main-color !important;
     text-transform: none !important;
     border: 2px solid $main-color !important;
+
     @include for-phone-only {
         font-size: 2.5rem;
     }
@@ -80,6 +99,7 @@
     background-color: $cancel-background-color !important;
     text-transform: none !important;
     border: 2px solid $main-color !important;
+
     @include for-phone-only {
         font-size: 2.5rem;
     }
@@ -95,9 +115,29 @@
     display: flex !important;
     justify-content: center !important;
     margin: 6.25rem 0 0 0 !important;
+
+    .Mui-checked {
+        color: $black !important;
+        position: absolute;
+        top: 1px;
+    }
+
+    .Mui-checked + .MuiSwitch-track {
+        border: 1px solid $black !important;
+        background-color: $toggle-background-color !important;
+        opacity: 10 !important;
+    }
+}
+
+.vote-count-show-button {
+    display: flex !important;
+    justify-content: center !important;
+    margin: 6.25rem 0 0 0 !important;
+
     .Mui-checked {
         color: $black !important;
     }
+
     .MuiSwitch-track {
         border: 1px solid $black !important;
         background-color: $toggle-background-color !important;

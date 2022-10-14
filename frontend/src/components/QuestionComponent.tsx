@@ -5,7 +5,8 @@ import {
     FormControl,
     InputLabel,
     Select,
-    MenuItem
+    MenuItem,
+    Paper
 } from '@mui/material';
 import {
     KeyboardArrowDown,
@@ -21,7 +22,6 @@ function QuestionComponent(props: any) {
     console.log(props);
     const [showOptionBtn, setShowOptionBtn] = useState(false);
     const [quesOptions, setQuesOptions] = useState(['', '']);
-    const [inputWidth, setInputWidth] = useState('260px');
     useEffect(() => {
         setQuesOptions(props.ques.options);
     }, [props.ques.options]);
@@ -31,7 +31,6 @@ function QuestionComponent(props: any) {
      * @param value
      */
     const onQuestionInput = (value: string) => {
-        setInputWidth((value.length + 1) * 8 + 'px'); //dynamically setting the width of question input field
         props.questionInputHandler(value, props.ind);
     };
 
@@ -89,7 +88,7 @@ function QuestionComponent(props: any) {
 
     return (
         <>
-            <div className="question-wrapper">
+            <Paper className="question-wrapper" elevation={3}>
                 <FormControl
                     className="type-dropdown"
                     sx={{ m: 1, minWidth: 120 }}
@@ -102,12 +101,11 @@ function QuestionComponent(props: any) {
                         labelId="select-ques-type"
                         id="select-ques-type"
                         value={props.ques.type}
-                        label="Question Type"
                         onChange={(event) => onTypeChange(event.target.value)}
                     >
-                        <MenuItem value={''}>
+                        {/* <MenuItem value={''}>
                             <em>None</em>
-                        </MenuItem>
+                        </MenuItem> */}
                         {/* {QUESTION_TYPES.map(item => {
                             return <MenuItem value={item.value}>{item.type}</MenuItem>;
                         })} */}
@@ -116,7 +114,6 @@ function QuestionComponent(props: any) {
                     </Select>
                 </FormControl>
                 <TextField
-                    sx={{ minWidth: inputWidth }}
                     autoComplete="off"
                     className="question-field"
                     onChange={(event) => onQuestionInput(event.target.value)}
@@ -124,12 +121,16 @@ function QuestionComponent(props: any) {
                     value={props.ques.text}
                     variant="outlined"
                     inputProps={{ 'data-testid': 'question-field' }}
+                    multiline
                     InputProps={{
                         startAdornment: (
                             <InputAdornment position="start">
-                                <HighlightOff
+                                <span
+                                    className="adornment-span"
                                     onClick={() => removeQuestion()}
-                                />
+                                >
+                                    <HighlightOff />
+                                </span>
                             </InputAdornment>
                         )
                     }}
@@ -170,7 +171,6 @@ function QuestionComponent(props: any) {
                         <Button
                             className="add-option-btn"
                             onClick={addOption}
-                            sx={{ mt: '4.5rem', width: 200 }}
                             variant="outlined"
                         >
                             <AddCircleOutline />
@@ -178,7 +178,7 @@ function QuestionComponent(props: any) {
                         </Button>
                     </>
                 ) : null}
-            </div>
+            </Paper>
         </>
     );
 }
