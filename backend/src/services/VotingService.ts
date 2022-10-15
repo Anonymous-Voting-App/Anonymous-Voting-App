@@ -229,8 +229,6 @@ export default class VotingService {
 
         if (poll.loadedFromDatabase()) {
             return await this._answerExistingPoll(poll, answerData, user);
-        } else {
-            throw new Error('Poll with given public id not found.');
         }
 
         return null;
