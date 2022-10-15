@@ -40,12 +40,12 @@ describe('Answer', () => {
 
             try {
                 answer.newDatabaseObject();
-                fail('questionId was set');
+                expect(true).toBeFalsy();
             } catch (e: unknown) {
                 if (e instanceof AssertionError) {
                     expect(e.message).toBe('questionId is set');
                 } else {
-                    fail();
+                    expect(true).toBeFalsy();
                 }
             }
         });
@@ -58,12 +58,12 @@ describe('Answer', () => {
 
             try {
                 answer.newDatabaseObject();
-                fail('answerer was set');
+                expect(true).toBeFalsy();
             } catch (e: unknown) {
                 if (e instanceof AssertionError) {
                     expect(e.message).toBe('answerer is set');
                 } else {
-                    fail();
+                    expect(true).toBeFalsy();
                 }
             }
         });
@@ -84,12 +84,12 @@ describe('Answer', () => {
 
             try {
                 answer.newDatabaseObject();
-                fail('answerer was identifiable');
+                expect(true).toBeFalsy();
             } catch (e: unknown) {
                 if (e instanceof AssertionError) {
                     expect(e.message).toBe('answerer is identifiable');
                 } else {
-                    fail();
+                    expect(true).toBeFalsy();
                 }
             }
         });
@@ -125,12 +125,12 @@ describe('Answer', () => {
 
             try {
                 await answer.createNewInDatabase();
-                fail();
+                expect(true).toBeFalsy();
             } catch (e: unknown) {
                 if (e instanceof AssertionError) {
                     expect(e.message).toBe('questionId is set');
                 } else {
-                    fail();
+                    expect(true).toBeFalsy();
                 }
             }
         });
