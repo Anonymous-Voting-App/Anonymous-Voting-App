@@ -3,17 +3,37 @@ import prisma from '../utils/prismaHandler';
 import VotingService from '../services/VotingService';
 import Logger from '../utils/logger';
 import * as responses from '../utils/responses';
+import * as IPolling from '../models/IPolling';
+import * as IVotingService from '../services/IVotingService';
 
-async function callService(
+const internalServerError = (
     method: string,
     req: Request,
     res: Response
-): Promise<Response> {
+): Response => {
+    Logger.error(`Error occured when calling ${method} service`);
+    return responses.internalServerError(req, res);
+};
+
+const callService = async (
+    method: keyof VotingService,
+    req: Request,
+    res: Response
+): Promise<Response> => {
     const service = new VotingService(prisma);
 
     try {
-        // Would there be better way to do this? - Joonas Hiltunen 01.10.2022
-        const poll = await (service as any)[method](req.body);
+        if (typeof service[method] !== 'function') {
+            return internalServerError(method, req, res);
+        }
+
+        type serviceFunction = (
+            body: string | IPolling.PollRequest | IVotingService.AnswerData
+        ) => IPolling.PollData | IPolling.AnswerData | null;
+
+        const poll = await (service[method] as unknown as serviceFunction)(
+            req.body
+        );
 
         // Poll not found
         if (poll === null) {
@@ -22,8 +42,7 @@ async function callService(
             return responses.ok(req, res, poll);
         }
 
-        Logger.error(`Error occured when calling ${method} service`);
-        return responses.internalServerError(req, res);
+        return internalServerError(method, req, res);
     } catch (e: unknown) {
         if (e instanceof Error) {
             Logger.error(e.message);
@@ -36,7 +55,7 @@ async function callService(
 
         return responses.internalServerError(req, res);
     }
-}
+};
 
 export const createPoll = async (req: Request, res: Response) => {
     return await callService('createPoll', req, res);
