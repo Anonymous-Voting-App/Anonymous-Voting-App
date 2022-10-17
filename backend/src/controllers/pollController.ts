@@ -41,6 +41,15 @@ const callService = async (
         if (poll === null) {
             return responses.notFound(req, res);
         } else if (typeof poll === 'object') {
+            // Location headers not correct on local runtime!
+            if (method === 'createPoll') {
+                const location = `/poll/${poll.id}`;
+                return responses.created(req, res, location, poll);
+            } else if (method === 'answerPoll') {
+                const location = `/poll/${req.body.publicId}/answers`;
+                return responses.created(req, res, location, poll);
+            }
+
             return responses.ok(req, res, poll);
         }
 
