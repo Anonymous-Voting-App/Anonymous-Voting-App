@@ -4,6 +4,7 @@ import * as IMultiQuestion from './IMultiQuestion';
 import * as IMultiQuestionCollection from './IMultiQuestionCollection';
 import QuestionCollection from './QuestionCollection';
 import { PrismaClient } from '@prisma/client';
+import QuestionFactory from './QuestionFactory';
 
 /**
  * Collection of MultiQuestion instances.
@@ -11,9 +12,10 @@ import { PrismaClient } from '@prisma/client';
 export default class MultiQuestionCollection extends QuestionCollection {
     constructor(
         database: PrismaClient,
-        questions?: { [id: string]: MultiQuestion }
+        questions: { [id: string]: MultiQuestion } = {},
+        questionFactory: QuestionFactory
     ) {
-        super(database, questions);
+        super(database, questions, questionFactory);
     }
 
     /**
@@ -83,7 +85,7 @@ export default class MultiQuestionCollection extends QuestionCollection {
      * Retrieves questions from database and
      * populates the collection with according MultiQuestion instances.
      */
-    async loadFromDatabase(): Promise<Array<IMultiQuestion.DatabaseData>> {
+    async loadFromDatabase(): Promise<void> {
         pre(
             'question collection is empty',
             Object.keys(this.questions()).length == 0
@@ -95,8 +97,6 @@ export default class MultiQuestionCollection extends QuestionCollection {
             );
 
         this.setFromDatabaseObj(questionsData);
-
-        return questionsData;
     }
 
     /**
