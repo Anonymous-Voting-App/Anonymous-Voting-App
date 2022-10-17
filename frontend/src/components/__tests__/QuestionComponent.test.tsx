@@ -21,7 +21,7 @@ test('Renders two text fields for question options when question type is selecte
     UserEvent.click(screen.getByRole('button', { name: 'Question type' }));
     UserEvent.click(screen.getByText(/Pick One/i));
     const inputFields = screen.getAllByRole('textbox', { name: '' });
-    expect(inputFields.length).toBe(3);
+    expect(inputFields.length).toBe(2);
 });
 
 test('onTypeChange is called when question type is selected', () => {
