@@ -81,7 +81,7 @@ export const getPollAnswers = async (req: Request, res: Response) => {
     return await callService('getPollAnswers', req, res);
 };
 
-export const fetchPublicPoll = async (req: Request, res: Response) => {
+export const getPublicPoll = async (req: Request, res: Response) => {
     try {
         req.body = req.params.publicId;
     } catch (e) {
@@ -91,7 +91,7 @@ export const fetchPublicPoll = async (req: Request, res: Response) => {
     return await callService('getPollWithPublicId', req, res);
 };
 
-export const fetchPrivatePoll = async (req: Request, res: Response) => {
+export const getPrivatePoll = async (req: Request, res: Response) => {
     try {
         req.body = req.params.privateId;
     } catch (e) {

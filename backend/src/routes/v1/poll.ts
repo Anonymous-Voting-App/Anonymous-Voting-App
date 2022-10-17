@@ -2,8 +2,8 @@ import { Router } from 'express';
 import {
     createPoll,
     answerPoll,
-    fetchPublicPoll,
-    fetchPrivatePoll,
+    getPublicPoll,
+    getPrivatePoll,
     getPollAnswers
 } from '../../controllers/pollController';
 
@@ -27,9 +27,9 @@ router.post('/:publicId/answers', answerPoll);
 /**
  * Gets polls public information
  */
-router.get('/:publicId', fetchPublicPoll);
+router.get('/:publicId', getPublicPoll);
 
 /**
  * Gets polls info for admin view
  */
-router.get('/admin/:privateId', fetchPrivatePoll);
+router.get('/admin/:privateId', getPrivatePoll);
