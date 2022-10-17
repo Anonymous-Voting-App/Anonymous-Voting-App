@@ -3,6 +3,7 @@ import Question from './Question';
 import * as IQuestion from './IQuestion';
 import * as IQuestionCollection from './IQuestionCollection';
 import { PrismaClient } from '@prisma/client';
+import QuestionFactory from './QuestionFactory';
 
 /**
  * Collection of Question instances.
@@ -12,6 +13,29 @@ export default class QuestionCollection {
     _questions: { [id: string]: Question } = {};
     _pollId = '';
     _databaseData: Array<IQuestion.DatabaseData> = [];
+    _questionFactory: QuestionFactory;
+
+    /** A QuestionFactory the collection uses to create new Questions. */
+
+    questionFactory(): QuestionFactory {
+        return this._questionFactory;
+    }
+
+    /** Sets value of questionFactory. */
+
+    setQuestionFactory(questionFactory: QuestionFactory): void {
+        pre(
+            'argument questionFactory is of type QuestionFactory',
+            questionFactory instanceof QuestionFactory
+        );
+
+        this._questionFactory = questionFactory;
+
+        post(
+            '_questionFactory is questionFactory',
+            this._questionFactory === questionFactory
+        );
+    }
 
     /**
      * Latest data received from database corresponding to the
@@ -82,14 +106,34 @@ export default class QuestionCollection {
         this.questions()[questionData.id] = question;
     }
 
+    /**
+     * Creates given Question with given id in database and
+     * updates it to the correct key in collection. Question
+     * is assumed to already be prepared with values
+     * in such a way that it can be created in the database.
+     */
+
+    async _createNewQuestionInDatabase(
+        question: Question,
+        id: string
+    ): Promise<void> {
+        delete this.questions()[id];
+
+        await question.createNewInDatabase();
+
+        this.questions()[question.id()] = question;
+    }
+
     constructor(
         database: PrismaClient,
-        questions: { [id: string]: Question } = {}
+        questions: { [id: string]: Question } = {},
+        questionFactory: QuestionFactory
     ) {
         pre('database is of type object', typeof database === 'object');
 
         this._database = database;
         this._questions = questions;
+        this._questionFactory = questionFactory;
     }
 
     /**
@@ -129,17 +173,14 @@ export default class QuestionCollection {
 
     /**
      * Loads questions into collection from
-     * database by querying with pollId.
+     * database.
      */
-    async loadFromDatabase(): Promise<Array<IQuestion.DatabaseData>> {
-        const questionsData = await this.database().question.findMany(
-            this.findSelfInDatabaseQuery()
-        );
+    async loadFromDatabase(): Promise<void> {
+        for (const id in this.questions()) {
+            const question = this.questions()[id];
 
-        this.setQuestions({});
-        this.setFromDatabaseObj(questionsData);
-
-        return questionsData;
+            await question.loadFromDatabase();
+        }
     }
 
     /**
@@ -153,9 +194,9 @@ export default class QuestionCollection {
             Object.keys(this.questions()).length > 0
         );
 
-        await this.database().question.createMany({
-            data: this.newDatabaseObject()
-        });
+        for (const id in this.questions()) {
+            await this._createNewQuestionInDatabase(this.questions()[id], id);
+        }
 
         await this.loadFromDatabase();
     }

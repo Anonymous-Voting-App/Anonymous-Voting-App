@@ -8,16 +8,22 @@ export interface QuestionData {
     id: string;
     pollId: string;
     answers?: Array<AnswerData>;
+    minValue?: number;
+    maxValue?: number;
+    step?: number;
 }
 
 export interface MultiQuestionData extends QuestionData {
     subQuestions: QuestionData[];
+    minAnswers: number;
+    maxAnswers: number;
 }
 
 export interface AnswerData {
     id: string;
     questionId: string;
-    value: string | number | boolean | object;
+    value: string | number | boolean | object | null;
+    subAnswers: Array<AnswerData>;
     answerer: IUser.DatabaseData;
 }
 

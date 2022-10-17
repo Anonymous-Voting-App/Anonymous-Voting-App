@@ -3,12 +3,7 @@ import Poll from './Poll';
 import Question from './Question';
 import User from './User';
 import * as IPoll from './IPoll';
-import {
-    Poll as PrismaPoll,
-    Question as PrismaQuestion,
-    Option as PrismaOption,
-    Vote as PrismaVote
-} from '@prisma/client';
+import QuestionFactory from './QuestionFactory';
 
 describe('Poll', () => {
     beforeEach(() => {
@@ -21,14 +16,18 @@ describe('Poll', () => {
                 id: '',
                 createdAt: new Date(),
                 questionId: 'question-id',
+                parentId: null,
                 value: 'answer',
                 voterId: '1'
             });
 
-            const poll = new Poll(prismaMock);
+            const poll = new Poll(prismaMock, new QuestionFactory(prismaMock));
             poll.setId('pollId');
 
             const question = new Question();
+
+            question.answer = jest.fn();
+
             question.setDatabase(prismaMock);
             question.setId('question-id');
             question.setType('type');
@@ -40,7 +39,7 @@ describe('Poll', () => {
 
             const user = makeAnswerer();
 
-            const answer = await poll.answer(
+            await poll.answer(
                 'question-id',
                 {
                     answer: 'answer'
@@ -48,29 +47,36 @@ describe('Poll', () => {
                 user
             );
 
-            expect(answer?.createdInDatabase()).toBe(true);
-            expect(answer?.questionId()).toBe('question-id');
-            expect(answer?.answerer().id()).toBe('1');
+            expect(question.answer).toHaveBeenCalledTimes(1);
+            expect(question.answer).toHaveBeenCalledWith(
+                {
+                    answer: 'answer'
+                },
+                user
+            );
         });
     });
 
     describe('setAnswersFromDatabaseData', () => {
         test('Set answers with data from database', () => {
-            const poll = new Poll(prismaMock);
+            const poll = new Poll(prismaMock, new QuestionFactory(prismaMock));
 
             poll.setAnswersFromDatabaseData([
                 {
                     id: '1',
                     pollId: '1',
                     type: 'type',
+                    typeName: 'free',
                     title: 'title',
                     description: 'description',
+                    parentId: null,
                     votes: [
                         {
                             id: '1',
                             questionId: '1',
                             value: 'value',
                             voterId: '1',
+                            parentId: null,
                             voter: {
                                 ip: '',
                                 cookie: '',
@@ -95,7 +101,7 @@ describe('Poll', () => {
 
     describe('setQuestionsFromDatabaseData', () => {
         test('Set questions with data from database', () => {
-            const poll = new Poll(prismaMock);
+            const poll = new Poll(prismaMock, new QuestionFactory(prismaMock));
 
             poll.setId('1');
 
@@ -104,8 +110,10 @@ describe('Poll', () => {
                     id: '1',
                     pollId: '1',
                     type: 'type',
+                    typeName: 'free',
                     title: 'title',
                     description: 'description',
+                    parentId: null,
                     votes: []
                 }
             ]);
@@ -116,13 +124,13 @@ describe('Poll', () => {
 
             expect(question.id()).toBe('1');
             expect(question.pollId()).toBe('1');
-            expect(question.type()).toBe('type');
+            expect(question.type()).toBe('free');
         });
     });
 
     describe('setFromDatabaseData', () => {
         test('Set data from database data', () => {
-            const poll = new Poll(prismaMock);
+            const poll = new Poll(prismaMock, new QuestionFactory(prismaMock));
 
             poll.setFromDatabaseData(dummyDatabaseData as IPoll.DatabaseData);
 
@@ -141,9 +149,12 @@ describe('Poll', () => {
 
     describe('loadFromDatabase', () => {
         test('Load poll from database', async () => {
-            prismaMock.poll.findFirst.mockResolvedValue(dummyDatabaseData);
+            // This should be changed, just set it as any in hurry - Joonas Hiltunen 02.10.2022
+            prismaMock.poll.findFirst.mockResolvedValue(
+                dummyDatabaseData as any
+            );
 
-            const poll = new Poll(prismaMock);
+            const poll = new Poll(prismaMock, new QuestionFactory(prismaMock));
 
             poll.setId('1');
             poll.setDatabase(prismaMock);
@@ -166,7 +177,7 @@ describe('Poll', () => {
         test('Poll not found in database', async () => {
             prismaMock.poll.findFirst.mockResolvedValue(null);
 
-            const poll = new Poll(prismaMock);
+            const poll = new Poll(prismaMock, new QuestionFactory(prismaMock));
 
             poll.setId('1');
             poll.setDatabase(prismaMock);
@@ -191,7 +202,7 @@ describe('Poll', () => {
                 isActive: true
             });
 
-            const poll = new Poll(prismaMock);
+            const poll = new Poll(prismaMock, new QuestionFactory(prismaMock));
 
             poll.setId('1');
             poll.setDatabase(prismaMock);
@@ -202,7 +213,7 @@ describe('Poll', () => {
         test('Poll not found in database', async () => {
             prismaMock.poll.findFirst.mockResolvedValue(null);
 
-            const poll = new Poll(prismaMock);
+            const poll = new Poll(prismaMock, new QuestionFactory(prismaMock));
 
             poll.setId('1');
             poll.setDatabase(prismaMock);
@@ -213,7 +224,7 @@ describe('Poll', () => {
 
     describe('newDatabaseObject', () => {
         test('Create new database object for poll', () => {
-            const poll = new Poll(prismaMock);
+            const poll = new Poll(prismaMock, new QuestionFactory(prismaMock));
 
             poll.setFromDatabaseData(dummyDatabaseData as IPoll.DatabaseData);
             poll.owner().setId('d1b44abe-b336-497d-8148-11166b7c2489');
@@ -230,38 +241,39 @@ describe('Poll', () => {
         });
     });
 
-    const dummyDatabaseData: PrismaPoll & {
-        questions: (PrismaQuestion & {
-            options: PrismaOption[];
-            votes: PrismaVote[];
-        })[];
-    } = {
-        createdAt: new Date(),
-        updatedAt: new Date(),
+    const dummyDatabaseData = {
         id: '1',
         name: 'name',
+        type: 'type',
         pollLink: 'publicId',
         adminLink: 'privateId',
-        resultLink: 'publicId',
-        isActive: true,
-        creatorId: '1',
+        creator: {
+            ip: 'ip',
+            cookie: 'cookie',
+            accountId: 'accountId',
+            id: '1'
+        },
         questions: [
             {
-                createdAt: new Date(),
-                updatedAt: new Date(),
                 id: '1',
                 pollId: '1',
-                typeId: '1',
+                type: 'type',
+                typeName: 'free',
+                title: 'title',
+                description: 'description',
                 votes: [
                     {
-                        createdAt: new Date(),
                         id: '1',
                         questionId: '1',
                         value: 'value',
-                        voterId: '1'
+                        voter: {
+                            ip: '',
+                            cookie: '',
+                            accountId: '',
+                            id: '1'
+                        }
                     }
-                ],
-                options: []
+                ]
             }
         ]
     };

@@ -19,54 +19,47 @@ export default class Answer {
     _createdInDatabase = false;
     _id = '';
     _database!: PrismaClient;
+    _subAnswers: { [id: string]: Answer } = {};
+    _parentId = '';
 
-    /**
-     * Sets fields from given database data that are not optional.
-     */
-    _setMandatoriesFromDatabaseData(answerData: IAnswer.DatabaseData): void {
-        this.setId(answerData.id);
-        this.setQuestionId(answerData.questionId);
-        this.setValue(answerData.value);
+    /** Id of a possible parent Answer. */
+
+    parentId(): string {
+        return this._parentId;
+    }
+
+    /** Sets value of parentId. */
+
+    setParentId(parentId: string): void {
+        pre(
+            'argument parentId is of type string',
+            typeof parentId === 'string'
+        );
+
+        this._parentId = parentId;
+
+        post('_parentId is parentId', this._parentId === parentId);
     }
 
     /**
-     * Makes a new User from given database data object for user.
+     * Possible sub-answers the answer may have.
      */
-    _makeAnswerer(answererData: IUser.DatabaseData): User {
-        const answerer = new User();
 
-        answerer.setFromDatabaseData(answererData);
-
-        return answerer;
+    subAnswers(): { [id: string]: Answer } {
+        return this._subAnswers;
     }
 
-    /**
-     * Makes a new User from given answer database data object.
-     */
-    _makeAnswererFromDatabaseData(
-        answerData: IAnswer.DatabaseData
-    ): User | undefined {
-        let answerer: User | undefined;
+    /** Sets value of subAnswers. */
 
-        if (typeof answerData.voter === 'object') {
-            answerer = this._makeAnswerer(answerData.voter);
-        } else if (typeof answerData.voterId == 'string') {
-            answerer = this._makeAnswerer({ id: answerData.voterId });
-        }
+    setSubAnswers(subAnswers: { [id: string]: Answer }): void {
+        pre(
+            'argument subAnswers is of type object',
+            typeof subAnswers === 'object'
+        );
 
-        return answerer;
-    }
+        this._subAnswers = subAnswers;
 
-    /**
-     * Sets own optional fields from given database data object.
-     */
-    _setOptionalsFromDatabaseData(answerData: IAnswer.DatabaseData): void {
-        const answerer: User | undefined =
-            this._makeAnswererFromDatabaseData(answerData);
-
-        if (answerer !== undefined) {
-            this.setAnswerer(answerer);
-        }
+        post('_subAnswers is subAnswers', this._subAnswers === subAnswers);
     }
 
     /** Prisma database the instance is connected to. */
@@ -152,6 +145,146 @@ export default class Answer {
     }
 
     /**
+     * Sets fields from given database data that are not optional.
+     */
+    _setMandatoriesFromDatabaseData(answerData: IAnswer.DatabaseData): void {
+        this.setId(answerData.id);
+        this.setQuestionId(answerData.questionId);
+        this.setValue(answerData.value);
+    }
+
+    /**
+     * Makes a new User from given database data object for user.
+     */
+    _makeAnswerer(answererData: IUser.DatabaseData): User {
+        const answerer = new User();
+
+        answerer.setFromDatabaseData(answererData);
+
+        return answerer;
+    }
+
+    /**
+     * Makes a new User from given answer database data object.
+     */
+    _makeAnswererFromDatabaseData(
+        answerData: IAnswer.DatabaseData
+    ): User | undefined {
+        let answerer: User | undefined;
+
+        if (typeof answerData.voter === 'object') {
+            answerer = this._makeAnswerer(answerData.voter);
+        } else if (typeof answerData.voterId == 'string') {
+            answerer = this._makeAnswerer({ id: answerData.voterId });
+        }
+
+        return answerer;
+    }
+
+    /**
+     * Sets own optional fields from given database data object.
+     */
+    _setOptionalsFromDatabaseData(answerData: IAnswer.DatabaseData): void {
+        const answerer: User | undefined =
+            this._makeAnswererFromDatabaseData(answerData);
+
+        if (answerer !== undefined) {
+            this.setAnswerer(answerer);
+        }
+
+        if (Array.isArray(answerData.subVotes)) {
+            this.setSubAnswersFromDatabaseData(answerData.subVotes);
+        }
+    }
+
+    /**
+     * Makes new sub-Answer for this Answer from
+     * database data and adds it as a sub-answer.
+     */
+
+    _addNewSubAnswerFromDatabaseData(
+        subAnswerData: IAnswer.DatabaseData
+    ): void {
+        const subAnswer = new Answer(this.database());
+
+        subAnswer.setParentId(this.id());
+
+        subAnswer.setFromDatabaseData(subAnswerData);
+
+        this.subAnswers()[subAnswer.id()] = subAnswer;
+    }
+
+    /**
+     * Makes new sub-Answer for this Answer from
+     * rqeuest data and adds it as a sub-answer.
+     */
+
+    _addNewSubAnswerFromRequest(
+        subRequest: IAnswer.Request,
+        answerer: User,
+        questionId: string,
+        id: string
+    ): void {
+        const subAnswer = new Answer(this.database());
+
+        subAnswer.setFromRequest(subRequest, answerer, questionId);
+
+        this.subAnswers()[id] = subAnswer;
+    }
+
+    /**
+     * Sets the information of the Answer from a request object
+     * containing sub-answers. Note: Method currently not fully implemented.
+     * Currently does not actually instantiate sub-answers.
+     */
+
+    _setFromNestedRequest(
+        request: IAnswer.Request,
+        answerer: User,
+        questionId: string
+    ): void {
+        this.setValue('');
+        this.setAnswerer(answerer);
+        this.setQuestionId(questionId);
+    }
+
+    /**
+     * Sets the information of the Answer from a request object
+     * that does not contain sub-answers.
+     */
+
+    _setFromShallowRequest(
+        request: IAnswer.Request,
+        answerer: User,
+        questionId: string
+    ): void {
+        this.setValue(request.answer.toString());
+        this.setAnswerer(answerer);
+        this.setQuestionId(questionId);
+    }
+
+    constructor(database?: PrismaClient) {
+        if (database !== undefined) {
+            this._database = database;
+        }
+    }
+
+    /**
+     * Makes new sub-Answers for this Answer from
+     * database data and adds them as sub-answers.
+     */
+
+    setSubAnswersFromDatabaseData(
+        subAnswerDatas: Array<IAnswer.DatabaseData>
+    ): void {
+        for (let i = 0; i < subAnswerDatas.length; i++) {
+            const subAnswerData = subAnswerDatas[i];
+
+            this._addNewSubAnswerFromDatabaseData(subAnswerData);
+        }
+    }
+
+    /**
      * Sets the instance properties from an object
      * received from the Prisma database.
      */
@@ -189,6 +322,23 @@ export default class Answer {
     }
 
     /**
+     * Database objects (objects that can be added to database)
+     * for all the sub-answers of this answer.
+     */
+
+    newSubVoteDatabaseObjects(): Array<IAnswer.NewAnswerData> {
+        const objs: Array<IAnswer.NewAnswerData> = [];
+
+        for (const id in this.subAnswers()) {
+            const subAnswer = this.subAnswers()[id];
+
+            objs.push(subAnswer.newDatabaseObject());
+        }
+
+        return objs;
+    }
+
+    /**
      * New object that can be added to Prisma database. Constructed from the values
      * of the properties of this instance.
      */
@@ -198,11 +348,34 @@ export default class Answer {
         pre('answerer is identifiable', this.answerer().isIdentifiable());
         pre('answerer id is set', this.answerer().id().length > 0);
 
-        return {
+        const obj: IAnswer.NewAnswerData = {
             questionId: this.questionId(),
             value: this.value().toString(),
-            voterId: this.answerer().id()
+            voterId: this.answerer().id(),
+            parentId: this.parentId().length > 0 ? this.parentId() : null
         };
+
+        if (Object.keys(this.subAnswers()).length > 0) {
+            obj.subVotes = this.newSubVoteDatabaseObjects();
+        }
+
+        return obj;
+    }
+
+    /**
+     * Info objects of all the sub-answers of this answer.
+     */
+
+    subAnswersDataObjs(): Array<IPolling.AnswerData> {
+        const objs: Array<IPolling.AnswerData> = [];
+
+        for (const id in this.subAnswers()) {
+            const subAnswer = this.subAnswers()[id];
+
+            objs.push(subAnswer.privateDataObj());
+        }
+
+        return objs;
     }
 
     /**
@@ -215,7 +388,57 @@ export default class Answer {
             id: this.id(),
             questionId: this.questionId(),
             value: this.value(),
+            subAnswers: this.subAnswersDataObjs(),
             answerer: this.answerer().publicDataObj()
         };
+    }
+
+    /**
+     * Sets answer's information from a request object.
+     */
+
+    setFromRequest(
+        request: IAnswer.Request,
+        answerer: User,
+        questionId: string
+    ): void {
+        if (Array.isArray(request.answer)) {
+            this._setFromNestedRequest(request, answerer, questionId);
+        } else {
+            this._setFromShallowRequest(request, answerer, questionId);
+        }
+    }
+
+    /**
+     * Sets answer's sub-answers and their information from a request object.
+     */
+
+    setSubAnswersFromRequest(
+        request: IAnswer.Request,
+        answerer: User,
+        questionId: string
+    ): void {
+        pre('request.answer is of type Array', Array.isArray(request.answer));
+
+        let id = 0;
+
+        for (
+            let i = 0;
+            i < (request.answer as Array<IAnswer.Request>).length;
+            i++
+        ) {
+            id++;
+
+            const subRequestData = (request.answer as Array<IAnswer.Request>)[
+                i
+            ];
+
+            this._addNewSubAnswerFromRequest(
+                subRequestData,
+                answerer,
+                questionId,
+                id.toString()
+            );
+        }
     }
 }

@@ -15,12 +15,32 @@ import { PrismaClient } from '@prisma/client';
 export default class Question {
     _title = '';
     _description = '';
-    _type = '';
+    _type = 'free';
     _id = '';
     _pollId = '';
     _database!: PrismaClient;
     _answers: { [id: string]: Answer } = {};
     _databaseData!: IQuestion.DatabaseData;
+    _parentId = '';
+
+    /** Id of possible parent Question of the Question. */
+
+    parentId(): string {
+        return this._parentId;
+    }
+
+    /** Sets value of parentId. */
+
+    setParentId(parentId: string): void {
+        pre(
+            'argument parentId is of type string',
+            typeof parentId === 'string'
+        );
+
+        this._parentId = parentId;
+
+        post('_parentId is parentId', this._parentId === parentId);
+    }
 
     /** Latest database data object. Updated whenever .setFromDatabaseData() is called. */
     databaseData(): IQuestion.DatabaseData {
@@ -173,19 +193,34 @@ export default class Question {
     async _addNewAnswer(
         answerData: IQuestion.AnswerData,
         answerer: User,
-        parentId?: string
+        parentAnswerId?: string
     ): Promise<Answer> {
-        const answer = this.makeAnswer(answerData, answerer);
-
-        answer.setQuestionId(
-            typeof parentId === 'string' ? parentId : this.id()
-        );
+        const answer = this.makeAnswer(answerData, answerer, parentAnswerId);
 
         await answer.createNewInDatabase();
 
         this.answers()[answer.id()] = answer;
 
         return answer;
+    }
+
+    /**
+     * Attemps to set Question's information
+     * from database data. If given database data
+     * is null, then it is inferred that the question was not found in
+     * the database.
+     */
+
+    _tryToSetFromDatabaseData(
+        databaseData: IQuestion.DatabaseData | null
+    ): void {
+        if (databaseData !== null) {
+            this.setFromDatabaseData(databaseData);
+        } else {
+            throw new Error(
+                `Question ${this.id()} could not be found in database.`
+            );
+        }
     }
 
     constructor(database?: PrismaClient) {
@@ -233,8 +268,26 @@ export default class Question {
             // The schema demands some kind of typeId
             // even though question type are not currently used for anything.
             typeId: '7b76d1c6-8f40-4509-8317-ce444892b1ee',
-            pollId: this.pollId()
+            typeName: this.type(),
+            pollId: this.pollId(),
+            parentId: this.parentId().length > 0 ? this.parentId() : undefined,
+            title: this.title(),
+            description: this.description()
         };
+    }
+
+    /**
+     * Fetches and populates Question's information from database.
+     */
+
+    async loadFromDatabase(): Promise<void> {
+        const databaseData = await this.database().question.findFirst({
+            where: {
+                id: this.id()
+            }
+        });
+
+        this._tryToSetFromDatabaseData(databaseData);
     }
 
     /**
@@ -254,8 +307,6 @@ export default class Question {
             typeof questionData.pollId === 'string'
         );
 
-        this.setId(questionData.id);
-
         if (typeof questionData.title === 'string') {
             this.setTitle(questionData.title);
         }
@@ -264,11 +315,13 @@ export default class Question {
             this.setDescription(questionData.description);
         }
 
-        this.setPollId(questionData.pollId);
-
         // Not actually ever a string. Just a quick fix so unit tests don't break.
         if (typeof questionData.type === 'string') {
             this.setType(questionData.type);
+        }
+
+        if (typeof questionData.parentId === 'string') {
+            this.setParentId(questionData.parentId);
         }
 
         if (Array.isArray(questionData.votes)) {
@@ -276,6 +329,10 @@ export default class Question {
         } else {
             questionData.votes = [];
         }
+
+        this.setId(questionData.id);
+        this.setPollId(questionData.pollId);
+        this.setType(questionData.typeName);
 
         this.setDatabaseData(questionData);
     }
@@ -306,13 +363,19 @@ export default class Question {
      * is set to this question's id.
      */
 
-    makeAnswer(answerData: IQuestion.AnswerData, answerer: User): Answer {
-        const answer = new Answer();
+    makeAnswer(
+        answerData: IQuestion.AnswerData,
+        answerer: User,
+        parentAnswerId?: string
+    ): Answer {
+        const answer = new Answer(this.database());
 
-        answer.setDatabase(this._database);
+        answer.setFromRequest(answerData, answerer, this.id());
         answer.setQuestionId(this.id());
-        answer.setValue(answerData.answer);
-        answer.setAnswerer(answerer);
+
+        if (typeof parentAnswerId === 'string') {
+            answer.setParentId(parentAnswerId);
+        }
 
         return answer;
     }
@@ -327,16 +390,19 @@ export default class Question {
      */
     async answer(
         answerData: IQuestion.AnswerData,
-        answerer: User
-    ): Promise<Answer | null> {
-        pre('answerData is of type object', typeof answerData === 'object');
+        answerer: User,
+        parentAnswerId?: string
+    ): Promise<Answer | void> {
         pre('answerer is of type User', answerer instanceof User);
-
         if (this.answerDataIsAcceptable(answerData)) {
-            return this._addNewAnswer(answerData, answerer);
+            return await this._addNewAnswer(
+                answerData,
+                answerer,
+                parentAnswerId
+            );
+        } else {
+            throw new Error('Answer data is not acceptable.');
         }
-
-        throw new Error('Error: Answer data is not acceptable.');
     }
 
     /**
@@ -344,21 +410,19 @@ export default class Question {
      * treating the answer instance in the database
      * through the 'option' table.
      */
-    async answerAsOption(
+    /* async answerAsOption(
         answerData: IQuestion.AnswerData,
         answerer: User,
         parentId: string
     ): Promise<Answer> {
-        pre('answerData is of type object', typeof answerData === 'object');
-
         pre('answerer is of type User', answerer instanceof User);
 
         if (this.answerDataIsAcceptable(answerData)) {
-            return this._addNewAnswer(answerData, answerer, parentId);
+            return await this._addNewAnswer(answerData, answerer, parentId);
+        } else {
+            throw new Error('Answer data is not acceptable.');
         }
-
-        throw new Error('Error: Answer data is not acceptable.');
-    }
+    } */
 
     /**
      * Whether given answer data is of acceptable format.
@@ -370,9 +434,10 @@ export default class Question {
      * if they so wish.
      */
     answerDataIsAcceptable(answerData: IQuestion.AnswerData): boolean {
-        pre('answerData is of type object', typeof answerData === 'object');
-
-        return answerData.answer !== undefined;
+        return (
+            typeof answerData === 'object' &&
+            typeof answerData.answer === 'string'
+        );
     }
 
     /**
@@ -393,6 +458,7 @@ export default class Question {
      * given data object representing information for a new question.
      */
     setFromRequest(request: IQuestion.QuestionRequest): void {
+        this.setType(request.type);
         this.setTitle(request.title);
         this.setDescription(request.description);
     }

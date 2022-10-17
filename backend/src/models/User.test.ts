@@ -74,14 +74,14 @@ describe('User', () => {
 
             try {
                 await user.loadFromDatabase();
-                expect(true).toBeFalsy();
+                fail();
             } catch (e: unknown) {
                 if (e instanceof AssertionError) {
                     expect(e.message).toBe(
                         'either id, ip, cookie or accountId is set'
                     );
                 } else {
-                    expect(true).toBeFalsy();
+                    fail();
                 }
             }
         });
