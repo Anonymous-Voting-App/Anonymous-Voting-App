@@ -2,7 +2,7 @@
     "openapi": "3.0.3",
     "info": {
         "title": "Anonymous Voting App - Backend API",
-        "description": "This is a Swagger documentation for Anonymous Voting App\n",
+        "description": "This is a Swagger documentation for Anonymous Voting App",
         "license": {
             "name": "MIT License",
             "url": "https://github.com/Anonymous-Voting-App/Anonymous-Voting-App/blob/dev/LICENSE"
@@ -36,7 +36,7 @@
         "/api/poll": {
             "post": {
                 "tags": ["Poll public"],
-                "description": "Creates a new poll from given information for specified user. A poll consists of questions and each question has sub-questions. The sub-questions correspond to the different choices a question has. For now, the sub-question titles have to be unique in the poll due to how the database schema is currently set up.\n\nCurrently a test user \"1eb1cfae-09e7-4456-85cd-e2edfff80544\" can be set as the owner of new polls. Descriptions are also not saved to the database currently due to the database schema. The type properties for the poll, questions and sub-questions need to be given, although they do nothing at the moment. The types can be set to be an empty string for example.\n",
+                "description": "Creates a new poll from given information for specified user. A poll consists of questions and each question has sub-questions. The sub-questions correspond to the different choices a question has. For now, the sub-question titles have to be unique in the poll due to how the database schema is currently set up.Currently a test user \"1eb1cfae-09e7-4456-85cd-e2edfff80544\" can be set as the owner of new polls. Descriptions are also not saved to the database currently due to the database schema. The type properties for the poll, questions and sub-questions need to be given, although they do nothing at the moment. The types can be set to be an empty string for example.",
                 "responses": {
                     "201": {
                         "description": "Poll created",
@@ -65,7 +65,7 @@
         "/api/poll/{publicId}": {
             "get": {
                 "tags": ["Poll public"],
-                "description": "Fetches a poll's public information using a publicId of the poll.\n",
+                "description": "Fetches a poll's public information using a publicId of the poll.",
                 "parameters": [
                     {
                         "in": "path",
@@ -98,7 +98,7 @@
         "/api/poll/{publicId}/answers": {
             "get": {
                 "tags": ["Poll public"],
-                "description": "Future endpoint. Get public answer data of the poll.\n",
+                "description": "Get public answer data of the poll.",
                 "parameters": [
                     {
                         "in": "path",
@@ -113,7 +113,22 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Information about the answers to the poll."
+                        "description": "Information about the answers to the poll.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "answers": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/PrivateAnswer"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     },
                     "404": {
                         "description": "Poll not found"
@@ -122,7 +137,7 @@
             },
             "post": {
                 "tags": ["Poll public"],
-                "description": "Answers an option of a question of a poll with given answer. The questionId should be the id of the question to answer. The subQuestionId property of the answer object should be the id of the sub-question the answer is for. Sub-questions are currently synonymous with question options. The term sub-question is used in case different kinds of sub-questions are added later.\n",
+                "description": "Answers an option of a question of a poll with given answer. The questionId should be the id of the question to answer. The subQuestionId property of the answer object should be the id of the sub-question the answer is for. Sub-questions are currently synonymous with question options. The term sub-question is used in case different kinds of sub-questions are added later.",
                 "parameters": [
                     {
                         "in": "path",
@@ -136,12 +151,12 @@
                     }
                 ],
                 "responses": {
-                    "200": {
+                    "201": {
                         "description": "Information about the answer that was created.",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Answer"
+                                    "$ref": "#/components/schemas/PublicAnswer"
                                 }
                             }
                         }
@@ -166,7 +181,7 @@
         "/api/poll/admin/{privateId}": {
             "get": {
                 "tags": ["Poll admin"],
-                "description": "Fetches a poll's private information using a privateId of the poll for the admin view.\n",
+                "description": "Fetches a poll's private information using a privateId of the poll for the admin view.",
                 "parameters": [
                     {
                         "in": "path",
@@ -199,7 +214,7 @@
         "/api/health": {
             "get": {
                 "tags": ["Maintenance"],
-                "description": "Health check of API and database connection\n",
+                "description": "Health check of API and database connection",
                 "responses": {
                     "200": {
                         "description": "Ok",
@@ -336,7 +351,7 @@
                     "answers": {
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/Answer"
+                            "$ref": "#/components/schemas/PublicAnswer"
                         }
                     }
                 }
@@ -398,7 +413,27 @@
                     }
                 }
             },
-            "Answer": {
+            "PrivateAnswer": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/PublicAnswer"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "answerer": {
+                                "properties": {
+                                    "id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ]
+            },
+            "PublicAnswer": {
                 "properties": {
                     "id": {
                         "type": "string",
