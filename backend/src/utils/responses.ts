@@ -16,7 +16,15 @@ export const ok = (req: Request, res: Response, data: unknown) => {
 /**
  * 201 Created
  */
-export const created = (req: Request, res: Response, data: unknown = null) => {
+export const created = (
+    req: Request,
+    res: Response,
+    location: string,
+    data: unknown = null
+) => {
+    // Write required location header of the created item
+    res.location(`${req.protocol}://${req.hostname}/api${location}`);
+
     if (!data) {
         return res.status(201).json({
             code: 201,
