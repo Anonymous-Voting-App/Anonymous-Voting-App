@@ -468,7 +468,7 @@
                     "subAnswers": {
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/Answer"
+                            "$ref": "#/components/schemas/PublicAnswer"
                         }
                     }
                 }
