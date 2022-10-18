@@ -157,9 +157,26 @@ jobs:
             - run: npm ci
             - run: npm run lint
 
+    backend-validate-swagger:
+        name: Validate Swagger/OpenAPI
+        needs: backend-lint
+        runs-on: ubuntu-latest
+
+        defaults:
+            run:
+                working-directory: backend
+
+        steps:
+            - uses: actions/checkout@main
+            - uses: actions/setup-node@main
+              with:
+                  node-version: lts/*
+                  cache: npm
+            - run: npx swagger-cli validate ./src/routes/v1/swagger_api_v1.json --yes
+
     backend-test:
         name: Test backend
-        needs: backend-lint
+        needs: backend-validate-swagger
         runs-on: ubuntu-latest
 
         defaults:
