@@ -4,6 +4,12 @@ import Question from './Question';
 import User from './User';
 import * as IPoll from './IPoll';
 import QuestionFactory from './QuestionFactory';
+import {
+    Poll as PrismaPoll,
+    Question as PrismaQuestion,
+    Option as PrismaOption,
+    Vote as PrismaVote
+} from '@prisma/client';
 
 describe('Poll', () => {
     beforeEach(() => {
@@ -149,10 +155,7 @@ describe('Poll', () => {
 
     describe('loadFromDatabase', () => {
         test('Load poll from database', async () => {
-            // This should be changed, just set it as any in hurry - Joonas Hiltunen 02.10.2022
-            prismaMock.poll.findFirst.mockResolvedValue(
-                dummyDatabaseData as any
-            );
+            prismaMock.poll.findFirst.mockResolvedValue(dummyDatabaseData);
 
             const poll = new Poll(prismaMock, new QuestionFactory(prismaMock));
 
@@ -241,39 +244,46 @@ describe('Poll', () => {
         });
     });
 
-    const dummyDatabaseData = {
+    const dummyDatabaseData: PrismaPoll & {
+        questions: (PrismaQuestion & {
+            options: PrismaOption[];
+            votes: PrismaVote[];
+        })[];
+    } = {
+        createdAt: new Date(),
+        updatedAt: new Date(),
         id: '1',
         name: 'name',
-        type: 'type',
         pollLink: 'publicId',
         adminLink: 'privateId',
-        creator: {
-            ip: 'ip',
-            cookie: 'cookie',
-            accountId: 'accountId',
-            id: '1'
-        },
+        resultLink: 'publicId',
+        isActive: true,
+        creatorId: '1',
         questions: [
             {
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                maxValue: null,
+                minValue: null,
+                parentId: null,
+                step: null,
+                typeName: 'free',
+                description: '',
+                title: '',
                 id: '1',
                 pollId: '1',
-                type: 'type',
-                typeName: 'free',
-                title: 'title',
-                description: 'description',
+                typeId: '1',
                 votes: [
                     {
+                        createdAt: new Date(),
                         id: '1',
                         questionId: '1',
                         value: 'value',
-                        voter: {
-                            ip: '',
-                            cookie: '',
-                            accountId: '',
-                            id: '1'
-                        }
+                        parentId: '1',
+                        voterId: '1'
                     }
-                ]
+                ],
+                options: []
             }
         ]
     };

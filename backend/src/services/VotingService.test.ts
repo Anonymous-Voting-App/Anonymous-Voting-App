@@ -103,12 +103,12 @@ describe('VotingService', () => {
                     }
                 });
 
-                fail('User found');
+                expect(true).toBeFalsy();
             } catch (e: unknown) {
                 if (e instanceof BadRequestError) {
                     expect(e.message).toBe('User not found.');
                 } else {
-                    fail('Other kind of error');
+                    expect(true).toBeFalsy();
                 }
             }
         });
