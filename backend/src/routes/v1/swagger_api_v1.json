@@ -496,27 +496,22 @@
                     },
                     "minAnswers": {
                         "type": "number",
-                        "required": false,
                         "example": 1
                     },
                     "maxAnswers": {
                         "type": "number",
-                        "required": false,
                         "example": 1
                     },
                     "minValue": {
                         "type": "number",
-                        "required": false,
                         "example": 1
                     },
                     "maxValue": {
                         "type": "number",
-                        "required": false,
                         "example": 5
                     },
                     "step": {
                         "type": "number",
-                        "required": false,
                         "example": 1
                     }
                 }
