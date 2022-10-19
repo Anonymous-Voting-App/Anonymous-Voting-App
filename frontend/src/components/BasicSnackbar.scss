@@ -1,0 +1,11 @@
+@import '../styles/colors';
+
+.MuiAlert-filledError {
+    background-color: $flamingo !important;
+    color: $black !important;
+}
+
+.MuiAlert-filledSuccess {
+    background-color: $pear !important ;
+    color: $black !important;
+}

@@ -1,6 +1,7 @@
 import React, { forwardRef } from 'react';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
+import './BasicSnackbar.scss';
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
     props,
@@ -14,7 +15,7 @@ function BasicSnackbar(props: any) {
         <>
             <Snackbar
                 open={props.open}
-                autoHideDuration={6000}
+                autoHideDuration={666000}
                 onClose={props.onClose}
                 anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
             >
