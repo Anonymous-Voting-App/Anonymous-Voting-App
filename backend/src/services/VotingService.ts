@@ -1,12 +1,12 @@
 import { pre, post } from '../utils/designByContract';
 import User from '../models/User';
 import Poll from '../models/Poll';
-import Answer from '../models/Answer';
 import * as IPolling from '../models/IPolling';
 import * as IVotingService from './IVotingService';
 import * as IUserManager from './IUserManager';
 import UserManager from './/UserManager';
 import { PrismaClient } from '@prisma/client';
+import QuestionFactory from '../models/QuestionFactory';
 import BadRequestError from '../utils/badRequestError';
 
 /**
@@ -16,6 +16,29 @@ import BadRequestError from '../utils/badRequestError';
 export default class VotingService {
     _userManager: UserManager;
     _database: PrismaClient;
+    _questionFactory: QuestionFactory;
+
+    /** A factory the service uses for creating new Questions. */
+
+    questionFactory(): QuestionFactory {
+        return this._questionFactory;
+    }
+
+    /** Sets value of questionFactory. */
+
+    setQuestionFactory(questionFactory: QuestionFactory): void {
+        pre(
+            'argument questionFactory is of type QuestionFactory',
+            questionFactory instanceof QuestionFactory
+        );
+
+        this._questionFactory = questionFactory;
+
+        post(
+            '_questionFactory is questionFactory',
+            this._questionFactory === questionFactory
+        );
+    }
 
     /** Database the VotingService uses. */
     database(): PrismaClient {
@@ -52,7 +75,7 @@ export default class VotingService {
      */
 
     async _loadPollWithPublicId(publicId: string): Promise<Poll> {
-        const poll = new Poll(this.database());
+        const poll = new Poll(this.database(), this.questionFactory());
 
         poll.setPublicId(publicId);
 
@@ -85,24 +108,19 @@ export default class VotingService {
         poll: Poll,
         answerData: IVotingService.AnswerData,
         user: User
-    ): Promise<IPolling.AnswerData> {
-        const answer = await poll.answer(
+    ): Promise<void> {
+        await poll.answer(
             answerData.questionId,
             answerData.answer,
             user as User
         );
-
-        if (!(answer instanceof Answer)) {
-            throw new Error('Error: Poll could not be answered.');
-        }
-
-        return answer.privateDataObj();
     }
 
-    constructor(database: PrismaClient) {
+    constructor(database: PrismaClient, questionFactory: QuestionFactory) {
         pre('database is of type object', typeof database === 'object');
 
         this._database = database;
+        this._questionFactory = questionFactory;
         this._userManager = new UserManager(database);
     }
 
@@ -149,7 +167,7 @@ export default class VotingService {
             pollOptions.questions.length > 0
         );
 
-        const poll = new Poll(this.database());
+        const poll = new Poll(this.database(), this.questionFactory());
         const user = await this.userManager().getUser(pollOptions.owner);
 
         if (!user) {
@@ -169,7 +187,7 @@ export default class VotingService {
     ): Promise<IPolling.PollData | null> {
         pre('publicId is of type string', typeof publicId === 'string');
 
-        const poll = new Poll(this.database());
+        const poll = new Poll(this.database(), this.questionFactory());
 
         poll.setPublicId(publicId);
 
@@ -191,7 +209,7 @@ export default class VotingService {
     ): Promise<IPolling.AnswersData | null> {
         pre('publicId is of type string', typeof publicId === 'string');
 
-        const poll = new Poll(this.database());
+        const poll = new Poll(this.database(), this.questionFactory());
 
         poll.setPublicId(publicId);
 
@@ -206,14 +224,14 @@ export default class VotingService {
 
     /**
      * Returns a poll having given private id.
-     * If no such poll exists, return null.
+     * If no such poll exists, returns null.
      */
     async getPollWithPrivateId(
         privateId: string
     ): Promise<IPolling.PollData | null> {
         pre('privateId is of type string', typeof privateId === 'string');
 
-        const poll = new Poll(this.database());
+        const poll = new Poll(this.database(), this.questionFactory());
 
         poll.setPrivateId(privateId);
 
@@ -228,12 +246,12 @@ export default class VotingService {
 
     /**
      * Answers a poll that has given publicId.
-     * If poll was answered successfully, returns created answer
-     * info. If not, returns null.
+     * If poll was answered successfully, returns success object.
+     * If not, returns null.
      */
     async answerPoll(
         answerData: IVotingService.AnswerData
-    ): Promise<IPolling.AnswerData | null> {
+    ): Promise<IVotingService.SuccessObject | null> {
         pre('answerData is of type object', typeof answerData === 'object');
 
         pre(
@@ -251,9 +269,11 @@ export default class VotingService {
         const poll = await this._loadPollWithPublicId(answerData.publicId);
 
         if (poll.loadedFromDatabase()) {
-            return await this._answerExistingPoll(poll, answerData, user);
+            await this._answerExistingPoll(poll, answerData, user);
+        } else {
+            return null;
         }
 
-        return null;
+        return { success: true };
     }
 }

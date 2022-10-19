@@ -5,6 +5,7 @@ import Logger from '../utils/logger';
 import * as responses from '../utils/responses';
 import * as IPolling from '../models/IPolling';
 import * as IVotingService from '../services/IVotingService';
+import QuestionFactory from '../models/QuestionFactory';
 import { AssertionError } from 'assert';
 import BadRequestError from '../utils/badRequestError';
 
@@ -22,7 +23,7 @@ const callService = async (
     req: Request,
     res: Response
 ): Promise<Response> => {
-    const service = new VotingService(prisma);
+    const service = new VotingService(prisma, new QuestionFactory(prisma));
 
     try {
         if (typeof service[method] !== 'function') {
@@ -57,8 +58,10 @@ const callService = async (
     } catch (e: unknown) {
         // Bad request
         if (e instanceof AssertionError) {
+            Logger.warn(`Bad Request: ${e.message}`);
             return responses.badRequest(req, res);
         } else if (e instanceof BadRequestError) {
+            Logger.warn(`Bad Request: ${e.message}`);
             return responses.badRequest(req, res);
         }
 

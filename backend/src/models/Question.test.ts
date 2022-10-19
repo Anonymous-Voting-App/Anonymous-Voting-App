@@ -1,6 +1,5 @@
 import Question from './Question';
 import User from './User';
-import Answer from './Answer';
 import { prismaMock } from '../utils/prisma_singleton';
 
 describe('Question', () => {
@@ -28,6 +27,7 @@ describe('Question', () => {
                 id: 'a1',
                 createdAt: new Date(),
                 questionId: 'test-question-id',
+                parentId: null,
                 voterId: '1',
                 value: 'test-value'
             });
@@ -43,19 +43,21 @@ describe('Question', () => {
 
             const answerer = makeAnswerer();
 
-            const answer = await question.answer(
+            await question.answer(
                 {
-                    type: 'test-type',
                     answer: 'test-value'
                 },
                 answerer
             );
 
-            expect(answer instanceof Answer).toBe(true);
-            expect(answer?.questionId()).toBe('test-question-id');
-            expect(answer?.value()).toBe('test-value');
-            expect(answer?.answerer().id()).toBe('1');
-            expect(answer?.createdInDatabase()).toBe(true);
+            expect(prismaMock.vote.create).toBeCalledWith({
+                data: {
+                    questionId: 'test-question-id',
+                    value: 'test-value',
+                    voterId: '1',
+                    parentId: null
+                }
+            });
         });
     });
 
@@ -68,11 +70,14 @@ describe('Question', () => {
                 title: 'test-title',
                 description: 'test-description',
                 pollId: 'test-pollId',
+                parentId: null,
                 type: 'test-type',
+                typeName: 'free',
                 votes: []
             });
 
             expect(question.id()).toBe('test-id');
+            expect(question.type()).toBe('free');
             expect(question.pollId()).toBe('test-pollId');
         });
     });

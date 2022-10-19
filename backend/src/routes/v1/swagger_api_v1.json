@@ -36,7 +36,7 @@
         "/api/poll": {
             "post": {
                 "tags": ["Poll public"],
-                "description": "Creates a new poll from given information for specified user. A poll consists of questions and each question has sub-questions. The sub-questions correspond to the different choices a question has. For now, the sub-question titles have to be unique in the poll due to how the database schema is currently set up.Currently a test user \"1eb1cfae-09e7-4456-85cd-e2edfff80544\" can be set as the owner of new polls. Descriptions are also not saved to the database currently due to the database schema. The type properties for the poll, questions and sub-questions need to be given, although they do nothing at the moment. The types can be set to be an empty string for example.",
+                "description": "Creates a new poll from given information for specified user. A poll consists of questions and each question has sub-questions. The sub-questions correspond to the different choices a question has. For now, the sub-question titles have to be unique in the poll due to how the database schema is currently set up.\n\nCurrently a test user \"1eb1cfae-09e7-4456-85cd-e2edfff80544\" can be set as the owner of new polls. Descriptions are also not saved to the database currently due to the database schema. The type properties for the poll, questions and sub-questions need to be given. The type property for the poll currently does nothing so it can be set to an empty string.\n",
                 "responses": {
                     "201": {
                         "description": "Poll created",
@@ -137,12 +137,12 @@
             },
             "post": {
                 "tags": ["Poll public"],
-                "description": "Answers an option of a question of a poll with given answer. The questionId should be the id of the question to answer. The subQuestionId property of the answer object should be the id of the sub-question the answer is for. Sub-questions are currently synonymous with question options. The term sub-question is used in case different kinds of sub-questions are added later.",
+                "description": "Answers a sub-question of a poll's question. The questionId should be the id of the question to answer. The question type should be specified. Different question types are: \"free\" (free-form text question), \"multi\" (question containing sub-questions), \"number\" (number question), \"scale\" (number question with a specified range of allowed values).\n",
                 "parameters": [
                     {
                         "in": "path",
                         "name": "publicId",
-                        "description": "publicId of the poll to get.",
+                        "description": "publicId of the poll to answer.",
                         "required": true,
                         "schema": {
                             "type": "string",
@@ -152,11 +152,11 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": "Information about the answer that was created.",
+                        "description": "Whether answer was successfully given.",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/PublicAnswer"
+                                    "$ref": "#/components/schemas/SuccessMessage"
                                 }
                             }
                         }
@@ -242,6 +242,10 @@
     },
     "components": {
         "schemas": {
+            "QuestionType": {
+                "type": "string",
+                "description": "One of: \"free\" (free-form text question), \"multi\" (question containing sub-questions), \"number\" (number question), \"scale\" (number question with a specified range of allowed values)."
+            },
             "AddPoll": {
                 "properties": {
                     "name": {
@@ -317,6 +321,9 @@
                     "privateId": {
                         "type": "string",
                         "format": "uuid"
+                    },
+                    "type": {
+                        "type": "string"
                     },
                     "owner": {
                         "type": "object",
@@ -399,17 +406,28 @@
                         "type": "string",
                         "format": "uuid"
                     },
+                    "type": {
+                        "$ref": "#/components/schemas/QuestionType"
+                    },
                     "answer": {
-                        "type": "object",
-                        "properties": {
-                            "subQuestionId": {
-                                "type": "string",
-                                "format": "uuid"
+                        "oneOf": [
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "subQuestionId": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "answer": {
+                                        "type": "string"
+                                    }
+                                }
                             },
-                            "answer": {
-                                "type": "string"
+                            {
+                                "type": "string",
+                                "example": "test-text-value"
                             }
-                        }
+                        ]
                     }
                 }
             },
@@ -446,6 +464,12 @@
                     "value": {
                         "type": "string",
                         "example": true
+                    },
+                    "subAnswers": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PublicAnswer"
+                        }
                     }
                 }
             },
@@ -468,7 +492,35 @@
                         "format": "uuid"
                     },
                     "type": {
-                        "type": "string"
+                        "$ref": "#/components/schemas/QuestionType"
+                    },
+                    "minAnswers": {
+                        "type": "number",
+                        "example": 1
+                    },
+                    "maxAnswers": {
+                        "type": "number",
+                        "example": 1
+                    },
+                    "minValue": {
+                        "type": "number",
+                        "example": 1
+                    },
+                    "maxValue": {
+                        "type": "number",
+                        "example": 5
+                    },
+                    "step": {
+                        "type": "number",
+                        "example": 1
+                    }
+                }
+            },
+            "SuccessMessage": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": true
                     }
                 }
             }

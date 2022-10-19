@@ -11,3 +11,11 @@ export interface AnswerData {
         accountId: string;
     };
 }
+
+export interface SuccessObject {
+    success: boolean;
+}
+
+export type PublicMethod = (
+    arg?: number | string | object | boolean
+) => Promise<object | null>;

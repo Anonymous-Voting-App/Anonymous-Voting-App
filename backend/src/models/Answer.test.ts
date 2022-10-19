@@ -28,7 +28,8 @@ describe('Answer', () => {
             expect(answer.newDatabaseObject()).toEqual({
                 questionId: 'test-question-id',
                 value: 'test-value',
-                voterId: '1'
+                voterId: '1',
+                parentId: null
             });
         });
 
@@ -101,6 +102,7 @@ describe('Answer', () => {
                 id: '1',
                 createdAt: new Date(),
                 questionId: 'q1',
+                parentId: null,
                 value: 'asd',
                 voterId: 'v1'
             };
@@ -166,6 +168,7 @@ describe('Answer', () => {
             questionId: 'test-question-id',
             value: 'test-value',
             voterId: '1',
+            parentId: null,
             voter: {
                 id: '1'
             }

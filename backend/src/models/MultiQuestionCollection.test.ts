@@ -1,6 +1,7 @@
 import MultiQuestionCollection from './MultiQuestionCollection';
 import MultiQuestion from './MultiQuestion';
 import { prismaMock } from '../utils/prisma_singleton';
+import QuestionFactory from './QuestionFactory';
 
 describe('MultiQuestionCollection', () => {
     beforeEach(() => {
@@ -15,18 +16,36 @@ describe('MultiQuestionCollection', () => {
                     createdAt: new Date(),
                     updatedAt: new Date(),
                     pollId: 'p1',
-                    typeId: '7b76d1c6-8f40-4509-8317-ce444892b1ee'
+                    typeId: '7b76d1c6-8f40-4509-8317-ce444892b1ee',
+                    typeName: 'free',
+                    parentId: 'parent1',
+                    minValue: -1,
+                    maxValue: -1,
+                    step: -1,
+                    title: 'title',
+                    description: 'description'
                 },
                 {
                     id: 'q2',
                     createdAt: new Date(),
                     updatedAt: new Date(),
                     pollId: 'p1',
-                    typeId: '7b76d1c6-8f40-4509-8317-ce444892b1ee'
+                    typeId: '7b76d1c6-8f40-4509-8317-ce444892b1ee',
+                    typeName: 'free',
+                    parentId: 'parent1',
+                    minValue: -1,
+                    maxValue: -1,
+                    step: -1,
+                    title: 'title',
+                    description: 'description'
                 }
             ]);
 
-            const collection = new MultiQuestionCollection(prismaMock);
+            const collection = new MultiQuestionCollection(
+                prismaMock,
+                {},
+                new QuestionFactory(prismaMock)
+            );
 
             collection.setPollId('p1');
             await collection.loadFromDatabase();
@@ -42,7 +61,11 @@ describe('MultiQuestionCollection', () => {
         test('No questions in database', async () => {
             prismaMock.question.findMany.mockResolvedValue([]);
 
-            const collection = new MultiQuestionCollection(prismaMock);
+            const collection = new MultiQuestionCollection(
+                prismaMock,
+                {},
+                new QuestionFactory(prismaMock)
+            );
 
             collection.setPollId('find-nothing');
 
@@ -54,34 +77,54 @@ describe('MultiQuestionCollection', () => {
 
     describe('createNewInDatabase', () => {
         test('Create new multi question collection in database', async () => {
-            prismaMock.question.create.mockResolvedValue({
-                id: 'q1',
-                createdAt: new Date(),
-                updatedAt: new Date(),
-                pollId: 'p1',
-                typeId: '7b76d1c6-8f40-4509-8317-ce444892b1ee'
-            });
+            prismaMock.question.create
+                .mockResolvedValueOnce({
+                    id: 'q1',
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                    pollId: 'p1',
+                    typeId: '7b76d1c6-8f40-4509-8317-ce444892b1ee',
+                    typeName: 'multi',
+                    parentId: '',
+                    minValue: -1,
+                    maxValue: -1,
+                    step: -1,
+                    title: 'title',
+                    description: 'description'
+                })
+                .mockResolvedValue({
+                    id: 's1',
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                    pollId: 'p1',
+                    typeId: '7b76d1c6-8f40-4509-8317-ce444892b1ee',
+                    typeName: 'multi',
+                    parentId: 'q1',
+                    minValue: -1,
+                    maxValue: -1,
+                    step: -1,
+                    title: 'title',
+                    description: 'description'
+                });
 
-            prismaMock.option.create.mockResolvedValue({
-                id: 's1',
-                createdAt: new Date(),
-                updatedAt: new Date(),
-                option: 'sub-title',
-                questionId: 'q1'
-            });
-
-            const collection = new MultiQuestionCollection(prismaMock);
+            const collection = new MultiQuestionCollection(
+                prismaMock,
+                {},
+                new QuestionFactory(prismaMock)
+            );
             const question = new MultiQuestion(prismaMock);
 
             question.setFromRequest({
                 title: 'title',
                 description: 'description',
-                type: 'test',
+                type: 'multi',
+                minAnswers: 1,
+                maxAnswers: 1,
                 subQuestions: [
                     {
                         title: 'sub-title',
                         description: 'sub-description',
-                        type: 'test'
+                        type: 'free'
                     }
                 ]
             });

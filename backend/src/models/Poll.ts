@@ -11,6 +11,9 @@ import MultiQuestionCollection from './MultiQuestionCollection';
 import MultiQuestion from './MultiQuestion';
 import { PrismaClient } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
+import QuestionFactory from './QuestionFactory';
+import AnswerCollection from './AnswerCollection';
+import QuestionCollection from './QuestionCollection';
 
 /**
  * A voting poll that can have questions and an owner.
@@ -29,6 +32,29 @@ export default class Poll {
     _database: PrismaClient;
     _loadedFromDatabase = false;
     _createdInDatabase = false;
+    _questionFactory: QuestionFactory;
+
+    /** A QuestionFactory the Poll uses to create new Questions. */
+
+    questionFactory(): QuestionFactory {
+        return this._questionFactory;
+    }
+
+    /** Sets value of questionFactory. */
+
+    setQuestionFactory(questionFactory: QuestionFactory): void {
+        pre(
+            'argument questionFactory is of type QuestionFactory',
+            questionFactory instanceof QuestionFactory
+        );
+
+        this._questionFactory = questionFactory;
+
+        post(
+            '_questionFactory is questionFactory',
+            this._questionFactory === questionFactory
+        );
+    }
 
     /** Whether new database entry has been made from this instance. */
     createdInDatabase(): boolean {
@@ -235,9 +261,10 @@ export default class Poll {
     async _createQuestionsInDatabase(
         pollData: IPoll.DatabaseData
     ): Promise<Array<IQuestion.DatabaseData>> {
-        const questions = new MultiQuestionCollection(
+        const questions = new QuestionCollection(
             this.database(),
-            this.questions() as { [id: string]: MultiQuestion }
+            this.questions() as { [id: string]: Question },
+            this.questionFactory()
         );
 
         questions.setPollId(pollData.id);
@@ -246,40 +273,6 @@ export default class Poll {
         this.setQuestions(questions.questions());
 
         return questions.databaseData();
-    }
-
-    /**
-     * Creates new Answer instance from given database data object for answer
-     * and adds it to poll's answers.
-     */
-
-    _addNewAnswerFromDatabaseData(answerData: IAnswer.DatabaseData): void {
-        const answer = new Answer();
-
-        answer.setFromDatabaseData(answerData);
-
-        this.answers()[answer.id()] = answer;
-    }
-
-    /**
-     * Extracts list of answer database objects from given
-     * list of question database objects.
-     */
-
-    _answersDbDataFromQuestionsDbData(
-        questionsData: Array<IQuestion.DatabaseData>
-    ): Array<IAnswer.DatabaseData> {
-        let answersData: Array<IAnswer.DatabaseData> = [];
-
-        for (let i = 0; i < questionsData.length; i++) {
-            const question = questionsData[i];
-
-            if (Array.isArray(question.votes)) {
-                answersData = answersData.concat(question.votes);
-            }
-        }
-
-        return answersData;
     }
 
     /**
@@ -301,15 +294,11 @@ export default class Poll {
         questionId: string,
         answerData: IQuestion.AnswerData,
         user: User
-    ): Promise<Answer | null> {
+    ): Promise<void> {
         const question = this.questions()[questionId];
         question.setDatabase(this.database());
 
-        const answer = await question.answer(answerData, user);
-
-        this._possiblySaveAnswer(answer);
-
-        return answer;
+        await question.answer(answerData, user);
     }
 
     /**
@@ -321,7 +310,10 @@ export default class Poll {
         request: IQuestion.QuestionRequest,
         id: number
     ): void {
-        const question = new MultiQuestion();
+        const question = this.questionFactory().createFromType(
+            request.type,
+            request
+        );
 
         question.setDatabase(this.database());
         question.setFromRequest(request);
@@ -329,10 +321,11 @@ export default class Poll {
         this.questions()[id.toString()] = question;
     }
 
-    constructor(database: PrismaClient) {
+    constructor(database: PrismaClient, questionFactory: QuestionFactory) {
         pre('database is of type object', typeof database === 'object');
 
         this._database = database;
+        this._questionFactory = questionFactory;
     }
 
     /**
@@ -424,9 +417,17 @@ export default class Poll {
             where: this.findSelfInDatabaseQuery(),
             include: {
                 questions: {
+                    // The query right now probably does not support
+                    // fetching sub-questions or sub-answers recursively for more than 1 level.
+                    // - Joonas Halinen 16.10.2022
+                    where: { parentId: null },
                     include: {
-                        options: true,
-                        votes: true
+                        subQuestions: true,
+                        votes: {
+                            include: {
+                                subVotes: true
+                            }
+                        }
                     }
                 }
             }
@@ -521,7 +522,16 @@ export default class Poll {
         for (let i = 0; i < questionsData.length; i++) {
             const questionData = questionsData[i];
 
-            const question = new MultiQuestion();
+            // Question database data (questionData) is used here as an options object
+            // to the factory. The database field names happen to match
+            // with the options object interfaces. This should
+            // be changed in the future in case the database objects become
+            // different from the options objects.
+            // - Joonas Halinen 17.10.2022
+            const question = this.questionFactory().createFromType(
+                questionData.typeName,
+                questionData
+            );
 
             question.setFromDatabaseData(questionData);
 
@@ -536,12 +546,11 @@ export default class Poll {
     setAnswersFromDatabaseData(
         questionsData: Array<IQuestion.DatabaseData>
     ): void {
-        const answersData =
-            this._answersDbDataFromQuestionsDbData(questionsData);
+        const answers = new AnswerCollection(this.database());
 
-        for (let i = 0; i < answersData.length; i++) {
-            this._addNewAnswerFromDatabaseData(answersData[i]);
-        }
+        answers.setFromQuestionsDatabaseData(questionsData);
+
+        this.setAnswers(answers.answers());
     }
 
     /**
@@ -556,16 +565,18 @@ export default class Poll {
         questionId: string,
         answerData: IQuestion.AnswerData,
         user: User
-    ): Promise<Answer | null> {
+    ): Promise<void> {
         pre(
             'poll has question',
             this.questions()[questionId] instanceof Question
         );
 
         if (this.userHasRightToAnswerPoll(user)) {
-            return this._answerWithRights(questionId, answerData, user);
+            this._answerWithRights(questionId, answerData, user);
         } else {
-            return null;
+            throw new Error(
+                `User does not have right to answer poll ${this.id()}.`
+            );
         }
     }
 
