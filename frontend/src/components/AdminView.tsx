@@ -4,12 +4,13 @@ import {
     Typography,
     Button,
     FormControl,
-    InputLabel,
     Select,
     MenuItem,
     SelectChangeEvent,
-    TextField
+    TextField,
+    InputLabel
 } from '@mui/material';
+import { KeyboardArrowDown } from '@mui/icons-material';
 import './AdminView.scss';
 
 const PollAnsweringPage = () => {
@@ -18,6 +19,7 @@ const PollAnsweringPage = () => {
     const handleTypeChange = (e: SelectChangeEvent<string>) => {
         setSearchBy(e.target.value);
     };
+
     return (
         <Container>
             <Typography className="title" variant="h4">
@@ -28,6 +30,7 @@ const PollAnsweringPage = () => {
                     <Select
                         className="searchBy"
                         displayEmpty={true}
+                        IconComponent={KeyboardArrowDown}
                         renderValue={(value) =>
                             value?.length
                                 ? Array.isArray(value)
@@ -44,9 +47,12 @@ const PollAnsweringPage = () => {
                 </FormControl>
                 <TextField
                     className="searchField"
+                    variant="outlined"
                     placeholder="Search text here"
                 ></TextField>
-                <Button className="searchButton">Search</Button>
+                <Button className="searchButton" variant="outlined">
+                    Search
+                </Button>
             </div>
         </Container>
     );

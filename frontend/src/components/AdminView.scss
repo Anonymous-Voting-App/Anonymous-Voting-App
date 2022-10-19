@@ -21,19 +21,38 @@
     gap: 20px;
 }
 
+.button {
+    width: 260px;
+    height: 40px;
+    border-radius: 20px !important;
+    text-transform: none !important;
+    border: 1px solid $main-color !important;
+}
+
 .searchFormControl {
     align-items: center;
 }
 
 .searchBy {
+    @extend .button;
     margin-top: 76px;
-    width: 260px;
+
+    .MuiSvgIcon-root {
+        left: 1.875rem;
+    }
 }
 
 .searchField {
-    width: 260px;
+    input {
+        text-align: center;
+    }
+    .MuiOutlinedInput-root {
+        @extend .button;
+    }
 }
 
 .searchButton {
-    width: 260px;
+    @extend .button;
+    background-color: $main-color !important;
+    color: $background-color !important;
 }
