@@ -1,0 +1,39 @@
+@import '../styles/colors';
+
+@mixin for-phone-only {
+    @media (max-width: 599px) {
+        @content;
+    }
+}
+
+.MuiContainer-root {
+    margin-top: 180px;
+}
+
+.title {
+    font-weight: 600;
+}
+
+.itemsContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.searchFormControl {
+    align-items: center;
+}
+
+.searchBy {
+    margin-top: 76px;
+    width: 260px;
+}
+
+.searchField {
+    width: 260px;
+}
+
+.searchButton {
+    width: 260px;
+}
