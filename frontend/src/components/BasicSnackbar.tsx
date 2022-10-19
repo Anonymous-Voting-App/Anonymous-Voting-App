@@ -15,7 +15,7 @@ function BasicSnackbar(props: any) {
         <>
             <Snackbar
                 open={props.open}
-                autoHideDuration={666000}
+                autoHideDuration={6000}
                 onClose={props.onClose}
                 anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
             >
