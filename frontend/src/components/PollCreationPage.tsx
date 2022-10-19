@@ -171,12 +171,10 @@ function PollCreationPage(props: any) {
         createPoll(pollName, questions)
             .then((response) => {
                 // console.log(response);
-                if (response.status === 201) {
-                    props.showNotification({
-                        severity: 'success',
-                        message: 'Poll Created successfully'
-                    });
-                } else throw Error;
+                props.showNotification({
+                    severity: 'success',
+                    message: 'Poll Created successfully'
+                });
             })
             .catch((error) => {
                 console.log(error);
