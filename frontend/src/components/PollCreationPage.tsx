@@ -19,8 +19,8 @@ function PollCreationPage(props: any) {
             title: '',
             description: '',
             type: '',
-            minAnswer: 1,
-            maxAnswer: 1,
+            minAnswers: 1,
+            maxAnswers: 1,
             subQuestions: [{ title: '', description: '', type: '' }]
         }
     ]);
@@ -70,8 +70,8 @@ function PollCreationPage(props: any) {
                     title: '',
                     description: '',
                     type: '',
-                    minAnswer: 1,
-                    maxAnswer: 1,
+                    minAnswers: 1,
+                    maxAnswers: 1,
                     subQuestions: [{ title: '', description: '', type: '' }]
                 }
             ]);
@@ -90,8 +90,8 @@ function PollCreationPage(props: any) {
                     title: value,
                     description: value,
                     type: question.type,
-                    minAnswer: 1,
-                    maxAnswer:
+                    minAnswers: 1,
+                    maxAnswers:
                         question.type === 'radioBtn'
                             ? 1
                             : question.subQuestions.length,
@@ -126,8 +126,8 @@ function PollCreationPage(props: any) {
                     description: question.title,
                     type: question.type,
                     subQuestions: newOptions,
-                    minAnswer: 1,
-                    maxAnswer:
+                    minAnswers: 1,
+                    maxAnswers:
                         question.type === 'radioBtn' ? 1 : newOptions.length
                 };
             }
@@ -150,8 +150,8 @@ function PollCreationPage(props: any) {
                     description: question.description,
                     type: value,
                     subQuestions: question.subQuestions,
-                    minAnswer: 1,
-                    maxAnswer:
+                    minAnswers: 1,
+                    maxAnswers:
                         question.type === 'radioBtn'
                             ? 1
                             : question.subQuestions.length
@@ -171,13 +171,12 @@ function PollCreationPage(props: any) {
         createPoll(pollName, questions)
             .then((response) => {
                 // console.log(response);
-                if (response.code === 500) throw 'Bad Error';
-                else {
+                if (response.code === 201) {
                     props.showNotification({
                         severity: 'success',
                         message: 'Poll Created successfully'
                     });
-                }
+                } else throw 'Bad Error';
             })
             .catch((error) => {
                 console.log(error);
