@@ -31,6 +31,7 @@ export const createPoll = async (title: string, questions: any) => {
             'Content-type': 'application/json; charset=UTF-8'
         }
     });
+    console.log(response.status);
     const data = await response.json();
-    return data;
+    return { data: data, status: response.status };
 };
