@@ -5,8 +5,8 @@
     height: 80px;
     top: 0px;
     background: $main-color !important;
-    position: 'relative';
-    box-shadow: none;
+    position: 'relative' !important;
+    box-shadow: none !important;
     background-color: $main-color;
 }
 
@@ -55,6 +55,7 @@
     width: 40px !important;
     right: 40px;
     top: 20px;
+
     font-size: large;
     cursor: pointer;
     color: $main-color;
