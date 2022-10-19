@@ -38,7 +38,9 @@
 
 .poll-name {
     margin-top: 4.3rem;
-
+    .MuiInputBase-input {
+        text-align: center;
+    }
     .MuiInputLabel-shrink {
         position: absolute;
         left: 1rem;
@@ -90,7 +92,12 @@
         font-size: 2.5rem;
     }
 }
-
+.css-1r3dwil-MuiButtonBase-root-MuiButton-root.Mui-disabled {
+    color: rgba(0, 0, 0, 0.26) !important;
+    box-shadow: none !important;
+    border: rgba(1, 1, 1, 0.515) !important;
+    background-color: rgba(0, 0, 0, 0.12) !important;
+}
 .cancel-poll-btn {
     border-radius: 20px !important;
     width: 16.25rem !important;

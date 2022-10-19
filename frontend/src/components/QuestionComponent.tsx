@@ -19,12 +19,15 @@ import './QuestionComponent.scss';
 // import { QUESTION_TYPES } from './constants';
 
 function QuestionComponent(props: any) {
-    console.log(props);
+    // console.log(props);
     const [showOptionBtn, setShowOptionBtn] = useState(false);
-    const [quesOptions, setQuesOptions] = useState(['', '']);
+    const [quesOptions, setQuesOptions] = useState([
+        { title: '', description: '', type: '' },
+        { title: '', description: '', type: '' }
+    ]);
     useEffect(() => {
-        setQuesOptions(props.ques.options);
-    }, [props.ques.options]);
+        setQuesOptions(props.ques.subQuestions);
+    }, [props.ques.subQuestions]);
 
     /**
      * Function to pass entered question text to pollcreation page(parent)
@@ -48,7 +51,10 @@ function QuestionComponent(props: any) {
      * array on add option btn click
      */
     const addOption = () => {
-        setQuesOptions([...quesOptions, '']);
+        setQuesOptions([
+            ...quesOptions,
+            { title: '', description: '', type: '' }
+        ]);
     };
 
     /**
@@ -71,7 +77,7 @@ function QuestionComponent(props: any) {
     const onOptionInput = (index: number, value: string) => {
         const newOptions = quesOptions.map((quesOption, optionIndex) => {
             if (optionIndex === index) {
-                return value;
+                return { title: value, description: value, type: 'boolean' };
             }
             return quesOption;
         });
@@ -81,9 +87,8 @@ function QuestionComponent(props: any) {
 
     const removeQuestion = () => {
         props.questionRemovalHandler(props.ind);
-        console.log(props, 'props after ques removal');
-        console.log(props.ques.options, 'from new ques array');
-        setQuesOptions(props.ques.options);
+        // console.log(props, 'props after ques removal');
+        setQuesOptions(props.ques.subQuestions);
     };
 
     return (
@@ -118,7 +123,7 @@ function QuestionComponent(props: any) {
                     className="question-field"
                     onChange={(event) => onQuestionInput(event.target.value)}
                     type="text"
-                    value={props.ques.text}
+                    value={props.ques.title}
                     variant="outlined"
                     inputProps={{ 'data-testid': 'question-field' }}
                     multiline
@@ -165,7 +170,7 @@ function QuestionComponent(props: any) {
                                 }
                                 key={index}
                                 type="text"
-                                value={quesOption}
+                                value={quesOption.title}
                             />
                         ))}
                         <Button

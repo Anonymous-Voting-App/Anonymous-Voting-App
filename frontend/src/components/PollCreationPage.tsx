@@ -6,18 +6,53 @@ import {
     FormControlLabel,
     Switch
 } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowRightAlt, AddCircleOutline } from '@mui/icons-material';
 import './PollCreationPage.scss';
 import QuestionComponent from './QuestionComponent';
+import { createPoll } from '../services/pollService';
 
-function PollCreationPage() {
+function PollCreationPage(props: any) {
     const [showQuesContainer, setShowQuesContainer] = useState(false);
     const [questions, setQuestions] = useState([
-        { text: '', type: '', options: [''] }
+        {
+            title: '',
+            description: '',
+            type: '',
+            minAnswer: 1,
+            maxAnswer: 1,
+            subQuestions: [{ title: '', description: '', type: '' }]
+        }
     ]);
+
     const [pollName, setPollName] = useState('');
     const [showCount, setShowCount] = useState(false);
+    const [emptyFlag, setEmptyFlag] = useState(true);
+
+    useEffect(() => {
+        const isEmpty = emptyFieldCheck();
+        setEmptyFlag(isEmpty);
+    }, [questions]);
+
+    //    condition check to handle empty question type,
+    //    if empty dont increment array
+    const emptyFieldCheck = () => {
+        const isEmpty =
+            questions.findIndex(
+                (question) =>
+                    question.title === '' ||
+                    question.type === '' ||
+                    question.subQuestions.length < 2 ||
+                    (question.subQuestions.findIndex(
+                        (option) => option.title === ''
+                    ) === -1
+                        ? false
+                        : true)
+            ) === -1
+                ? false
+                : true;
+        return isEmpty;
+    };
     /**
      * Function to add empty object to array when add question btn is clicked
      */
@@ -26,22 +61,20 @@ function PollCreationPage() {
         // console.log(questions,'after questions added')
         //    condition check to handle empty question type,
         //    if empty dont increment array
-        const isEmpty =
-            questions.findIndex(
-                (question) =>
-                    question.text === '' ||
-                    question.type === '' ||
-                    question.options.length < 2 ||
-                    (question.options.findIndex((option) => option === '') ===
-                    -1
-                        ? false
-                        : true)
-            ) === -1
-                ? false
-                : true;
+        const isEmpty = emptyFieldCheck();
 
         if (!isEmpty) {
-            setQuestions([...questions, { text: '', type: '', options: [''] }]);
+            setQuestions([
+                ...questions,
+                {
+                    title: '',
+                    description: '',
+                    type: '',
+                    minAnswer: 1,
+                    maxAnswer: 1,
+                    subQuestions: [{ title: '', description: '', type: '' }]
+                }
+            ]);
         }
     };
 
@@ -54,9 +87,15 @@ function PollCreationPage() {
         const newQuestions = questions.map((question, questionIndex) => {
             if (questionIndex === index) {
                 return {
-                    text: value,
+                    title: value,
+                    description: value,
                     type: question.type,
-                    options: question.options
+                    minAnswer: 1,
+                    maxAnswer:
+                        question.type === 'radioBtn'
+                            ? 1
+                            : question.subQuestions.length,
+                    subQuestions: question.subQuestions
                 };
             }
             return question;
@@ -68,9 +107,7 @@ function PollCreationPage() {
         const updatedQuestions = questions.filter((item, i) => {
             return i !== index;
         });
-        console.log(updatedQuestions);
         setQuestions(updatedQuestions);
-        console.log(questions, 'is it updated');
     };
 
     /**
@@ -78,18 +115,25 @@ function PollCreationPage() {
      * @param newOptions - array of options for the question
      * @param index - index of question in the array
      */
-    const onOptionInput = (newOptions: [string], index: number) => {
+    const onOptionInput = (
+        newOptions: [{ title: string; description: string; type: string }],
+        index: number
+    ) => {
         const newQuestionList = questions.map((question, questionIndex) => {
             if (questionIndex === index) {
                 return {
-                    text: question.text,
+                    title: question.title,
+                    description: question.title,
                     type: question.type,
-                    options: newOptions
+                    subQuestions: newOptions,
+                    minAnswer: 1,
+                    maxAnswer:
+                        question.type === 'radioBtn' ? 1 : newOptions.length
                 };
             }
             return question;
         });
-        console.log(newQuestionList);
+        // console.log(newQuestionList);
         setQuestions(newQuestionList);
     };
 
@@ -102,9 +146,15 @@ function PollCreationPage() {
         const newQuestions = questions.map((question, questionIndex) => {
             if (questionIndex === index) {
                 return {
-                    text: question.text,
+                    title: question.title,
+                    description: question.description,
                     type: value,
-                    options: question.options
+                    subQuestions: question.subQuestions,
+                    minAnswer: 1,
+                    maxAnswer:
+                        question.type === 'radioBtn'
+                            ? 1
+                            : question.subQuestions.length
                 };
             }
             return question;
@@ -117,6 +167,26 @@ function PollCreationPage() {
      */
     const submitHandler = () => {
         console.log(questions, pollName, showCount);
+
+        createPoll(pollName, questions)
+            .then((response) => {
+                // console.log(response);
+                if (response.code === 500) throw 'Bad Error';
+                else {
+                    props.showNotification({
+                        severity: 'success',
+                        message: 'Poll Created successfully'
+                    });
+                }
+            })
+            .catch((error) => {
+                console.log(error);
+                props.showNotification({
+                    severity: 'error',
+                    message:
+                        'Sorry, An error encountered while creating your poll'
+                });
+            });
     };
 
     const cancelHandler = () => {
@@ -126,6 +196,7 @@ function PollCreationPage() {
     const handleVoteCount = (event: React.ChangeEvent<HTMLInputElement>) => {
         setShowCount(event.target.checked);
     };
+
     return (
         <Container className="main-wrapper">
             <div className="page-heading">
@@ -180,6 +251,11 @@ function PollCreationPage() {
                 sx={{ mt: '6.25rem', width: 200 }}
             />
             <Button
+                disabled={
+                    questions.length < 0 ||
+                    emptyFlag === true ||
+                    pollName === ''
+                }
                 type="submit"
                 variant="contained"
                 onClick={submitHandler}
