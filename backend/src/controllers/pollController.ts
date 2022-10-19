@@ -5,6 +5,8 @@ import Logger from '../utils/logger';
 import * as responses from '../utils/responses';
 import * as IPolling from '../models/IPolling';
 import * as IVotingService from '../services/IVotingService';
+import { AssertionError } from 'assert';
+import BadRequestError from '../utils/badRequestError';
 
 const internalServerError = (
     method: string,
@@ -39,19 +41,31 @@ const callService = async (
         if (poll === null) {
             return responses.notFound(req, res);
         } else if (typeof poll === 'object') {
+            // Location headers not correct on local runtime!
+            if (method === 'createPoll') {
+                const location = `/poll/${poll.id}`;
+                return responses.created(req, res, location, poll);
+            } else if (method === 'answerPoll') {
+                const location = `/poll/${req.body.publicId}/answers`;
+                return responses.created(req, res, location, poll);
+            }
+
             return responses.ok(req, res, poll);
         }
 
         return internalServerError(method, req, res);
     } catch (e: unknown) {
+        // Bad request
+        if (e instanceof AssertionError) {
+            return responses.badRequest(req, res);
+        } else if (e instanceof BadRequestError) {
+            return responses.badRequest(req, res);
+        }
+
         if (e instanceof Error) {
             Logger.error(e.message);
             Logger.error(e.stack);
         }
-
-        // TODO: There **needs** to be separation between 400 and 500 errors here
-        // To sent responses, use the error responses found inside responses.ts
-        // Joonas Hiltunen 01.10.2022
 
         return responses.internalServerError(req, res);
     }
@@ -81,7 +95,7 @@ export const getPollAnswers = async (req: Request, res: Response) => {
     return await callService('getPollAnswers', req, res);
 };
 
-export const fetchPublicPoll = async (req: Request, res: Response) => {
+export const getPublicPoll = async (req: Request, res: Response) => {
     try {
         req.body = req.params.publicId;
     } catch (e) {
@@ -91,7 +105,7 @@ export const fetchPublicPoll = async (req: Request, res: Response) => {
     return await callService('getPollWithPublicId', req, res);
 };
 
-export const fetchPrivatePoll = async (req: Request, res: Response) => {
+export const getPrivatePoll = async (req: Request, res: Response) => {
     try {
         req.body = req.params.privateId;
     } catch (e) {

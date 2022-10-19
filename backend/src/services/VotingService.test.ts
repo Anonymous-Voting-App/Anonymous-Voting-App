@@ -6,6 +6,7 @@ import * as IPolling from '../models/IPolling';
 import { prismaMock } from '../utils/prisma_singleton';
 import VotingService from './VotingService';
 import Answer from '../models/Answer';
+import BadRequestError from '../utils/badRequestError';
 
 jest.mock('./UserManager');
 jest.mock('../models/Poll');
@@ -97,7 +98,7 @@ describe('VotingService', () => {
 
                 expect(true).toBeFalsy();
             } catch (e: unknown) {
-                if (e instanceof Error) {
+                if (e instanceof BadRequestError) {
                     expect(e.message).toBe('User not found.');
                 } else {
                     expect(true).toBeFalsy();

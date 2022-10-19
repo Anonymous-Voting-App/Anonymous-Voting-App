@@ -7,6 +7,7 @@ import * as IVotingService from './IVotingService';
 import * as IUserManager from './IUserManager';
 import UserManager from './/UserManager';
 import { PrismaClient } from '@prisma/client';
+import BadRequestError from '../utils/badRequestError';
 
 /**
  * Service of the anonymous voting app
@@ -151,8 +152,8 @@ export default class VotingService {
         const poll = new Poll(this.database());
         const user = await this.userManager().getUser(pollOptions.owner);
 
-        if (!(user instanceof User)) {
-            throw new Error('User not found.');
+        if (!user) {
+            throw new BadRequestError('User not found.');
         }
 
         await poll.createInDatabaseFromRequest(pollOptions, user);
