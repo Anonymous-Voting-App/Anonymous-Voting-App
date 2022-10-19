@@ -2,8 +2,15 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import QuestionComponent from '../QuestionComponent';
 import UserEvent from '@testing-library/user-event';
 
-test('Renders two text fields for question options when question type is selected', () => {
-    const question = { text: '', type: '', options: [''] };
+test('Renders one text field for question options when question type is selected', () => {
+    const question = {
+        title: '',
+        description: '',
+        type: '',
+        minAnswer: 1,
+        maxAnswer: 1,
+        subQuestions: [{ title: '', description: '', type: '' }]
+    };
     const onTypeChange = jest.fn();
     const onQuestionInput = jest.fn();
     const onOptionInput = jest.fn();
@@ -25,7 +32,14 @@ test('Renders two text fields for question options when question type is selecte
 });
 
 test('onTypeChange is called when question type is selected', () => {
-    const question = { text: '', type: '', options: [''] };
+    const question = {
+        title: '',
+        description: '',
+        type: '',
+        minAnswer: 1,
+        maxAnswer: 1,
+        subQuestions: [{ title: '', description: '', type: '' }]
+    };
     const onTypeChange = jest.fn();
     const onQuestionInput = jest.fn();
     const onOptionInput = jest.fn();
@@ -46,7 +60,14 @@ test('onTypeChange is called when question type is selected', () => {
 });
 
 test('onQuestionInput is called when question is entered in the text field', () => {
-    const question = { text: '', type: '', options: [''] };
+    const question = {
+        title: '',
+        description: '',
+        type: '',
+        minAnswer: 1,
+        maxAnswer: 1,
+        subQuestions: [{ title: '', description: '', type: '' }]
+    };
     const onTypeChange = jest.fn();
     const onQuestionInput = jest.fn();
     const onOptionInput = jest.fn();
@@ -68,7 +89,14 @@ test('onQuestionInput is called when question is entered in the text field', () 
 });
 
 test('optionInputHandler is called when options are entered in the text field', () => {
-    const question = { text: '', type: '', options: ['', ''] };
+    const question = {
+        title: '',
+        description: '',
+        type: '',
+        minAnswer: 1,
+        maxAnswer: 1,
+        subQuestions: [{ title: '', description: '', type: '' }]
+    };
     const onTypeChange = jest.fn();
     const onQuestionInput = jest.fn();
     const onOptionInput = jest.fn();
@@ -86,14 +114,21 @@ test('optionInputHandler is called when options are entered in the text field', 
     // UserEvent.click(getByRole(screen.getByTestId('ques-type-field'), 'button')); commented due to lint error
     UserEvent.click(screen.getByRole('button', { name: 'Question type' }));
     UserEvent.click(screen.getByText(/Pick One/i));
-    fireEvent.change(screen.getByTestId('option-field-1'), {
+    fireEvent.change(screen.getByTestId('option-field-0'), {
         target: { value: 'new option is entered' }
     });
     expect(onOptionInput).toHaveBeenCalledTimes(1);
 });
 
 test('option is removed delete icon is clicked', () => {
-    const question = { text: '', type: '', options: ['', ''] };
+    const question = {
+        title: '',
+        description: '',
+        type: '',
+        minAnswer: 1,
+        maxAnswer: 1,
+        subQuestions: [{ title: '', description: '', type: '' }]
+    };
     const onTypeChange = jest.fn();
     const onQuestionInput = jest.fn();
     const onOptionInput = jest.fn();
@@ -110,12 +145,19 @@ test('option is removed delete icon is clicked', () => {
     // UserEvent.click(getByRole(screen.getByTestId('ques-type-field'), 'button'));
     UserEvent.click(screen.getByRole('button', { name: 'Question type' }));
     UserEvent.click(screen.getByText(/Pick One/i));
-    UserEvent.click(screen.getByTestId('option-delete-1'));
+    UserEvent.click(screen.getByTestId('option-delete-0'));
     expect(onOptionInput).toHaveBeenCalledTimes(1);
 });
 
 test('new option field is added add an option btn is clicked', () => {
-    const question = { text: '', type: '', options: ['', ''] };
+    const question = {
+        title: '',
+        description: '',
+        type: '',
+        minAnswer: 1,
+        maxAnswer: 1,
+        subQuestions: [{ title: '', description: '', type: '' }]
+    };
     const onTypeChange = jest.fn();
     const onQuestionInput = jest.fn();
     const onOptionInput = jest.fn();
@@ -134,5 +176,5 @@ test('new option field is added add an option btn is clicked', () => {
     UserEvent.click(screen.getByText(/Pick One/i));
     UserEvent.click(screen.getByText(/Add a new option/i));
     const inputFields = screen.getAllByRole('textbox', { name: '' });
-    expect(inputFields.length).toBe(4); // 1 default question field + 2 default option fields + 1 newly added field = 4
+    expect(inputFields.length).toBe(3); // 1 default question field + 2 default option fields + 1 newly added field = 4
 });
