@@ -24,7 +24,7 @@ export const createPoll = async (title: string, questions: any) => {
     };
 
     // await fetch(`${window.location.origin}/api/poll`, {
-    const response = await fetch('http://localhost:8080/api/poll', {
+    const response = await fetch('/api/poll', {
         method: 'POST',
         body: JSON.stringify(pollContent),
         headers: {
