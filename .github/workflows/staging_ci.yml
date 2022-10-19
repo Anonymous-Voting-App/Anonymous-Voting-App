@@ -213,10 +213,10 @@ jobs:
         env:
             AWS_REGION: eu-north-1
             ECR_REPOSITORY: ava-backend/staging
-            ECS_SERVICE: AVABackendStagingService
-            ECS_CLUSTER: AVABackendStagingCluster
+            ECS_SERVICE: ava-backend-staging-service
+            ECS_CLUSTER: ava-backend-staging-cluster
             ECS_TASK_DEFINITION: .aws/staging_task_definition.json
-            CONTAINER_NAME: AVABackendStagingContainer
+            CONTAINER_NAME: ava-backend-staging-container
             DATABASE_URL: ${{ secrets.STAGING_DB_URL }}
 
         steps:
