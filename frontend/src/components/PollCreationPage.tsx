@@ -30,7 +30,20 @@ function PollCreationPage(props: any) {
     const [emptyFlag, setEmptyFlag] = useState(true);
 
     useEffect(() => {
-        const isEmpty = emptyFieldCheck();
+        const isEmpty =
+            questions.findIndex(
+                (question) =>
+                    question.title === '' ||
+                    question.type === '' ||
+                    question.subQuestions.length < 2 ||
+                    (question.subQuestions.findIndex(
+                        (option) => option.title === ''
+                    ) === -1
+                        ? false
+                        : true)
+            ) === -1
+                ? false
+                : true;
         setEmptyFlag(isEmpty);
     }, [questions]);
 

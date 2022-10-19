@@ -7,12 +7,12 @@ const updatePollBody = (questions: PollObj[]) => {
             return { ...element, type: 'multi' };
         else return element;
     });
-    console.log(updatedQuestions);
+    // console.log(updatedQuestions);
     return updatedQuestions;
 };
 
 export const createPoll = async (title: string, questions: any) => {
-    console.log(title, questions, 'api called');
+    // console.log(title, questions, 'api called');
     const updatedQuestions = updatePollBody(questions);
     const pollContent = {
         name: title,
