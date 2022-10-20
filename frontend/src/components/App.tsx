@@ -1,8 +1,8 @@
 import './App.scss';
 import NavBar from './NavBar';
 import PollCreationPage from './PollCreationPage';
-//import RegisterPage from './RegisterPage'
-//import LoginPage from './LoginPage';
+import RegisterPage from './RegisterPage';
+import LoginPage from './LoginPage';
 //import PollAnsweringPage from './PollAnsweringPage';
 
 function App() {

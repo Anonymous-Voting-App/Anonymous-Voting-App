@@ -1,60 +1,17 @@
 import { useState } from 'react';
-import {
-    Typography,
-    Container,
-    Button,
-    Link,
-    FormControl,
-    InputLabel,
-    OutlinedInput
-} from '@mui/material';
-import AccountCircle from '@mui/icons-material/AccountCircle';
-import LockIcon from '@mui/icons-material/Lock';
-import './LoginPage.scss';
+import { Typography, Container, Button, Link } from '@mui/material';
+import Field from './Field';
+import './LoginAndRegisterPage.scss';
 
 function LoginPage(props: any) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [shrinkName, setShrinkName] = useState(false);
-    const [notchedName, setNotchedName] = useState(false);
-    const [moveName, setMoveName] = useState('label move-right');
-    const [shrinkPassword, setShrinkPassword] = useState(false);
-    const [notchedPassword, setNotchedPassword] = useState(false);
-    const [movePassword, setMovePassword] = useState('label move-right');
 
-    const onNameInput = (value: string) => {
-        setUsername(value);
-    };
-
-    const onPasswordInput = (value: string) => {
-        setPassword(value);
-    };
-
-    const handleFocusName = () => {
-        setShrinkName(true);
-        setNotchedName(true);
-        setMoveName('label');
-    };
-
-    const handleBlurName = (value: string) => {
-        if (!value) {
-            setShrinkName(false);
-            setNotchedName(false);
-            setMoveName('label move-right');
-        }
-    };
-
-    const handleFocusPassword = () => {
-        setShrinkPassword(true);
-        setNotchedPassword(true);
-        setMovePassword('label');
-    };
-
-    const handleBlurPassword = (value: string) => {
-        if (!value) {
-            setShrinkPassword(false);
-            setNotchedPassword(false);
-            setMovePassword('label move-right');
+    const InputHandler = (value: string, index: number) => {
+        if (index === 0) {
+            setUsername(value);
+        } else {
+            setPassword(value);
         }
     };
 
@@ -64,70 +21,18 @@ function LoginPage(props: any) {
                 Login
             </Typography>
             <Container className="fields">
-                <FormControl
-                    sx={{ minWidth: '260px' }}
-                    size="small"
-                    className="user-field"
-                >
-                    <InputLabel
-                        id="username-label"
-                        htmlFor="username"
-                        shrink={shrinkName}
-                        className={moveName}
-                    >
-                        Username
-                    </InputLabel>
-
-                    <OutlinedInput
-                        type="text"
-                        onChange={(event) => onNameInput(event.target.value)}
-                        onFocus={handleFocusName}
-                        onBlur={(event) => handleBlurName(event.target.value)}
-                        value={username}
-                        className="input-field username"
-                        label="username"
-                        id="username"
-                        autoComplete="off"
-                        notched={notchedName}
-                        startAdornment={
-                            <AccountCircle className="input-field-icon" />
-                        }
-                    />
-                </FormControl>
-
-                <FormControl
-                    sx={{ minWidth: '260px' }}
-                    size="small"
-                    className="user-field"
-                >
-                    <InputLabel
-                        id="password-label"
-                        htmlFor="password"
-                        className={movePassword}
-                        shrink={shrinkPassword}
-                    >
-                        Password
-                    </InputLabel>
-                    <OutlinedInput
-                        type="text"
-                        onFocus={handleFocusPassword}
-                        onBlur={(event) =>
-                            handleBlurPassword(event.target.value)
-                        }
-                        onChange={(event) =>
-                            onPasswordInput(event.target.value)
-                        }
-                        value={'*'.repeat(password.length)}
-                        className="input-field"
-                        label="password"
-                        id="password"
-                        notched={notchedPassword}
-                        autoComplete="off"
-                        startAdornment={
-                            <LockIcon className="input-field-icon" />
-                        }
-                    />
-                </FormControl>
+                <Field
+                    page="login"
+                    text="Username"
+                    onInput={InputHandler}
+                    ind={0}
+                ></Field>
+                <Field
+                    page="login"
+                    text="Password"
+                    onInput={InputHandler}
+                    ind={1}
+                ></Field>
 
                 <Button
                     className="login-btn"
