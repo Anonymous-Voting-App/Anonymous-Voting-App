@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import './App.scss';
 import './NavBar.scss';
 import NavBar from './NavBar';
-import PollCreationPage from './PollCreationPage';
+//import PollCreationPage from './PollCreationPage';
 import BasicSnackbar from './BasicSnackbar';
-//import PollAnsweringPage from './PollAnsweringPage';
+import PollAnsweringPage from './PollAnsweringPage';
 
 function App() {
     const [open, setOpen] = useState(false);
@@ -34,10 +34,10 @@ function App() {
             <NavBar></NavBar>
             {/*For now since we don't have routing, comment out the components
             you don't want to see.*/}
-            <PollCreationPage
+            {/*<PollCreationPage
                 showNotification={handleNotification}
-            ></PollCreationPage>
-            {/*<PollAnsweringPage></PollAnsweringPage>*/}
+        ></PollCreationPage>*/}
+            <PollAnsweringPage></PollAnsweringPage>
             <BasicSnackbar
                 open={open}
                 onClose={handleClose}

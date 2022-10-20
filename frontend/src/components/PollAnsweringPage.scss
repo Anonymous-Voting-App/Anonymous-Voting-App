@@ -15,12 +15,13 @@
 }
 
 .questionType {
-    font-weight: 600;
+    padding-top: 80px;
+    font-weight: 600 !important;
 }
 
 .questionTitle {
     padding-top: 80px;
-    font-size: 40px;
+    font-size: 40px !important;
 }
 
 .answerContainer {
@@ -33,18 +34,19 @@
 
 .buttonsContainer {
     display: flex;
+    justify-content: center;
     gap: 48px;
 }
 
 .button {
-    margin-top: 52px;
-    border-radius: 20px;
+    margin-top: 52px !important;
+    border-radius: 20px !important;
     width: 16.25rem;
-    color: $main-color;
-    font-weight: bold;
-    text-transform: none;
-    background-color: $melon;
-    border: 2px solid $main-color;
+    color: $main-color !important;
+    font-weight: bold !important;
+    text-transform: none !important;
+    background-color: $melon !important;
+    border: 2px solid $main-color !important;
     gap: 10px;
     @include for-phone-only {
         font-size: 2.5rem;
@@ -53,10 +55,10 @@
 
 .previousQuestionButton {
     @extend .button;
-    background-color: $melon;
+    background-color: $melon !important;
 }
 
 .nextQuestionButton {
     @extend .button;
-    background-color: $mint;
+    background-color: $mint !important;
 }
