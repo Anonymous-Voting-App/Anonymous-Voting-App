@@ -1,7 +1,8 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
+cd backend && npm ci && npx --yes prisma generate && cd ..
 npm run lint
 npm run eslint -- --fix
-cd frontend && npm test -- --watchAll=false
-cd ../backend && npm test -- --watchAll=false
+cd frontend && npm test -- --watchAll=false && cd ..
+cd backend && npm test -- --watchAll=false && cd ..
