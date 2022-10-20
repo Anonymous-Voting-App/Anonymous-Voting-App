@@ -56,3 +56,22 @@
     background-color: $main-color !important;
     color: $background-color !important;
 }
+
+.listItems {
+    padding-top: 83px;
+}
+
+.listItem {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    padding-bottom: 20px;
+}
+
+.pinkLink {
+    color: $lollipop;
+}
+
+.deleteLink {
+    color: $cancel-background-color;
+}

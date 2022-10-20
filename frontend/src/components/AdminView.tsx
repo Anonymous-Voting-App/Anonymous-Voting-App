@@ -8,16 +8,24 @@ import {
     MenuItem,
     SelectChangeEvent,
     TextField,
-    InputLabel
+    Link,
+    Box
 } from '@mui/material';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import './AdminView.scss';
 
+const TEST_USERS = ['Martti', 'user123'];
+
 const PollAnsweringPage = () => {
     const [searchBy, setSearchBy] = useState('');
+    const [showSearchResults, setShowSearchResults] = useState(false);
 
     const handleTypeChange = (e: SelectChangeEvent<string>) => {
         setSearchBy(e.target.value);
+    };
+
+    const handleSearchClick = () => {
+        setShowSearchResults(true);
     };
 
     return (
@@ -50,10 +58,37 @@ const PollAnsweringPage = () => {
                     variant="outlined"
                     placeholder="Search text here"
                 ></TextField>
-                <Button className="searchButton" variant="outlined">
+                <Button
+                    className="searchButton"
+                    variant="outlined"
+                    onClick={handleSearchClick}
+                >
                     Search
                 </Button>
             </div>
+            {showSearchResults ? (
+                <div className="listItems">
+                    {TEST_USERS.map((user) => {
+                        return (
+                            <Box key={user} className="listItem">
+                                <Typography>{user}</Typography>
+                                <Link className="pinkLink" href="#">
+                                    Edit
+                                </Link>
+                                <Link className="pinkLink" href="#">
+                                    View Results
+                                </Link>
+                                <Link className="pinkLink" href="#">
+                                    View links
+                                </Link>
+                                <Link className="deleteLink" href="#">
+                                    Delete
+                                </Link>
+                            </Box>
+                        );
+                    })}
+                </div>
+            ) : null}
         </Container>
     );
 };
