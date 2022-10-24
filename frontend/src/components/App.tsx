@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './App.scss';
 import './NavBar.scss';
 import NavBar from './NavBar';
-import PollCreationPage from './PollCreationPage';
+//import PollCreationPage from './PollCreationPage';
 import BasicSnackbar from './BasicSnackbar';
 //import PollAnsweringPage from './PollAnsweringPage';
 import AdminView from './AdminView';
