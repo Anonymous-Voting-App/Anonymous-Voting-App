@@ -51,6 +51,7 @@
     },
     "devDependencies": {
         "eslint-config-prettier": "^8.5.0",
+        "react-router-dom": "^6.4.2",
         "sass": "^1.55.0"
     }
 }

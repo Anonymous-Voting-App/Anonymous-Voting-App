@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.scss';
 import './NavBar.scss';
 import NavBar from './NavBar';
-//import PollCreationPage from './PollCreationPage';
+import PollCreationPage from './PollCreationPage';
 import BasicSnackbar from './BasicSnackbar';
 import PollAnsweringPage from './PollAnsweringPage';
 
@@ -32,12 +33,19 @@ function App() {
     return (
         <div className="App">
             <NavBar></NavBar>
-            {/*For now since we don't have routing, comment out the components
-            you don't want to see.*/}
-            {/*<PollCreationPage
-                showNotification={handleNotification}
-        ></PollCreationPage>*/}
-            <PollAnsweringPage></PollAnsweringPage>
+            <BrowserRouter>
+                <Routes>
+                    <Route
+                        index
+                        element={
+                            <PollCreationPage
+                                showNotification={handleNotification}
+                            ></PollCreationPage>
+                        }
+                    />
+                    <Route path="answer" element={<PollAnsweringPage />} />
+                </Routes>
+            </BrowserRouter>
             <BasicSnackbar
                 open={open}
                 onClose={handleClose}
