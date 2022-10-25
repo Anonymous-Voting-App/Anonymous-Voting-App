@@ -13,6 +13,7 @@ function App() {
         severity: ''
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const handleNotification = (status: {
         severity: string;
         message: string;

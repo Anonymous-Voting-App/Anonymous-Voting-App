@@ -61,7 +61,9 @@ resource "aws_iam_policy" "allow_ecs_deployment" {
         Sid    = "RegisterTaskDefinition",
         Effect = "Allow",
         Action = [
-          "ecs:RegisterTaskDefinition"
+          "ecs:RegisterTaskDefinition",
+          "ecs:DescribeTaskDefinition",
+          "ecs:DeregisterTaskDefinition"
         ],
         Resource = "*"
       },
