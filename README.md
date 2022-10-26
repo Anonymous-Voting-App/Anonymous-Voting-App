@@ -21,11 +21,11 @@ To utilize code formatting and linting on commit, run `npm install` in the proje
 
 The project deployment is spread to two different versions:
 
--   Production
+-   Production (Not yet set up)
     -   When code is pushed to `main`, it will be deployed to production environment
-    -   Website URL: TBD
-    -   API URL: TBD
+    -   Website URL: [https://knowit-anonymous-voting-app.aws.cybercom.dev/]()
+    -   API URL: [https://knowit-anonymous-voting-app.aws.cybercom.dev/api/]()
 -   Staging
     -   When code is pushed to `dev`, it will be deployed to staging environment
-    -   Website URL: [https://d2l9c7s1roosdj.cloudfront.net/](https://d2l9c7s1roosdj.cloudfront.net/)
-    -   API URL: [https://d2l9c7s1roosdj.cloudfront.net/api/](https://d2l9c7s1roosdj.cloudfront.net/api/)
+    -   Website URL: [https://staging.knowit-anonymous-voting-app.aws.cybercom.dev/](https://staging.knowit-anonymous-voting-app.aws.cybercom.dev/)
+    -   API URL: [https://staging.knowit-anonymous-voting-app.aws.cybercom.dev/api/](https://staging.knowit-anonymous-voting-app.aws.cybercom.dev/api/)

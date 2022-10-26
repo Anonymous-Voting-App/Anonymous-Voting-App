@@ -5,30 +5,38 @@ on:
         branches:
             - dev
 
+env:
+    # User specified
+    # Empty
+
+    # Secrets
+    GITGUARDIAN_API_KEY: ${{ secrets.GITGUARDIAN_API_KEY }}
+    CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+    # Automatic
+    GITHUB_PUSH_BEFORE_SHA: ${{ github.event.before }}
+    GITHUB_PUSH_BASE_SHA: ${{ github.event.base }}
+    GITHUB_PULL_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+    GITHUB_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+
 jobs:
     scan-code:
         name: GitGuardian scan
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
-              uses: actions/checkout@v2
+              uses: actions/checkout@v3
               with:
                   fetch-depth: 0 # fetch all history so multiple commits can be scanned
             - name: GitGuardian scan
               uses: GitGuardian/ggshield-action@master
-              env:
-                  GITHUB_PUSH_BEFORE_SHA: ${{ github.event.before }}
-                  GITHUB_PUSH_BASE_SHA: ${{ github.event.base }}
-                  GITHUB_PULL_BASE_SHA: ${{ github.event.pull_request.base.sha }}
-                  GITHUB_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
-                  GITGUARDIAN_API_KEY: ${{ secrets.GITGUARDIAN_API_KEY }}
 
     check-style-frontend:
         name: Check frontend code style
         needs: scan-code
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@main
+            - uses: actions/checkout@v3
             - uses: actions/setup-node@main
               with:
                   node-version: lts/*
@@ -46,7 +54,7 @@ jobs:
                 working-directory: frontend
 
         steps:
-            - uses: actions/checkout@main
+            - uses: actions/checkout@v3
             - uses: actions/setup-node@main
               with:
                   node-version: lts/*
@@ -64,7 +72,7 @@ jobs:
                 working-directory: frontend
 
         steps:
-            - uses: actions/checkout@main
+            - uses: actions/checkout@v3
             - uses: actions/setup-node@main
               with:
                   node-version: lts/*
@@ -73,7 +81,7 @@ jobs:
             - run: npm run test:ci
             - uses: codecov/codecov-action@v3
               with:
-                  token: ${{ secrets.CODECOV_TOKEN }}
+                  token: ${{ enc.CODECOV_TOKEN }}
                   flags: dev,unit,frontend
                   fail_ci_if_error: true
 
@@ -82,7 +90,7 @@ jobs:
         needs: scan-code
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@main
+            - uses: actions/checkout@v3
             - uses: actions/setup-node@main
               with:
                   node-version: lts/*
@@ -100,7 +108,7 @@ jobs:
                 working-directory: backend
 
         steps:
-            - uses: actions/checkout@main
+            - uses: actions/checkout@v3
             - uses: actions/setup-node@main
               with:
                   node-version: lts/*
@@ -118,7 +126,7 @@ jobs:
                 working-directory: backend
 
         steps:
-            - uses: actions/checkout@main
+            - uses: actions/checkout@v3
             - uses: actions/setup-node@main
               with:
                   node-version: lts/*
@@ -135,7 +143,7 @@ jobs:
                 working-directory: backend
 
         steps:
-            - uses: actions/checkout@main
+            - uses: actions/checkout@v3
             - uses: actions/setup-node@main
               with:
                   node-version: lts/*
@@ -144,6 +152,6 @@ jobs:
             - run: npm run test:coverage
             - uses: codecov/codecov-action@v3
               with:
-                  token: ${{ secrets.CODECOV_TOKEN }}
+                  token: ${{ env.CODECOV_TOKEN }}
                   flags: dev,unit,backend
                   fail_ci_if_error: true

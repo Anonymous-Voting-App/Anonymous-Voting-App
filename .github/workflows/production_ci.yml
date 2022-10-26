@@ -1,25 +1,25 @@
-name: Staging CI
+name: Production CI
 
 on:
     push:
         branches:
-            - dev
+            - main
 
 env:
     # User specified
     AWS_REGION: eu-north-1
-    ECR_REPOSITORY: ava/backend-staging
-    ECS_SERVICE: ava-staging-backend-service
-    ECS_CLUSTER: ava-staging-backend-cluster
-    ECS_TASK: ava-staging-backend-task
-    CONTAINER_NAME: ava-staging-backend-container
-    FRONTEND_BUCKET: ava-staging-s3-frontend
+    ECR_REPOSITORY: ava/backend-production
+    ECS_SERVICE: ava-production-backend-service
+    ECS_CLUSTER: ava-production-backend-cluster
+    ECS_TASK: ava-production-backend-task
+    CONTAINER_NAME: ava-production-backend-container
+    FRONTEND_BUCKET: ava-production-s3-frontend
 
     # Secrets
-    DATABASE_URL: ${{ secrets.STAGING_DB_URL }}
+    DATABASE_URL: ${{ secrets.PRODUCTION_DB_URL }}
     GITGUARDIAN_API_KEY: ${{ secrets.GITGUARDIAN_API_KEY }}
     CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-    AWS_STAGING_ROLE_TO_ASSUME: ${{ secrets.AWS_STAGING_ROLE_TO_ASSUME }}
+    AWS_PRODUCTION_ROLE_TO_ASSUME: ${{ secrets.AWS_PRODUCTION_ROLE_TO_ASSUME }}
 
     # Automatic
     GITHUB_PUSH_BEFORE_SHA: ${{ github.event.before }}
@@ -92,11 +92,11 @@ jobs:
             - uses: codecov/codecov-action@v3
               with:
                   token: ${{ env.CODECOV_TOKEN }}
-                  flags: staging,unit,frontend
+                  flags: production,unit,frontend
                   fail_ci_if_error: true
 
-    frontend-deploy-staging:
-        name: Deploy frontend to staging environment
+    frontend-deploy-production:
+        name: Deploy frontend to production environment
         needs: frontend-test
         runs-on: ubuntu-latest
         permissions:
@@ -119,7 +119,7 @@ jobs:
             - name: Configure AWS credentials
               uses: aws-actions/configure-aws-credentials@v1
               with:
-                  role-to-assume: ${{ env.AWS_STAGING_ROLE_TO_ASSUME }}
+                  role-to-assume: ${{ env.AWS_PRODUCTION_ROLE_TO_ASSUME }}
                   aws-region: ${{ env.AWS_REGION }}
 
             - name: Copy files to the S3 with the AWS CLI
@@ -194,10 +194,10 @@ jobs:
             - uses: codecov/codecov-action@v3
               with:
                   token: ${{ env.CODECOV_TOKEN }}
-                  flags: staging,unit,backend
+                  flags: production,unit,backend
                   fail_ci_if_error: true
 
-    backend-build-staging:
+    backend-build-production:
         name: Build and push backend
         needs: backend-test
         runs-on: ubuntu-latest
@@ -216,7 +216,7 @@ jobs:
             - name: Configure AWS credentials
               uses: aws-actions/configure-aws-credentials@v1
               with:
-                  role-to-assume: ${{ env.AWS_STAGING_ROLE_TO_ASSUME }}
+                  role-to-assume: ${{ env.AWS_PRODUCTION_ROLE_TO_ASSUME }}
                   aws-region: eu-north-1
 
             - name: Login to Amazon ECR
@@ -224,6 +224,7 @@ jobs:
               uses: aws-actions/amazon-ecr-login@v1
 
             - name: Build, tag, and push image to Amazon ECR
+              id: build-image
               env:
                   ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
                   IMAGE_TAG: ${{ github.sha }}
@@ -231,9 +232,9 @@ jobs:
                   docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
                   docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
-    backend-deploy-staging:
-        name: Deploy backend to staging environment
-        needs: backend-build-staging
+    backend-deploy-production:
+        name: Deploy backend to production environment
+        needs: backend-build-production
         runs-on: ubuntu-latest
         permissions:
             id-token: write
@@ -246,7 +247,7 @@ jobs:
             - name: Configure AWS credentials
               uses: aws-actions/configure-aws-credentials@v1
               with:
-                  role-to-assume: ${{ env.AWS_STAGING_ROLE_TO_ASSUME }}
+                  role-to-assume: ${{ env.AWS_PRODUCTION_ROLE_TO_ASSUME }}
                   aws-region: eu-north-1
 
             - name: Login to Amazon ECR
@@ -283,9 +284,9 @@ jobs:
               run: |
                   aws ecs deregister-task-definition --task-definition ${{ env.ECS_TASK }}:${{ steps.download-task.outputs.revision }}
 
-    migrate-staging-database:
-        name: Migrate changes to staging database
-        needs: backend-build-staging
+    migrate-production-database:
+        name: Migrate changes to production database
+        needs: backend-build-production
         runs-on: ubuntu-latest
 
         defaults:
