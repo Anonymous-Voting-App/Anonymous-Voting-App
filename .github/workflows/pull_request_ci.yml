@@ -81,7 +81,7 @@ jobs:
             - run: npm run test:ci
             - uses: codecov/codecov-action@v3
               with:
-                  token: ${{ enc.CODECOV_TOKEN }}
+                  token: ${{ env.CODECOV_TOKEN }}
                   flags: dev,unit,frontend
                   fail_ci_if_error: true
 
