@@ -21,19 +21,23 @@ describe('MultiQuestion', () => {
 
             expect(
                 question.answerDataIsAcceptable({
-                    subQuestionId: 'sub-id',
-                    answer: {
-                        answer: 'sub-answer'
-                    }
+                    subQuestionIds: ['sub-id'],
+                    answer: [
+                        {
+                            answer: 'sub-answer'
+                        }
+                    ]
                 })
             ).toBe(true);
 
             expect(
                 question.answerDataIsAcceptable({
-                    subQuestionId: 'does-not-exist',
-                    answer: {
-                        answer: 'sub-answer'
-                    }
+                    subQuestionIds: ['does-not-exist'],
+                    answer: [
+                        {
+                            answer: 'sub-answer'
+                        }
+                    ]
                 })
             ).toBe(false);
         });
@@ -41,14 +45,25 @@ describe('MultiQuestion', () => {
 
     describe('answer', () => {
         test('Successfully answer multi question', async () => {
-            const user = makeAnswerer();
+            const calls: Array<string> = [];
 
-            Answer.prototype.value = jest.fn().mockReturnValue('true');
-            Answer.prototype.questionId = jest.fn().mockReturnValue('q1');
-            Answer.prototype.answerer = jest.fn().mockReturnValue(user);
-            Answer.prototype.createdInDatabase = jest
-                .fn()
-                .mockReturnValue(true);
+            Answer.prototype.createNewInDatabase = jest.fn(async () => {
+                calls.push('createNewInDatabase');
+            });
+            Answer.prototype.setDatabase = jest.fn(async () => {
+                calls.push('setDatabase');
+            });
+            Answer.prototype.setQuestionId = jest.fn(async () => {
+                calls.push('setQuestionId');
+            });
+            Answer.prototype.setValue = jest.fn(async () => {
+                calls.push('setValue');
+            });
+            Answer.prototype.setAnswerer = jest.fn(async () => {
+                calls.push('setAnswerer');
+            });
+
+            const user = makeAnswerer();
 
             const question = new MultiQuestion();
             const subQuestion = new Question();
@@ -58,21 +73,35 @@ describe('MultiQuestion', () => {
             question.subQuestions()[subQuestion.id()] = subQuestion;
             question.setDatabase(prismaMock);
 
-            const answer = await question.answer(
-                {
-                    subQuestionId: 'sub-id',
-                    answer: {
-                        answer: true
+            const requestObj = {
+                subQuestionIds: ['sub-id'],
+                answer: [
+                    {
+                        answer: 'test-value'
                     }
-                },
-                user
+                ]
+            };
+
+            await question.answer(requestObj, user);
+
+            expect(Answer.prototype.setFromRequest).toHaveBeenNthCalledWith(
+                1,
+                requestObj,
+                user,
+                'q1'
             );
 
-            expect(answer instanceof Answer).toBe(true);
-            expect(answer?.value()).toBe('true');
-            expect(answer?.questionId()).toBe('q1');
-            expect(answer?.answerer()).toBe(user);
-            expect(answer?.createdInDatabase()).toBe(true);
+            expect(Answer.prototype.setFromRequest).toHaveBeenNthCalledWith(
+                2,
+                requestObj.answer[0],
+                user,
+                'sub-id'
+            );
+
+            expect(Answer.prototype.createNewInDatabase).toHaveBeenCalledTimes(
+                2
+            );
+            expect(calls[calls.length - 1]).toBe('createNewInDatabase');
         });
 
         test('Question not found', async () => {
@@ -86,17 +115,23 @@ describe('MultiQuestion', () => {
 
             const user = makeAnswerer();
 
-            const answer = await question.answer(
-                {
-                    subQuestionId: 'does-not-exist',
-                    answer: {
-                        answer: true
-                    }
-                },
-                user
-            );
-
-            expect(answer).toBeNull();
+            try {
+                await question.answer(
+                    {
+                        subQuestionIds: ['does-not-exist'],
+                        answer: [
+                            {
+                                answer: true
+                            }
+                        ]
+                    },
+                    user
+                );
+            } catch (e) {
+                if (e instanceof Error) {
+                    expect(e.message).toBe('sub-question with given id exists');
+                }
+            }
         });
     });
 
@@ -109,26 +144,38 @@ describe('MultiQuestion', () => {
                 title: 'title',
                 description: 'description',
                 pollId: 'pollId',
+                parentId: null,
                 type: 'type',
+                typeName: 'multi',
+                minValue: 1,
+                maxValue: 1,
                 votes: [],
-                options: [
+                subQuestions: [
                     {
                         id: 'sub-id',
-                        questionId: 'id',
-                        option: 'option'
+                        title: 'title',
+                        description: 'description',
+                        pollId: 'pollId',
+                        parentId: 'id',
+                        type: 'type',
+                        typeName: 'free',
+                        votes: []
                     }
                 ]
             });
 
             expect(question.id()).toBe('id');
             expect(question.pollId()).toBe('pollId');
-            expect(question.type()).toBe('type');
+            expect(question.type()).toBe('multi');
+            expect(question.minAnswers()).toBe(1);
+            expect(question.maxAnswers()).toBe(1);
             expect(Object.keys(question.subQuestions())).toEqual(['sub-id']);
 
             const subQuestion = question.subQuestions()['sub-id'];
 
             expect(subQuestion.id()).toBe('sub-id');
-            expect(subQuestion.title()).toBe('option');
+            expect(subQuestion.title()).toBe('title');
+            expect(subQuestion.type()).toBe('free');
         });
     });
 
@@ -153,7 +200,13 @@ describe('MultiQuestion', () => {
 
             expect(question.newDatabaseObject()).toEqual({
                 typeId: '7b76d1c6-8f40-4509-8317-ce444892b1ee',
-                pollId: 'pollId'
+                pollId: 'pollId',
+                maxValue: 1,
+                minValue: 1,
+                parentId: undefined,
+                typeName: 'type',
+                title: 'title',
+                description: 'description'
             });
         });
     });

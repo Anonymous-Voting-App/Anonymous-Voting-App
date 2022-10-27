@@ -1,5 +1,7 @@
+import * as IAnswer from './IAnswer';
+
 export interface AnswerData {
-    answer: any;
+    answer: string | number | boolean | object | Array<AnswerData>;
     [extra: string]: unknown;
 }
 
@@ -9,8 +11,13 @@ export interface NewOptionData {
 }
 
 export interface NewQuestionData {
+    typeName: string;
     typeId: string;
     pollId: string;
+    title: string;
+    description: string;
+    parentId?: string;
+    [extra: string]: unknown;
 }
 
 export interface OptionData {
@@ -18,13 +25,15 @@ export interface OptionData {
     questionId: string;
 }
 
-export interface QuestionData {
+export interface DatabaseData {
     id: string;
     title?: string;
     description?: string;
     pollId: string;
     type?: string;
-    votes?: Array<any>;
+    typeName: string;
+    votes?: Array<IAnswer.DatabaseData>;
+    parentId: string | null;
     [extra: string]: unknown;
 }
 
@@ -39,4 +48,10 @@ export interface QuestionRequest {
     description: string;
     type: string;
     subQuestions?: Array<QuestionRequest>;
+    minValue?: number;
+    maxValue?: number;
+    step?: number;
+    minAnswers?: number;
+    maxAnswers?: number;
+    [extra: string]: number | string | object | boolean | undefined;
 }

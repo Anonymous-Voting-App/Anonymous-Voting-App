@@ -5,47 +5,48 @@ on:
         branches:
             - dev
 
+env:
+    # User specified
+    AWS_REGION: eu-north-1
+    ECR_REPOSITORY: ava/backend-staging
+    ECS_SERVICE: ava-staging-backend-service
+    ECS_CLUSTER: ava-staging-backend-cluster
+    ECS_TASK: ava-staging-backend-task
+    CONTAINER_NAME: ava-staging-backend-container
+    FRONTEND_BUCKET: ava-staging-s3-frontend
+
+    # Secrets
+    DATABASE_URL: ${{ secrets.STAGING_DB_URL }}
+    GITGUARDIAN_API_KEY: ${{ secrets.GITGUARDIAN_API_KEY }}
+    CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+    AWS_STAGING_ROLE_TO_ASSUME: ${{ secrets.AWS_STAGING_ROLE_TO_ASSUME }}
+
+    # Automatic
+    GITHUB_PUSH_BEFORE_SHA: ${{ github.event.before }}
+    GITHUB_PUSH_BASE_SHA: ${{ github.event.base }}
+    GITHUB_PULL_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+    GITHUB_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+
 jobs:
     scan-code:
         name: GitGuardian scan
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
-              uses: actions/checkout@v2
+              uses: actions/checkout@v3
               with:
                   fetch-depth: 0 # fetch all history so multiple commits can be scanned
             - name: GitGuardian scan
               uses: GitGuardian/ggshield-action@master
               env:
-                  GITHUB_PUSH_BEFORE_SHA: ${{ github.event.before }}
-                  GITHUB_PUSH_BASE_SHA: ${{ github.event.base }}
-                  GITHUB_PULL_BASE_SHA: ${{ github.event.pull_request.base.sha }}
-                  GITHUB_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
-                  GITGUARDIAN_API_KEY: ${{ secrets.GITGUARDIAN_API_KEY }}
-
-    check-for-changes:
-        name: Check for changes
-        runs-on: ubuntu-latest
-        outputs:
-            backend: ${{ steps.filter.outputs.backend }}
-            frontend: ${{ steps.filter.outputs.frontend }}
-        steps:
-            - uses: actions/checkout@main
-            - uses: dorny/paths-filter@v2
-              id: filter
-              with:
-                  filters: |
-                      backend:
-                      - 'backend/**'
-                      frontend:
-                      - 'frontend/**'
+                  GITGUARDIAN_API_KEY: ${{ env.GITGUARDIAN_API_KEY }}
 
     check-style-frontend:
         name: Check frontend code style
-        needs: [scan-code, check-for-changes]
+        needs: scan-code
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@main
+            - uses: actions/checkout@v3
             - uses: actions/setup-node@main
               with:
                   node-version: lts/*
@@ -63,7 +64,7 @@ jobs:
                 working-directory: frontend
 
         steps:
-            - uses: actions/checkout@main
+            - uses: actions/checkout@v3
             - uses: actions/setup-node@main
               with:
                   node-version: lts/*
@@ -81,7 +82,7 @@ jobs:
                 working-directory: frontend
 
         steps:
-            - uses: actions/checkout@main
+            - uses: actions/checkout@v3
             - uses: actions/setup-node@main
               with:
                   node-version: lts/*
@@ -90,14 +91,13 @@ jobs:
             - run: npm run test:ci
             - uses: codecov/codecov-action@v3
               with:
-                  token: ${{ secrets.CODECOV_TOKEN }}
+                  token: ${{ env.CODECOV_TOKEN }}
                   flags: staging,unit,frontend
                   fail_ci_if_error: true
 
     frontend-deploy-staging:
         name: Deploy frontend to staging environment
         needs: frontend-test
-        if: ${{ (needs.check-for-changes.outputs.frontend == 'true') || (contains(github.event.head_commit.message, 'ci deploy')) }}
         runs-on: ubuntu-latest
         permissions:
             id-token: write
@@ -108,7 +108,7 @@ jobs:
                 working-directory: frontend
 
         steps:
-            - uses: actions/checkout@main
+            - uses: actions/checkout@v3
             - uses: actions/setup-node@main
               with:
                   node-version: lts/*
@@ -119,19 +119,19 @@ jobs:
             - name: Configure AWS credentials
               uses: aws-actions/configure-aws-credentials@v1
               with:
-                  role-to-assume: ${{ secrets.AWS_STAGING_ROLE_TO_ASSUME }}
-                  aws-region: eu-north-1
+                  role-to-assume: ${{ env.AWS_STAGING_ROLE_TO_ASSUME }}
+                  aws-region: ${{ env.AWS_REGION }}
 
             - name: Copy files to the S3 with the AWS CLI
               run: |
-                  aws s3 sync ./build s3://staging.knowit-anonymous-voting-app.aws.cybercom.dev
+                  aws s3 sync ./build s3://${{ env.FRONTEND_BUCKET }}
 
     check-style-backend:
         name: Check backend code style
-        needs: [scan-code, check-for-changes]
+        needs: scan-code
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@main
+            - uses: actions/checkout@v3
             - uses: actions/setup-node@main
               with:
                   node-version: lts/*
@@ -149,7 +149,7 @@ jobs:
                 working-directory: backend
 
         steps:
-            - uses: actions/checkout@main
+            - uses: actions/checkout@v3
             - uses: actions/setup-node@main
               with:
                   node-version: lts/*
@@ -157,8 +157,8 @@ jobs:
             - run: npm ci
             - run: npm run lint
 
-    backend-test:
-        name: Test backend
+    backend-validate-swagger:
+        name: Validate Swagger/OpenAPI
         needs: backend-lint
         runs-on: ubuntu-latest
 
@@ -167,7 +167,24 @@ jobs:
                 working-directory: backend
 
         steps:
-            - uses: actions/checkout@main
+            - uses: actions/checkout@v3
+            - uses: actions/setup-node@main
+              with:
+                  node-version: lts/*
+                  cache: npm
+            - run: npx swagger-cli validate ./src/routes/v1/swagger_api_v1.json --yes
+
+    backend-test:
+        name: Test backend
+        needs: backend-validate-swagger
+        runs-on: ubuntu-latest
+
+        defaults:
+            run:
+                working-directory: backend
+
+        steps:
+            - uses: actions/checkout@v3
             - uses: actions/setup-node@main
               with:
                   node-version: lts/*
@@ -176,14 +193,13 @@ jobs:
             - run: npm run test:coverage
             - uses: codecov/codecov-action@v3
               with:
-                  token: ${{ secrets.CODECOV_TOKEN }}
+                  token: ${{ env.CODECOV_TOKEN }}
                   flags: staging,unit,backend
                   fail_ci_if_error: true
 
-    backend-deploy-staging:
-        name: Deploy backend to staging environment
+    backend-build-staging:
+        name: Build and push backend
         needs: backend-test
-        if: ${{ (needs.check-for-changes.outputs.backend == 'true') || (contains(github.event.head_commit.message, 'ci deploy')) }}
         runs-on: ubuntu-latest
         permissions:
             id-token: write
@@ -193,24 +209,14 @@ jobs:
             run:
                 working-directory: backend
 
-        env:
-            AWS_REGION: eu-north-1
-            ECR_REPOSITORY: ava-backend/staging
-            ECS_SERVICE: AVABackendStagingService
-            ECS_CLUSTER: AVABackendStagingCluster
-            ECS_TASK_DEFINITION: .aws/staging_task_definition.json
-            CONTAINER_NAME: AVABackendStagingContainer
-            DATABASE_URL: ${{ secrets.STAGING_DB_URL }}
-
         steps:
-            # Checks out the repository
             - name: Checkout Repo
-              uses: actions/checkout@main
+              uses: actions/checkout@v3
 
             - name: Configure AWS credentials
               uses: aws-actions/configure-aws-credentials@v1
               with:
-                  role-to-assume: ${{ secrets.AWS_STAGING_ROLE_TO_ASSUME }}
+                  role-to-assume: ${{ env.AWS_STAGING_ROLE_TO_ASSUME }}
                   aws-region: eu-north-1
 
             - name: Login to Amazon ECR
@@ -218,22 +224,51 @@ jobs:
               uses: aws-actions/amazon-ecr-login@v1
 
             - name: Build, tag, and push image to Amazon ECR
-              id: build-image
               env:
                   ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
                   IMAGE_TAG: ${{ github.sha }}
               run: |
                   docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
                   docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-                  echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+
+    backend-deploy-staging:
+        name: Deploy backend to staging environment
+        needs: backend-build-staging
+        runs-on: ubuntu-latest
+        permissions:
+            id-token: write
+            contents: read
+
+        steps:
+            - name: Checkout Repo
+              uses: actions/checkout@v3
+
+            - name: Configure AWS credentials
+              uses: aws-actions/configure-aws-credentials@v1
+              with:
+                  role-to-assume: ${{ env.AWS_STAGING_ROLE_TO_ASSUME }}
+                  aws-region: eu-north-1
+
+            - name: Login to Amazon ECR
+              id: login-ecr
+              uses: aws-actions/amazon-ecr-login@v1
+
+            - name: Download task definition
+              id: download-task
+              run: |
+                  aws ecs describe-task-definition --task-definition ${{ env.ECS_TASK }} --query taskDefinition > task-definition.json
+                  echo "revision=$(($(cat task-definition.json | jq .revision) - 1))" >> $GITHUB_OUTPUT
 
             - name: Fill in the new image ID in the Amazon ECS task definition
               id: task-def
               uses: aws-actions/amazon-ecs-render-task-definition@v1
+              env:
+                  ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+                  IMAGE_TAG: ${{ github.sha }}
               with:
-                  task-definition: ${{ env.ECS_TASK_DEFINITION }}
+                  task-definition: task-definition.json
                   container-name: ${{ env.CONTAINER_NAME }}
-                  image: ${{ steps.build-image.outputs.image }}
+                  image: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
 
             - name: Deploy Amazon ECS task definition
               uses: aws-actions/amazon-ecs-deploy-task-definition@v1
@@ -243,11 +278,29 @@ jobs:
                   cluster: ${{ env.ECS_CLUSTER }}
                   wait-for-service-stability: false
 
+            - name: De-register previous revision
+              if: ${{ steps.download-task.outputs.revision > 0 }}
+              run: |
+                  aws ecs deregister-task-definition --task-definition ${{ env.ECS_TASK }}:${{ steps.download-task.outputs.revision }}
+
+    migrate-staging-database:
+        name: Migrate changes to staging database
+        needs: backend-build-staging
+        runs-on: ubuntu-latest
+
+        defaults:
+            run:
+                working-directory: backend
+
+        steps:
+            - name: Checkout Repo
+              uses: actions/checkout@v3
             - name: Setup node
               uses: actions/setup-node@main
               with:
                   node-version: lts/*
                   cache: npm
-            - run: npx prisma migrate deploy
+            - name: Migrate database
+              run: npx prisma migrate deploy
               env:
                   DATABASE_URL: ${{ env.DATABASE_URL }}

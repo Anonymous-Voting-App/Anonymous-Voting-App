@@ -6,6 +6,8 @@ import * as IPolling from '../models/IPolling';
 import { prismaMock } from '../utils/prisma_singleton';
 import VotingService from './VotingService';
 import Answer from '../models/Answer';
+import QuestionFactory from '../models/QuestionFactory';
+import BadRequestError from '../utils/badRequestError';
 
 jest.mock('./UserManager');
 jest.mock('../models/Poll');
@@ -27,16 +29,16 @@ describe('VotingService', () => {
                 type: 'type',
                 publicId: 'publicId',
                 privateId: 'privateId',
-                questions: {
-                    q1: {
+                questions: [
+                    {
                         title: '',
                         description: '',
                         type: 'question-type',
                         id: 'q1',
                         pollId: '1'
                     }
-                },
-                answers: {}
+                ],
+                answers: []
             };
 
             Poll.prototype.createInDatabaseFromRequest = jest
@@ -47,7 +49,10 @@ describe('VotingService', () => {
                 .fn()
                 .mockReturnValueOnce(mockResponse);
 
-            const service = new VotingService(prismaMock);
+            const service = new VotingService(
+                prismaMock,
+                new QuestionFactory(prismaMock)
+            );
 
             const poll = await service.createPoll({
                 name: 'name',
@@ -74,7 +79,10 @@ describe('VotingService', () => {
             UserManager.prototype.getUser = jest
                 .fn()
                 .mockResolvedValueOnce(null);
-            const service = new VotingService(prismaMock);
+            const service = new VotingService(
+                prismaMock,
+                new QuestionFactory(prismaMock)
+            );
 
             try {
                 await service.createPoll({
@@ -95,12 +103,12 @@ describe('VotingService', () => {
                     }
                 });
 
-                fail('User found');
+                expect(true).toBeFalsy();
             } catch (e: unknown) {
-                if (e instanceof Error) {
+                if (e instanceof BadRequestError) {
                     expect(e.message).toBe('User not found.');
                 } else {
-                    fail('Other kind of error');
+                    expect(true).toBeFalsy();
                 }
             }
         });
@@ -122,9 +130,12 @@ describe('VotingService', () => {
                     return mockAnswer;
                 });
 
-            const service = new VotingService(prismaMock);
+            const service = new VotingService(
+                prismaMock,
+                new QuestionFactory(prismaMock)
+            );
 
-            const answer = await service.answerPoll({
+            await service.answerPoll({
                 publicId: '1',
                 questionId: 'q1',
                 answer: {
@@ -140,16 +151,24 @@ describe('VotingService', () => {
                 }
             });
 
-            expect(typeof answer).toBe('object');
-            expect(answer?.id).toBe('a1');
-            expect(answer?.questionId).toBe('q1');
-            expect(answer?.answerer).toEqual({
-                id: '1eb1cfae-09e7-4456-85cd-e2edfff80544'
-            });
+            expect(Poll.prototype.answer).toHaveBeenCalledTimes(1);
+            expect(Poll.prototype.answer).toHaveBeenCalledWith(
+                'q1',
+                {
+                    subQuestionId: 'o1',
+                    answer: {
+                        answer: true
+                    }
+                },
+                createMockUser()
+            );
         });
 
         test('Poll does not exist', async () => {
-            const service = new VotingService(prismaMock);
+            const service = new VotingService(
+                prismaMock,
+                new QuestionFactory(prismaMock)
+            );
 
             try {
                 await service.answerPoll({
@@ -164,16 +183,11 @@ describe('VotingService', () => {
                         accountId: '3'
                     }
                 });
-
-                fail('Poll did exist');
             } catch (e: unknown) {
-                if (e instanceof Error) {
-                    expect(e.message).toBe(
-                        'Poll with given public id not found.'
-                    );
-                } else {
-                    fail('Other kind of error');
-                }
+                expect(e instanceof Error).toBe(true);
+                expect((e as Error).message).toBe(
+                    'Poll with publicId 1 could not be found.'
+                );
             }
         });
     });
@@ -189,18 +203,21 @@ describe('VotingService', () => {
                 name: 'name',
                 publicId: 'publicId',
                 type: 'type',
-                questions: {
-                    q1: {
+                questions: [
+                    {
                         title: '',
                         description: '',
                         type: 'question-type',
                         id: 'q1',
                         pollId: '1'
                     }
-                }
+                ]
             });
 
-            const service = new VotingService(prismaMock);
+            const service = new VotingService(
+                prismaMock,
+                new QuestionFactory(prismaMock)
+            );
             const poll = await service.getPollWithPublicId('publicId');
 
             checkPoll(poll, false);
@@ -211,10 +228,45 @@ describe('VotingService', () => {
                 .fn()
                 .mockReturnValueOnce(false);
 
-            const service = new VotingService(prismaMock);
+            const service = new VotingService(
+                prismaMock,
+                new QuestionFactory(prismaMock)
+            );
             const poll = await service.getPollWithPublicId('does-not-exist');
 
             expect(poll).toBe(null);
+        });
+    });
+
+    describe('getPollAnswers', () => {
+        test('getPollAnswers for existing poll', async () => {
+            const mockAnswerDataObjs = [
+                {
+                    id: 'id',
+                    questionId: 'question-id',
+                    value: 'true',
+                    answerer: { id: 'answerer-id' }
+                }
+            ];
+
+            Poll.prototype.existsInDatabase = jest
+                .fn()
+                .mockReturnValueOnce(true);
+            Poll.prototype.setPublicId = jest.fn();
+            Poll.prototype.loadFromDatabase = jest.fn();
+            Poll.prototype.answersDataObjs = jest
+                .fn()
+                .mockReturnValueOnce(mockAnswerDataObjs);
+
+            const service = new VotingService(
+                prismaMock,
+                new QuestionFactory(prismaMock)
+            );
+
+            const answers = await service.getPollAnswers('test-id');
+
+            expect(answers).toEqual({ answers: mockAnswerDataObjs });
+            expect(Poll.prototype.setPublicId).toHaveBeenCalledWith('test-id');
         });
     });
 
@@ -238,18 +290,18 @@ describe('VotingService', () => {
         }
 
         expect(poll?.type).toBe('type');
-        expect(poll?.questions).toEqual({
-            q1: {
+        expect(poll?.questions).toEqual([
+            {
                 title: '',
                 description: '',
                 type: 'question-type',
                 id: 'q1',
                 pollId: '1'
             }
-        });
+        ]);
 
         if (isPrivate) {
-            expect(poll?.answers).toEqual({});
+            expect(poll?.answers).toEqual([]);
         }
     };
 });

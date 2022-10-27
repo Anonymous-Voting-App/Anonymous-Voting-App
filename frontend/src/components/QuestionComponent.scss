@@ -11,20 +11,30 @@
     display: flex !important;
     flex-direction: column !important;
     align-items: center;
+    border-radius: 20px !important;
+    border: 1px solid $black;
+    padding: 1.25rem;
+    background-color: $background-color !important;
 }
 
 .type-dropdown {
-    // .css-1sumxir-MuiFormLabel-root-MuiInputLabel-root.Mui-focused {
-    //     display: none;
-    // }
     .MuiFormLabel-root {
         left: 4.25rem;
     }
+    .MuiOutlinedInput-notchedOutline {
+        border: none;
+    }
+
+    .MuiInputLabel-shrink {
+        display: none;
+    }
+
     .MuiInputBase-root {
-        background-color: $btn-background-color;
+        background-color: $melon;
         border-radius: 1.25rem;
         min-width: 16.25rem;
         border: 1px solid $main-color;
+
         .MuiSvgIcon-root {
             left: 1.875rem;
         }
@@ -35,10 +45,21 @@
     .MuiInputBase-root {
         min-width: 16.25rem;
         border-radius: 1.25rem;
-        height: 2.5rem;
+        min-height: 2.5rem;
         border: 1px solid $main-color;
         margin-top: 1.25rem;
         margin-bottom: 1.25rem;
+    }
+
+    .MuiOutlinedInput-notchedOutline {
+        border: none;
+    }
+
+    .adornment-span {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
     }
 }
 
@@ -50,6 +71,16 @@
         border: 1px solid $main-color;
         margin-bottom: 0.625rem;
     }
+    .MuiOutlinedInput-notchedOutline {
+        border: none;
+    }
+
+    .adornment-span {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+    }
 }
 
 .add-option-btn {
@@ -58,9 +89,10 @@
     width: 14.5rem !important;
     margin-top: 0;
     color: $main-color !important;
-    background-color: $btn-background-color !important;
+    background-color: $clay !important;
     text-transform: none !important;
     border: 2px solid $main-color !important;
+
     @include for-phone-only {
         font-size: 2.5rem;
     }

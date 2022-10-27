@@ -1,32 +1,39 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     TextField,
     Button,
     FormControl,
     InputLabel,
     Select,
-    MenuItem
+    MenuItem,
+    Paper
 } from '@mui/material';
 import {
     KeyboardArrowDown,
     AddCircleOutline,
-    RemoveCircleOutline
+    RemoveCircleOutline,
+    HighlightOff
 } from '@mui/icons-material';
 import InputAdornment from '@mui/material/InputAdornment';
-
 import './QuestionComponent.scss';
+// import { QUESTION_TYPES } from './constants';
 
 function QuestionComponent(props: any) {
+    // console.log(props);
     const [showOptionBtn, setShowOptionBtn] = useState(false);
-    const [quesOptions, setQuesOptions] = useState(['', '']);
-    const [inputWidth, setInputWidth] = useState('260px');
+    const [quesOptions, setQuesOptions] = useState([
+        { title: '', description: '', type: '' },
+        { title: '', description: '', type: '' }
+    ]);
+    useEffect(() => {
+        setQuesOptions(props.ques.subQuestions);
+    }, [props.ques.subQuestions]);
 
     /**
      * Function to pass entered question text to pollcreation page(parent)
      * @param value
      */
     const onQuestionInput = (value: string) => {
-        setInputWidth((value.length + 1) * 8 + 'px'); //dynamically setting the width of question input field
         props.questionInputHandler(value, props.ind);
     };
 
@@ -44,7 +51,10 @@ function QuestionComponent(props: any) {
      * array on add option btn click
      */
     const addOption = () => {
-        setQuesOptions([...quesOptions, '']);
+        setQuesOptions([
+            ...quesOptions,
+            { title: '', description: '', type: '' }
+        ]);
     };
 
     /**
@@ -67,7 +77,7 @@ function QuestionComponent(props: any) {
     const onOptionInput = (index: number, value: string) => {
         const newOptions = quesOptions.map((quesOption, optionIndex) => {
             if (optionIndex === index) {
-                return value;
+                return { title: value, description: value, type: 'boolean' };
             }
             return quesOption;
         });
@@ -75,54 +85,81 @@ function QuestionComponent(props: any) {
         props.optionInputHandler(newOptions, props.ind);
     };
 
+    const removeQuestion = () => {
+        props.questionRemovalHandler(props.ind);
+        // console.log(props, 'props after ques removal');
+        setQuesOptions(props.ques.subQuestions);
+    };
+
     return (
         <>
-            <div className="question-wrapper">
+            <Paper className="question-wrapper" elevation={3}>
                 <FormControl
                     className="type-dropdown"
                     sx={{ m: 1, minWidth: 120 }}
                     size="small"
                 >
-                    <InputLabel id="demo-select-small">
-                        Question type
-                    </InputLabel>
+                    <InputLabel id="select-ques-type">Question type</InputLabel>
                     <Select
+                        data-testid="ques-type-field"
                         IconComponent={KeyboardArrowDown}
-                        labelId="demo-select-small"
-                        id="demo-select-small"
+                        labelId="select-ques-type"
+                        id="select-ques-type"
                         value={props.ques.type}
-                        label="Question Type"
                         onChange={(event) => onTypeChange(event.target.value)}
                     >
-                        <MenuItem value={''}>
+                        {/* <MenuItem value={''}>
                             <em>None</em>
-                        </MenuItem>
-                        <MenuItem value={'radioBtn'}>Pick One</MenuItem>
-                        <MenuItem value={'checkBox'}>Multiple choice</MenuItem>
+                        </MenuItem> */}
+                        {/* {QUESTION_TYPES.map(item => {
+                            return <MenuItem value={item.value}>{item.type}</MenuItem>;
+                        })} */}
+                        <MenuItem value={'radioBtn'}>Pick one</MenuItem>
+                        <MenuItem value={'checkBox'}>Multi - choice</MenuItem>
                     </Select>
                 </FormControl>
                 <TextField
-                    sx={{ minWidth: inputWidth }}
                     autoComplete="off"
                     className="question-field"
                     onChange={(event) => onQuestionInput(event.target.value)}
                     type="text"
-                    value={props.ques.text}
+                    value={props.ques.title}
                     variant="outlined"
+                    inputProps={{ 'data-testid': 'question-field' }}
+                    multiline
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <span
+                                    className="adornment-span"
+                                    onClick={() => removeQuestion()}
+                                >
+                                    <HighlightOff />
+                                </span>
+                            </InputAdornment>
+                        )
+                    }}
                 />
                 {showOptionBtn ? (
                     <>
                         {quesOptions.map((quesOption, index) => (
                             <TextField
+                                inputProps={{
+                                    'data-testid': `option-field-${index}`
+                                }}
                                 className="option-field"
                                 InputProps={{
                                     startAdornment: (
                                         <InputAdornment position="start">
-                                            <RemoveCircleOutline
+                                            <span
+                                                className="adornment-span"
+                                                data-testid={`option-delete-${index}`}
                                                 onClick={() =>
                                                     removeOption(index)
                                                 }
-                                            />
+                                            >
+                                                <RemoveCircleOutline />
+                                            </span>
                                         </InputAdornment>
                                     )
                                 }}
@@ -133,13 +170,12 @@ function QuestionComponent(props: any) {
                                 }
                                 key={index}
                                 type="text"
-                                value={quesOption}
+                                value={quesOption.title}
                             />
                         ))}
                         <Button
                             className="add-option-btn"
                             onClick={addOption}
-                            sx={{ mt: '4.5rem', width: 200 }}
                             variant="outlined"
                         >
                             <AddCircleOutline />
@@ -147,7 +183,7 @@ function QuestionComponent(props: any) {
                         </Button>
                     </>
                 ) : null}
-            </div>
+            </Paper>
         </>
     );
 }

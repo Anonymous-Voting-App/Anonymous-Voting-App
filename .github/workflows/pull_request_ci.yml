@@ -5,47 +5,38 @@ on:
         branches:
             - dev
 
+env:
+    # User specified
+    # Empty
+
+    # Secrets
+    GITGUARDIAN_API_KEY: ${{ secrets.GITGUARDIAN_API_KEY }}
+    CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+    # Automatic
+    GITHUB_PUSH_BEFORE_SHA: ${{ github.event.before }}
+    GITHUB_PUSH_BASE_SHA: ${{ github.event.base }}
+    GITHUB_PULL_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+    GITHUB_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+
 jobs:
     scan-code:
         name: GitGuardian scan
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
-              uses: actions/checkout@v2
+              uses: actions/checkout@v3
               with:
                   fetch-depth: 0 # fetch all history so multiple commits can be scanned
             - name: GitGuardian scan
               uses: GitGuardian/ggshield-action@master
-              env:
-                  GITHUB_PUSH_BEFORE_SHA: ${{ github.event.before }}
-                  GITHUB_PUSH_BASE_SHA: ${{ github.event.base }}
-                  GITHUB_PULL_BASE_SHA: ${{ github.event.pull_request.base.sha }}
-                  GITHUB_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
-                  GITGUARDIAN_API_KEY: ${{ secrets.GITGUARDIAN_API_KEY }}
-
-    check-for-changes:
-        name: Check for changes
-        runs-on: ubuntu-latest
-        outputs:
-            backend: ${{ steps.filter.outputs.backend }}
-            frontend: ${{ steps.filter.outputs.frontend }}
-        steps:
-            - uses: actions/checkout@main
-            - uses: dorny/paths-filter@v2
-              id: filter
-              with:
-                  filters: |
-                      backend:
-                      - 'backend/**'
-                      frontend:
-                      - 'frontend/**'
 
     check-style-frontend:
         name: Check frontend code style
-        needs: [scan-code, check-for-changes]
+        needs: scan-code
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@main
+            - uses: actions/checkout@v3
             - uses: actions/setup-node@main
               with:
                   node-version: lts/*
@@ -63,7 +54,7 @@ jobs:
                 working-directory: frontend
 
         steps:
-            - uses: actions/checkout@main
+            - uses: actions/checkout@v3
             - uses: actions/setup-node@main
               with:
                   node-version: lts/*
@@ -81,7 +72,7 @@ jobs:
                 working-directory: frontend
 
         steps:
-            - uses: actions/checkout@main
+            - uses: actions/checkout@v3
             - uses: actions/setup-node@main
               with:
                   node-version: lts/*
@@ -90,48 +81,16 @@ jobs:
             - run: npm run test:ci
             - uses: codecov/codecov-action@v3
               with:
-                  token: ${{ secrets.CODECOV_TOKEN }}
+                  token: ${{ env.CODECOV_TOKEN }}
                   flags: dev,unit,frontend
                   fail_ci_if_error: true
 
-    frontend-deploy-dev:
-        name: Deploy frontend to dev environment
-        needs: frontend-test
-        if: ${{ (needs.check-for-changes.outputs.frontend == 'true') || (contains(github.event.head_commit.message, 'ci deploy')) }}
-        runs-on: ubuntu-latest
-        permissions:
-            id-token: write
-            contents: read
-
-        defaults:
-            run:
-                working-directory: frontend
-
-        steps:
-            - uses: actions/checkout@main
-            - uses: actions/setup-node@main
-              with:
-                  node-version: lts/*
-                  cache: npm
-            - run: npm ci
-            - run: npm run build:ci
-
-            - name: Configure AWS credentials
-              uses: aws-actions/configure-aws-credentials@v1
-              with:
-                  role-to-assume: ${{ secrets.AWS_DEV_ROLE_TO_ASSUME }}
-                  aws-region: eu-north-1
-
-            - name: Copy files to the S3 with the AWS CLI
-              run: |
-                  aws s3 sync ./build s3://dev.knowit-anonymous-voting-app.aws.cybercom.dev
-
     check-style-backend:
         name: Check backend code style
-        needs: [scan-code, check-for-changes]
+        needs: scan-code
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@main
+            - uses: actions/checkout@v3
             - uses: actions/setup-node@main
               with:
                   node-version: lts/*
@@ -149,7 +108,7 @@ jobs:
                 working-directory: backend
 
         steps:
-            - uses: actions/checkout@main
+            - uses: actions/checkout@v3
             - uses: actions/setup-node@main
               with:
                   node-version: lts/*
@@ -157,8 +116,8 @@ jobs:
             - run: npm ci
             - run: npm run lint
 
-    backend-test:
-        name: Test backend
+    backend-validate-swagger:
+        name: Validate Swagger/OpenAPI
         needs: backend-lint
         runs-on: ubuntu-latest
 
@@ -167,7 +126,24 @@ jobs:
                 working-directory: backend
 
         steps:
-            - uses: actions/checkout@main
+            - uses: actions/checkout@v3
+            - uses: actions/setup-node@main
+              with:
+                  node-version: lts/*
+                  cache: npm
+            - run: npx swagger-cli validate ./src/routes/v1/swagger_api_v1.json --yes
+
+    backend-test:
+        name: Test backend
+        needs: backend-validate-swagger
+        runs-on: ubuntu-latest
+
+        defaults:
+            run:
+                working-directory: backend
+
+        steps:
+            - uses: actions/checkout@v3
             - uses: actions/setup-node@main
               with:
                   node-version: lts/*
@@ -176,68 +152,6 @@ jobs:
             - run: npm run test:coverage
             - uses: codecov/codecov-action@v3
               with:
-                  token: ${{ secrets.CODECOV_TOKEN }}
+                  token: ${{ env.CODECOV_TOKEN }}
                   flags: dev,unit,backend
                   fail_ci_if_error: true
-
-    backend-deploy-dev:
-        name: Deploy backend to dev environment
-        needs: backend-test
-        if: ${{ (needs.check-for-changes.outputs.backend == 'true') || (contains(github.event.head_commit.message, 'ci deploy')) }}
-        runs-on: ubuntu-latest
-        permissions:
-            id-token: write
-            contents: read
-
-        defaults:
-            run:
-                working-directory: backend
-
-        env:
-            AWS_REGION: eu-north-1
-            ECR_REPOSITORY: ava-backend/dev
-            ECS_SERVICE: AVABackendDevService
-            ECS_CLUSTER: AVABackendDevCluster
-            ECS_TASK_DEFINITION: .aws/dev_task_definition.json
-            CONTAINER_NAME: AVABackendDevContainer
-
-        steps:
-            # Checks out the repository
-            - name: Checkout Repo
-              uses: actions/checkout@main
-
-            - name: Configure AWS credentials
-              uses: aws-actions/configure-aws-credentials@v1
-              with:
-                  role-to-assume: ${{ secrets.AWS_DEV_ROLE_TO_ASSUME }}
-                  aws-region: eu-north-1
-
-            - name: Login to Amazon ECR
-              id: login-ecr
-              uses: aws-actions/amazon-ecr-login@v1
-
-            - name: Build, tag, and push image to Amazon ECR
-              id: build-image
-              env:
-                  ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-                  IMAGE_TAG: ${{ github.sha }}
-              run: |
-                  docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-                  docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-                  echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-
-            - name: Fill in the new image ID in the Amazon ECS task definition
-              id: task-def
-              uses: aws-actions/amazon-ecs-render-task-definition@v1
-              with:
-                  task-definition: ${{ env.ECS_TASK_DEFINITION }}
-                  container-name: ${{ env.CONTAINER_NAME }}
-                  image: ${{ steps.build-image.outputs.image }}
-
-            - name: Deploy Amazon ECS task definition
-              uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-              with:
-                  task-definition: ${{ steps.task-def.outputs.task-definition }}
-                  service: ${{ env.ECS_SERVICE }}
-                  cluster: ${{ env.ECS_CLUSTER }}
-                  wait-for-service-stability: false

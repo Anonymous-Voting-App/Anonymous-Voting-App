@@ -28,7 +28,8 @@ describe('Answer', () => {
             expect(answer.newDatabaseObject()).toEqual({
                 questionId: 'test-question-id',
                 value: 'test-value',
-                voterId: '1'
+                voterId: '1',
+                parentId: null
             });
         });
 
@@ -40,12 +41,12 @@ describe('Answer', () => {
 
             try {
                 answer.newDatabaseObject();
-                fail('questionId was set');
+                expect(true).toBeFalsy();
             } catch (e: unknown) {
                 if (e instanceof AssertionError) {
                     expect(e.message).toBe('questionId is set');
                 } else {
-                    fail();
+                    expect(true).toBeFalsy();
                 }
             }
         });
@@ -58,12 +59,12 @@ describe('Answer', () => {
 
             try {
                 answer.newDatabaseObject();
-                fail('answerer was set');
+                expect(true).toBeFalsy();
             } catch (e: unknown) {
                 if (e instanceof AssertionError) {
                     expect(e.message).toBe('answerer is set');
                 } else {
-                    fail();
+                    expect(true).toBeFalsy();
                 }
             }
         });
@@ -84,12 +85,12 @@ describe('Answer', () => {
 
             try {
                 answer.newDatabaseObject();
-                fail('answerer was identifiable');
+                expect(true).toBeFalsy();
             } catch (e: unknown) {
                 if (e instanceof AssertionError) {
                     expect(e.message).toBe('answerer is identifiable');
                 } else {
-                    fail();
+                    expect(true).toBeFalsy();
                 }
             }
         });
@@ -101,6 +102,7 @@ describe('Answer', () => {
                 id: '1',
                 createdAt: new Date(),
                 questionId: 'q1',
+                parentId: null,
                 value: 'asd',
                 voterId: 'v1'
             };
@@ -125,12 +127,12 @@ describe('Answer', () => {
 
             try {
                 await answer.createNewInDatabase();
-                fail();
+                expect(true).toBeFalsy();
             } catch (e: unknown) {
                 if (e instanceof AssertionError) {
                     expect(e.message).toBe('questionId is set');
                 } else {
-                    fail();
+                    expect(true).toBeFalsy();
                 }
             }
         });
@@ -166,6 +168,7 @@ describe('Answer', () => {
             questionId: 'test-question-id',
             value: 'test-value',
             voterId: '1',
+            parentId: null,
             voter: {
                 id: '1'
             }

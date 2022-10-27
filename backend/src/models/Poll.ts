@@ -5,10 +5,15 @@ import Answer from './Answer';
 import * as IPolling from './IPolling';
 import * as IPoll from './IPoll';
 import * as IQuestion from './IQuestion';
+import * as IUser from './IUser';
+import * as IAnswer from './IAnswer';
 import MultiQuestionCollection from './MultiQuestionCollection';
 import MultiQuestion from './MultiQuestion';
 import { PrismaClient } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
+import QuestionFactory from './QuestionFactory';
+import AnswerCollection from './AnswerCollection';
+import QuestionCollection from './QuestionCollection';
 
 /**
  * A voting poll that can have questions and an owner.
@@ -27,6 +32,29 @@ export default class Poll {
     _database: PrismaClient;
     _loadedFromDatabase = false;
     _createdInDatabase = false;
+    _questionFactory: QuestionFactory;
+
+    /** A QuestionFactory the Poll uses to create new Questions. */
+
+    questionFactory(): QuestionFactory {
+        return this._questionFactory;
+    }
+
+    /** Sets value of questionFactory. */
+
+    setQuestionFactory(questionFactory: QuestionFactory): void {
+        pre(
+            'argument questionFactory is of type QuestionFactory',
+            questionFactory instanceof QuestionFactory
+        );
+
+        this._questionFactory = questionFactory;
+
+        post(
+            '_questionFactory is questionFactory',
+            this._questionFactory === questionFactory
+        );
+    }
 
     /** Whether new database entry has been made from this instance. */
     createdInDatabase(): boolean {
@@ -218,23 +246,25 @@ export default class Poll {
     }
 
     /**
-     *
+     * Creates entry / entries with according info
+     * for poll in database.
      */
-    async _createPollInDatabase(): Promise<IPoll.PollData> {
+    async _createPollInDatabase(): Promise<IPoll.DatabaseData> {
         return await this._database.poll.create({
             data: this.newDatabaseObject()
         });
     }
 
     /**
-     *
+     * Creates poll's questions in database.
      */
     async _createQuestionsInDatabase(
-        pollData: IPoll.PollData
-    ): Promise<{ [prop: string]: any }> {
-        const questions = new MultiQuestionCollection(
+        pollData: IPoll.DatabaseData
+    ): Promise<Array<IQuestion.DatabaseData>> {
+        const questions = new QuestionCollection(
             this.database(),
-            this.questions() as { [id: string]: MultiQuestion }
+            this.questions() as { [id: string]: Question },
+            this.questionFactory()
         );
 
         questions.setPollId(pollData.id);
@@ -245,10 +275,57 @@ export default class Poll {
         return questions.databaseData();
     }
 
-    constructor(database: PrismaClient) {
+    /**
+     * Saves Answer as poll's answer if not null.
+     */
+
+    _possiblySaveAnswer(answer: Answer | null): void {
+        if (answer instanceof Answer) {
+            this.answers()[answer.id()] = answer;
+        }
+    }
+
+    /**
+     * Answers poll with no answer rights checks.
+     * The user is assumed to have the right to answer the poll.
+     */
+
+    async _answerWithRights(
+        questionId: string,
+        answerData: IQuestion.AnswerData,
+        user: User
+    ): Promise<void> {
+        const question = this.questions()[questionId];
+        question.setDatabase(this.database());
+
+        await question.answer(answerData, user);
+    }
+
+    /**
+     * Makes new MultiQuestion from given request object
+     * and adds it to poll's questions.
+     */
+
+    _addNewQuestionFromRequest(
+        request: IQuestion.QuestionRequest,
+        id: number
+    ): void {
+        const question = this.questionFactory().createFromType(
+            request.type,
+            request
+        );
+
+        question.setDatabase(this.database());
+        question.setFromRequest(request);
+
+        this.questions()[id.toString()] = question;
+    }
+
+    constructor(database: PrismaClient, questionFactory: QuestionFactory) {
         pre('database is of type object', typeof database === 'object');
 
         this._database = database;
+        this._questionFactory = questionFactory;
     }
 
     /**
@@ -271,34 +348,28 @@ export default class Poll {
      * Object that can be given to Prisma database to add
      * the information of this instance into the database.
      */
-    newDatabaseObject(): IPoll.NewPollData {
+    newDatabaseObject(): IPoll.NewDatabaseObject {
         pre('name is set', this.name().length > 0);
         pre('privateId is set', this.privateId().length > 0);
         pre('publicId is set', this.publicId().length > 0);
         pre('owner is set', this.owner() instanceof User);
         pre('owner has v4 uuid', this.owner().hasV4Uuid());
 
-        const result: IPoll.NewPollData = {
+        return {
             name: this.name(),
             adminLink: this.privateId(),
             pollLink: this.publicId(),
             resultLink: '',
             creatorId: this.owner().id()
         };
-
-        if (this.owner() instanceof User) {
-            result.creatorId = this.owner().id();
-        }
-
-        return result;
     }
 
     /**
      * Query object inside where property to use
      * when trying to find this poll in database.
      */
-    findSelfInDatabaseQuery(): { [prop: string]: any } {
-        const subQueries: Array<object> = [];
+    findSelfInDatabaseQuery(): IPoll.FindSelfInDbQuery {
+        const subQueries: Array<{ [identifyingProp: string]: string }> = [];
 
         const query = { OR: subQueries };
 
@@ -338,6 +409,32 @@ export default class Poll {
     }
 
     /**
+     * Finds poll in database and returns found database object.
+     */
+
+    async findSelfInDatabase(): Promise<IPoll.DatabaseData | null> {
+        return await this._database.poll.findFirst({
+            where: this.findSelfInDatabaseQuery(),
+            include: {
+                questions: {
+                    // The query right now probably does not support
+                    // fetching sub-questions or sub-answers recursively for more than 1 level.
+                    // - Joonas Halinen 16.10.2022
+                    where: { parentId: null },
+                    include: {
+                        subQuestions: true,
+                        votes: {
+                            include: {
+                                subVotes: true
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    /**
      * Populates info of the poll with data retrieved
      * from database. If poll with not found in database,
      * does nothing. If poll was found, .loadedFromDatabase() becomes true.
@@ -350,17 +447,7 @@ export default class Poll {
                 this.privateId().length > 0
         );
 
-        const pollData = await this._database.poll.findFirst({
-            where: this.findSelfInDatabaseQuery(),
-            include: {
-                questions: {
-                    include: {
-                        options: true,
-                        votes: true
-                    }
-                }
-            }
-        });
+        const pollData = await this.findSelfInDatabase();
 
         if (pollData !== null) {
             this.setFromDatabaseData(pollData);
@@ -370,10 +457,28 @@ export default class Poll {
     }
 
     /**
+     * Makes new User from given database data
+     * and sets it to be poll's owner.
+     */
+
+    setOwnerFromDatabaseData(ownerData: IUser.DatabaseData): void {
+        if (typeof ownerData === 'object') {
+            const owner = new User();
+
+            owner.setFromDatabaseData(ownerData);
+
+            this.setOwner(owner);
+        }
+    }
+
+    /**
      * Manually populates info of the poll with data object
      * that's been retrieved from the database beforehand.
      */
-    setFromDatabaseData(pollData: IPoll.PollData, omitQuestions = false): void {
+    setFromDatabaseData(
+        pollData: IPoll.DatabaseData,
+        omitQuestions = false
+    ): void {
         pre('pollData.id is of type string', typeof pollData.id === 'string');
         pre(
             'pollData.name is of type string',
@@ -395,18 +500,7 @@ export default class Poll {
         this.setId(pollData.id);
         this.setName(pollData.name);
 
-        // Not actually ever a string. Just a quick fix so unit tests don't break.
-        if (typeof pollData.type === 'string') {
-            this.setType(pollData.type);
-        }
-
-        if (typeof pollData.creator === 'object') {
-            const owner = new User();
-
-            owner.setFromDatabaseData(pollData.creator as any);
-
-            this.setOwner(owner);
-        }
+        this.setOwnerFromDatabaseData(pollData);
 
         this.setPublicId(pollData.pollLink);
         this.setPrivateId(pollData.adminLink);
@@ -422,11 +516,22 @@ export default class Poll {
      * Manually populates info of the poll's questions with data
      * that's been retrieved from the database beforehand.
      */
-    setQuestionsFromDatabaseData(questionsData: Array<any>): void {
+    setQuestionsFromDatabaseData(
+        questionsData: Array<IQuestion.DatabaseData>
+    ): void {
         for (let i = 0; i < questionsData.length; i++) {
             const questionData = questionsData[i];
 
-            const question = new MultiQuestion();
+            // Question database data (questionData) is used here as an options object
+            // to the factory. The database field names happen to match
+            // with the options object interfaces. This should
+            // be changed in the future in case the database objects become
+            // different from the options objects.
+            // - Joonas Halinen 17.10.2022
+            const question = this.questionFactory().createFromType(
+                questionData.typeName,
+                questionData
+            );
 
             question.setFromDatabaseData(questionData);
 
@@ -438,24 +543,14 @@ export default class Poll {
      * Manually populates info of the poll's answers with data
      * that's been retrieved from the database beforehand.
      */
-    setAnswersFromDatabaseData(questionsData: Array<any>): void {
-        let answersData: Array<any> = [];
+    setAnswersFromDatabaseData(
+        questionsData: Array<IQuestion.DatabaseData>
+    ): void {
+        const answers = new AnswerCollection(this.database());
 
-        for (let i = 0; i < questionsData.length; i++) {
-            const question = questionsData[i];
+        answers.setFromQuestionsDatabaseData(questionsData);
 
-            answersData = answersData.concat(question.votes);
-        }
-
-        for (let i = 0; i < answersData.length; i++) {
-            const answerData = answersData[i];
-
-            const answer = new Answer();
-
-            answer.setFromDatabaseData(answerData);
-
-            this.answers()[answer.id()] = answer;
-        }
+        this.setAnswers(answers.answers());
     }
 
     /**
@@ -470,25 +565,18 @@ export default class Poll {
         questionId: string,
         answerData: IQuestion.AnswerData,
         user: User
-    ): Promise<Answer | null> {
+    ): Promise<void> {
         pre(
             'poll has question',
             this.questions()[questionId] instanceof Question
         );
 
         if (this.userHasRightToAnswerPoll(user)) {
-            const question = this.questions()[questionId];
-            question.setDatabase(this.database());
-
-            const answer = await question.answer(answerData, user);
-
-            if (answer instanceof Answer) {
-                this.answers()[answer.id()] = answer;
-            }
-
-            return answer;
+            this._answerWithRights(questionId, answerData, user);
         } else {
-            return null;
+            throw new Error(
+                `User does not have right to answer poll ${this.id()}.`
+            );
         }
     }
 
@@ -561,13 +649,13 @@ export default class Poll {
     /**
      * Poll's questions as non-sensitive public data objects.
      */
-    questionsDataObjs(): { [id: string]: IPolling.QuestionData } {
-        const result: { [prop: string]: any } = {};
+    questionsDataObjs(): IPolling.QuestionData[] {
+        const result: IPolling.QuestionData[] = [];
 
         for (const id in this.questions()) {
             const question = this.questions()[id];
 
-            result[question.id()] = question.publicDataObj();
+            result.push(question.publicDataObj());
         }
 
         return result;
@@ -577,13 +665,13 @@ export default class Poll {
      * Poll's answers as data objects. Contain sensitive information.
      * Contains the information of who the answerers are.
      */
-    answersDataObjs(): { [id: string]: IPolling.AnswerData } {
-        const result: { [prop: string]: any } = {};
+    answersDataObjs(): IPolling.AnswerData[] {
+        const result: IPolling.AnswerData[] = [];
 
         for (const id in this.answers()) {
             const answer = this.answers()[id];
 
-            result[answer.id()] = answer.privateDataObj();
+            result.push(answer.privateDataObj());
         }
 
         return result;
@@ -604,15 +692,9 @@ export default class Poll {
         let id = 0;
 
         for (let i = 0; i < requests.length; i++) {
-            const request = requests[i];
-            const question = new MultiQuestion();
-
-            question.setDatabase(this.database());
-            question.setFromRequest(request);
-
             id++;
 
-            this.questions()[id.toString()] = question;
+            this._addNewQuestionFromRequest(requests[i], id);
         }
     }
 

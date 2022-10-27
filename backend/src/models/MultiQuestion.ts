@@ -1,10 +1,11 @@
 import { pre, post } from '../utils/designByContract';
-import Answer from './Answer';
 import Question from './Question';
 import User from './User';
 import * as IPolling from './IPolling';
+import * as IQuestion from './IQuestion';
 import * as IMultiQuestion from './IMultiQuestion';
 import { PrismaClient } from '@prisma/client';
+import Answer from './Answer';
 
 /**
  * A Question that can have sub-questions.
@@ -12,6 +13,54 @@ import { PrismaClient } from '@prisma/client';
 export default class MultiQuestion extends Question {
     _type = 'multi';
     _subQuestions: { [id: string]: Question } = {};
+    _minAnswers = 1;
+    _maxAnswers = 1;
+
+    /**
+     * Maximum amount of sub-answers the question can
+     * at most take in a single answer. Setting this to -1
+     * will mean there is no maximum.
+     */
+
+    maxAnswers(): number {
+        return this._maxAnswers;
+    }
+
+    /** Sets value of maxAnswers. */
+
+    setMaxAnswers(maxAnswers: number): void {
+        pre(
+            'argument maxAnswers is of type number',
+            typeof maxAnswers === 'number'
+        );
+
+        this._maxAnswers = maxAnswers;
+
+        post('_maxAnswers is maxAnswers', this._maxAnswers === maxAnswers);
+    }
+
+    /**
+     * Minimum amount of sub-answers the question will
+     * accept in a single answer. Setting this to -1 will mean
+     * there is no minimum.
+     */
+
+    minAnswers(): number {
+        return this._minAnswers;
+    }
+
+    /** Sets value of minAnswers. */
+
+    setMinAnswers(minAnswers: number): void {
+        pre(
+            'argument minAnswers is of type number',
+            typeof minAnswers === 'number'
+        );
+
+        this._minAnswers = minAnswers;
+
+        post('_minAnswers is minAnswers', this._minAnswers === minAnswers);
+    }
 
     /** Sub-questions of the instance. */
     subQuestions(): { [id: string]: Question } {
@@ -33,6 +82,227 @@ export default class MultiQuestion extends Question {
         );
     }
 
+    /**
+     * Makes new Question instances with data according to given
+     * array of question database objects.
+     */
+    _setSubQuestionsFromDatabaseOptions(
+        options: Array<IQuestion.QuestionDataOptions>
+    ): void {
+        for (let i = 0; i < options.length; i++) {
+            const optionData = options[i];
+            const subQuestion = new Question();
+
+            subQuestion.setFromOptionData(optionData);
+
+            this.subQuestions()[subQuestion.id()] = subQuestion;
+        }
+    }
+
+    /**
+     * Makes sub-Questions from given database data
+     * and adds them as sub-questions.
+     */
+
+    _setSubQuestionsFromDatabaseData(
+        subQuestions: Array<IQuestion.DatabaseData>
+    ): void {
+        for (let i = 0; i < subQuestions.length; i++) {
+            const subQuestionData = subQuestions[i];
+            const subQuestion = new Question();
+
+            subQuestion.setFromDatabaseData(subQuestionData);
+
+            this.subQuestions()[subQuestion.id()] = subQuestion;
+        }
+    }
+
+    /**
+     * Gives an answer to a sub-question of the multi-question.
+     */
+    async _answerSubQuestion(
+        subQuestion: Question,
+        answerData: IQuestion.AnswerData,
+        answerer: User,
+        ownAnswerId: string
+    ): Promise<void> {
+        await subQuestion.answer(answerData, answerer, ownAnswerId);
+    }
+
+    /**
+     * Gives answers to all given sub-questions according
+     * to corresponding answer data given.
+     */
+
+    async _answerSubQuestions(
+        subQuestions: Array<Question>,
+        answerData: IMultiQuestion.AnswerData,
+        answerer: User,
+        ownAnswerId: string
+    ): Promise<void> {
+        for (let i = 0; i < subQuestions.length; i++) {
+            await this._answerSubQuestion(
+                subQuestions[i],
+                answerData.answer[i],
+                answerer,
+                ownAnswerId
+            );
+        }
+    }
+
+    /**
+     * All sub-questions having given ids.
+     */
+
+    _gatherSubQuestions(subQuestionIds: Array<string>): Array<Question> {
+        const subQuestions: Array<Question> = [];
+
+        for (let i = 0; i < subQuestionIds.length; i++) {
+            const subQuestion = this.subQuestions()[subQuestionIds[i]];
+
+            subQuestion.setDatabase(this.database());
+
+            subQuestions.push(subQuestion);
+        }
+
+        return subQuestions;
+    }
+
+    /**
+     * Answers the multi-question without regarding
+     * sub-questions.
+     */
+
+    async _answerOwnQuestion(
+        answerData: IMultiQuestion.AnswerData,
+        answerer: User
+    ): Promise<Answer> {
+        answerData = Object.assign({}, answerData);
+
+        return (await super.answer(answerData, answerer)) as Answer;
+    }
+
+    /**
+     * Answer the multi-question with data assumed
+     * to be in acceptable format.
+     */
+    async _answerWithAcceptableData(
+        answerData: IMultiQuestion.AnswerData,
+        answerer: User
+    ): Promise<void> {
+        const subQuestions = this._gatherSubQuestions(
+            answerData.subQuestionIds
+        );
+
+        const ownAnswer = await this._answerOwnQuestion(answerData, answerer);
+
+        await this._answerSubQuestions(
+            subQuestions,
+            answerData,
+            answerer,
+            ownAnswer.id()
+        );
+    }
+
+    /**
+     * Whether answer data is acceptable
+     * to sub-question of multi-question.
+     */
+
+    _subQuestionAnswerDataIsAcceptable(
+        subQuestionId: string,
+        answer: IQuestion.AnswerData
+    ): boolean {
+        let result = false;
+
+        const subQuestion = this.subQuestions()[subQuestionId];
+
+        if (subQuestion instanceof Question) {
+            result = subQuestion.answerDataIsAcceptable(answer);
+        }
+
+        return result;
+    }
+
+    /**
+     * Whether the given answer data objects are
+     * acceptable to all sub-questions having given sub-question ids.
+     * The order of the sub-question ids should be the same as
+     * the answer objects.
+     */
+
+    _answerDataIsAcceptableToSubQuestions(
+        subQuestionIds: Array<string>,
+        answer: Array<IQuestion.AnswerData>
+    ): boolean {
+        for (let i = 0; i < subQuestionIds.length; i++) {
+            const subQuestionId = subQuestionIds[i];
+
+            if (
+                !this._subQuestionAnswerDataIsAcceptable(
+                    subQuestionId,
+                    answer[i]
+                )
+            ) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Makes new Question instance from given request data object
+     * and adds it as a sub-question.
+     */
+    _setSubQuestionFromRequest(
+        subQuestionData: IMultiQuestion.QuestionRequest
+    ): void {
+        const subQuestion = new Question();
+
+        subQuestion.setDatabase(this.database());
+        subQuestion.setFromRequest(subQuestionData);
+
+        this.subQuestions()[subQuestion.id()] = subQuestion;
+    }
+
+    /**
+     * Whether given answerData is acceptable to the multi-question
+     * without taking into consideration the sub-questions.
+     */
+
+    _answerDataIsAcceptableToMultiQuestion(
+        answerData: IMultiQuestion.AnswerData
+    ): boolean {
+        return (
+            Array.isArray(answerData.subQuestionIds) &&
+            Array.isArray(answerData.answer) &&
+            answerData.subQuestionIds.length === answerData.answer.length &&
+            this.amountOfAnswersIsAcceptable(
+                answerData.subQuestionIds.length
+            ) &&
+            this.hasSubQuestionIds(answerData.subQuestionIds)
+        );
+    }
+
+    /**
+     * Sub-Question of the multi-question
+     * with needed properties instantiated
+     * for use as a sub-question.
+     */
+
+    _getPreparedSubQuestion(id: string): Question {
+        const subQuestion = this.subQuestions()[id];
+
+        subQuestion.setPollId(this.pollId());
+
+        subQuestion.setParentId(this.id());
+
+        subQuestion.setDatabase(this.database());
+
+        return subQuestion;
+    }
+
     constructor(database?: PrismaClient) {
         super(database);
     }
@@ -51,11 +321,11 @@ export default class MultiQuestion extends Question {
      */
     async createSubQuestionsInDatabase(): Promise<void> {
         for (const id in this.subQuestions()) {
-            const subQuestion = this.subQuestions()[id];
+            const subQuestion = this._getPreparedSubQuestion(id);
 
             delete this.subQuestions()[id];
 
-            await subQuestion.createNewInDatabaseAsOption(this.id());
+            await subQuestion.createNewInDatabase();
 
             this.subQuestions()[subQuestion.id()] = subQuestion;
         }
@@ -79,26 +349,44 @@ export default class MultiQuestion extends Question {
      * be added to Prisma database.
      */
     newDatabaseObject(): IMultiQuestion.NewQuestionData {
-        return super.newDatabaseObject();
+        const obj = super.newDatabaseObject();
+
+        obj.minValue = this.minAnswers();
+        obj.maxValue = this.maxAnswers();
+
+        return obj;
     }
 
     /**
      * Sets instance's properties from given question object
      * received from the database.
      */
-    setFromDatabaseData(questionData: IMultiQuestion.QuestionData): void {
+    setFromDatabaseData(questionData: IMultiQuestion.DatabaseData): void {
         super.setFromDatabaseData(questionData);
 
-        if (Array.isArray(questionData.options)) {
-            for (let i = 0; i < questionData.options.length; i++) {
-                const optionData = questionData.options[i];
-                const subQuestion = new Question();
+        this.setMinAnswers(questionData.minValue as number);
+        this.setMaxAnswers(questionData.maxValue as number);
 
-                subQuestion.setFromOptionData(optionData);
+        if (Array.isArray(questionData.subQuestions)) {
+            this._setSubQuestionsFromDatabaseData(questionData.subQuestions);
+        }
+    }
 
-                this.subQuestions()[subQuestion.id()] = subQuestion;
+    /**
+     * Whether multi-question has sub-questions with corresponding
+     * ids.
+     */
+
+    hasSubQuestionIds(subQuestionIds: Array<string>): boolean {
+        for (let i = 0; i < subQuestionIds.length; i++) {
+            const subQuestionId = subQuestionIds[i];
+
+            if (!(this.subQuestions()[subQuestionId] instanceof Question)) {
+                return false;
             }
         }
+
+        return true;
     }
 
     /**
@@ -113,29 +401,62 @@ export default class MultiQuestion extends Question {
     async answer(
         answerData: IMultiQuestion.AnswerData,
         answerer: User
-    ): Promise<null | Answer> {
+    ): Promise<void> {
         pre('answerData is of type object', typeof answerData === 'object');
         pre('answerer is of type User', answerer instanceof User);
+        pre(
+            'sub-questions with given ids exist',
+            this.hasSubQuestionIds(answerData.subQuestionIds)
+        );
 
         if (this.answerDataIsAcceptable(answerData)) {
-            const subQuestion = this.subQuestions()[answerData.subQuestionId];
-
-            subQuestion.setDatabase(this.database());
-
-            const answer = await subQuestion.answerAsOption(
-                answerData.answer,
-                answerer,
-                this.id()
-            );
-
-            if (answer instanceof Answer) {
-                this.answers()[answer.id()] = answer;
-            }
-
-            return answer;
+            await this._answerWithAcceptableData(answerData, answerer);
+        } else {
+            throw new Error('Invalid answer data.');
         }
+    }
 
-        return null;
+    /**
+     * Whether the multi-question has maximum amount
+     * of answers set. Maximum of -1 means maximum is not set.
+     */
+
+    hasMaxAnswers(): boolean {
+        return this.maxAnswers() >= 0;
+    }
+
+    /**
+     * Whether the multi-question has minimum amount
+     * of answers set. Minimum of -1 means maximum is not set.
+     */
+
+    hasMinAnswers(): boolean {
+        return this.minAnswers() >= 0;
+    }
+
+    /**
+     * Whether the amount of answers given is acceptable
+     * according to the set minAnswers and maxAnswers of
+     * the instance.
+     */
+
+    amountOfAnswersIsAcceptable(amountOfAnswers: number): boolean {
+        if (this.hasMaxAnswers()) {
+            if (this.hasMinAnswers()) {
+                return (
+                    amountOfAnswers >= this.minAnswers() &&
+                    amountOfAnswers <= this.maxAnswers()
+                );
+            } else {
+                return amountOfAnswers <= this.maxAnswers();
+            }
+        } else {
+            if (this.hasMinAnswers()) {
+                return amountOfAnswers >= this.minAnswers();
+            } else {
+                return true;
+            }
+        }
     }
 
     /**
@@ -151,19 +472,13 @@ export default class MultiQuestion extends Question {
     answerDataIsAcceptable(answerData: IMultiQuestion.AnswerData): boolean {
         pre('answerData is of type object', typeof answerData === 'object');
 
-        pre(
-            'answerData.answer is of type object',
-            typeof answerData.answer === 'object'
-        );
-
         let result = false;
 
-        if (typeof answerData.subQuestionId === 'string') {
-            const subQuestion = this.subQuestions()[answerData.subQuestionId];
-
-            if (subQuestion instanceof Question) {
-                result = subQuestion.answerDataIsAcceptable(answerData.answer);
-            }
+        if (this._answerDataIsAcceptableToMultiQuestion(answerData)) {
+            result = this._answerDataIsAcceptableToSubQuestions(
+                answerData.subQuestionIds,
+                answerData.answer
+            );
         }
 
         return result;
@@ -175,11 +490,14 @@ export default class MultiQuestion extends Question {
     publicDataObj(): IPolling.MultiQuestionData {
         const result = super.publicDataObj() as IPolling.MultiQuestionData;
 
-        result.subQuestions = {};
+        result.minAnswers = this.minAnswers();
+        result.maxAnswers = this.maxAnswers();
+
+        result.subQuestions = [];
 
         for (const id in this.subQuestions()) {
             const question = this.subQuestions()[id];
-            result.subQuestions[question.id()] = question.publicDataObj();
+            result.subQuestions.push(question.publicDataObj());
         }
 
         return result;
@@ -197,7 +515,19 @@ export default class MultiQuestion extends Question {
      * given data object representing information for a new question.
      */
     setFromRequest(request: IMultiQuestion.QuestionRequest): void {
+        pre(
+            'request.minAnswers is of type number',
+            typeof request.minAnswers === 'number'
+        );
+        pre(
+            'request.maxAnswers is of type number',
+            typeof request.maxAnswers === 'number'
+        );
+
         super.setFromRequest(request);
+
+        this.setMinAnswers(request.minAnswers as number);
+        this.setMaxAnswers(request.maxAnswers as number);
 
         if (Array.isArray(request.subQuestions)) {
             this.setSubQuestionsFromRequest(request.subQuestions);
@@ -214,13 +544,7 @@ export default class MultiQuestion extends Question {
         pre('subQuestions is of type Array', Array.isArray(subQuestions));
 
         for (let i = 0; i < subQuestions.length; i++) {
-            const subQuestionData = subQuestions[i];
-            const subQuestion = new Question();
-
-            subQuestion.setDatabase(this.database());
-            subQuestion.setFromRequest(subQuestionData);
-
-            this.subQuestions()[subQuestion.id()] = subQuestion;
+            this._setSubQuestionFromRequest(subQuestions[i]);
         }
     }
 }

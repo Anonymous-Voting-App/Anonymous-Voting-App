@@ -1,4 +1,11 @@
-export interface NewPollData {
+import * as IQuestion from './IQuestion';
+import * as IUser from './IUser';
+
+export interface FindSelfInDbQuery {
+    OR: Array<{ [identifyingProp: string]: string }>;
+}
+
+export interface NewDatabaseObject {
     name: string;
     adminLink: string;
     pollLink: string;
@@ -6,12 +13,12 @@ export interface NewPollData {
     creatorId: string;
 }
 
-export interface PollData {
+export interface DatabaseData {
     id: string;
     name: string;
     type?: string;
     pollLink: string;
     adminLink: string;
-    creator?: { [prop: string]: any };
-    questions?: Array<{ [prop: string]: any }>;
+    creator?: IUser.DatabaseData;
+    questions?: Array<IQuestion.DatabaseData>;
 }

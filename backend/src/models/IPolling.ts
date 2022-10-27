@@ -8,17 +8,27 @@ export interface QuestionData {
     id: string;
     pollId: string;
     answers?: Array<AnswerData>;
+    minValue?: number;
+    maxValue?: number;
+    step?: number;
 }
 
 export interface MultiQuestionData extends QuestionData {
-    subQuestions: { [id: string]: QuestionData };
+    subQuestions: QuestionData[];
+    minAnswers: number;
+    maxAnswers: number;
 }
 
 export interface AnswerData {
     id: string;
     questionId: string;
-    value: any;
-    answerer: IUser.UserDataFromDatabase;
+    value: string | number | boolean | object | null;
+    subAnswers: Array<AnswerData>;
+    answerer: IUser.DatabaseData;
+}
+
+export interface AnswersData {
+    answers: Array<AnswerData>;
 }
 
 export interface PollData {
@@ -27,9 +37,9 @@ export interface PollData {
     type: string;
     publicId: string;
     privateId?: string;
-    owner?: IUser.UserDataFromDatabase;
-    questions: { [id: string]: QuestionData };
-    answers?: { [id: string]: AnswerData };
+    owner?: IUser.DatabaseData;
+    questions: QuestionData[];
+    answers?: AnswerData[];
 }
 
 export interface PollRequest {

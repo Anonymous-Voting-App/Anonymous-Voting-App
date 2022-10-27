@@ -95,8 +95,8 @@ export default class UserManager {
         const user = new User();
         user.setDatabase(this.database());
         user.setIp(userOptions.ip || '');
-        user.setCookie(userOptions.cookie);
-        user.setAccountId(userOptions.accountId);
+        user.setCookie(userOptions.cookie || '');
+        user.setAccountId(userOptions.accountId || '');
 
         return await user.existsInDatabase();
     }

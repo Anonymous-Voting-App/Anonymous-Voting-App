@@ -1,7 +1,10 @@
 import { pre } from '../utils/designByContract';
 import MultiQuestion from './MultiQuestion';
+import * as IMultiQuestion from './IMultiQuestion';
+import * as IMultiQuestionCollection from './IMultiQuestionCollection';
 import QuestionCollection from './QuestionCollection';
 import { PrismaClient } from '@prisma/client';
+import QuestionFactory from './QuestionFactory';
 
 /**
  * Collection of MultiQuestion instances.
@@ -9,9 +12,42 @@ import { PrismaClient } from '@prisma/client';
 export default class MultiQuestionCollection extends QuestionCollection {
     constructor(
         database: PrismaClient,
-        questions?: { [id: string]: MultiQuestion }
+        questions: { [id: string]: MultiQuestion } = {},
+        questionFactory: QuestionFactory
     ) {
-        super(database, questions);
+        super(database, questions, questionFactory);
+    }
+
+    /**
+     * Makes new MultiQuestion from given database data object
+     * and adds it into collection.
+     */
+
+    _addNewMultiQuestionFromDatabaseData(
+        questionData: IMultiQuestion.DatabaseData
+    ): void {
+        questionData.votes = [];
+
+        const question = new MultiQuestion();
+        question.setFromDatabaseData(questionData);
+
+        this.questions()[questionData.id] = question;
+    }
+
+    /**
+     * Creates in database a question in the collection
+     * having given id.
+     */
+
+    async _createQuestionInDatabase(questionId: string): Promise<void> {
+        const question = this.questions()[questionId];
+
+        delete this.questions()[questionId];
+
+        await question.createNewInDatabase();
+
+        this.databaseData().push(question.databaseData());
+        this.questions()[question.id()] = question;
     }
 
     /**
@@ -19,42 +55,48 @@ export default class MultiQuestionCollection extends QuestionCollection {
      * to given array of data objects retrieved
      * from database.
      */
-    setFromDatabaseObj(questionsData: Array<any>): void {
+    setFromDatabaseObj(
+        questionsData: Array<IMultiQuestion.DatabaseData>
+    ): void {
         super.setFromDatabaseObj(questionsData);
 
         for (let i = 0; i < questionsData.length; i++) {
-            const questionData = questionsData[i];
-            questionData.votes = [];
-
-            const question = new MultiQuestion();
-            question.setFromDatabaseData(questionData);
-
-            this.questions()[questionData.id] = question;
+            this._addNewMultiQuestionFromDatabaseData(questionsData[i]);
         }
     }
 
     /**
-     * Retrieves questions from database and
-     * populates the collection with according MultiQuestion instances.
+     * Query object to use when wanting to find
+     * the question collection in database.
      */
-    async loadFromDatabase(): Promise<{ [prop: string]: any }> {
-        pre(
-            'question collection is empty',
-            Object.keys(this.questions()).length == 0
-        );
 
-        const questionsData = await this.database().question.findMany({
+    findSelfFromDatabaseQuery(): IMultiQuestionCollection.FindSelfDbQuery {
+        return {
             where: {
                 pollId: this.pollId()
             },
             include: {
                 options: true
             }
-        });
+        };
+    }
+
+    /**
+     * Retrieves questions from database and
+     * populates the collection with according MultiQuestion instances.
+     */
+    async loadFromDatabase(): Promise<void> {
+        pre(
+            'question collection is empty',
+            Object.keys(this.questions()).length == 0
+        );
+
+        const questionsData: Array<IMultiQuestion.DatabaseData> =
+            await this.database().question.findMany(
+                this.findSelfFromDatabaseQuery()
+            );
 
         this.setFromDatabaseObj(questionsData);
-
-        return questionsData;
     }
 
     /**
@@ -70,14 +112,7 @@ export default class MultiQuestionCollection extends QuestionCollection {
         );
 
         for (const id in this.questions()) {
-            const question = this.questions()[id];
-
-            delete this.questions()[id];
-
-            await question.createNewInDatabase();
-
-            this.databaseData().push(question.databaseData());
-            this.questions()[question.id()] = question;
+            await this._createQuestionInDatabase(id);
         }
     }
 }

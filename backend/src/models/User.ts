@@ -131,7 +131,7 @@ export default class User {
     /**
      * Sets the user object's values from given data returned by the database.
      */
-    setFromDatabaseData(userData: IUser.UserDataFromDatabase): void {
+    setFromDatabaseData(userData: IUser.DatabaseData): void {
         pre('userData is of type object', typeof userData === 'object');
 
         pre('userData.id is of type string', typeof userData.id === 'string');
@@ -233,7 +233,7 @@ export default class User {
     /**
      * A data object of the user's non-sensitive public information.
      */
-    publicDataObj(): IUser.UserDataFromDatabase {
+    publicDataObj(): IUser.DatabaseData {
         return {
             id: this.id()
         };
