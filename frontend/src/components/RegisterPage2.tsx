@@ -4,17 +4,17 @@ import './LoginAndRegisterPage.scss';
 import Field from './Field';
 
 function LoginPage() {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [password2, setPassword2] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [email, setEmail] = useState('');
 
     const InputHandler = (value: string, index: number) => {
         if (index === 0) {
-            setUsername(value);
+            setFirstName(value);
         } else if (index === 1) {
-            setPassword(value);
+            setLastName(value);
         } else {
-            setPassword2(value);
+            setEmail(value);
         }
     };
 
@@ -25,23 +25,24 @@ function LoginPage() {
             </Typography>
             <Container className="fields">
                 <Field
+                    className="field"
                     page="register"
-                    text="Username"
-                    input={username}
+                    text="First name"
+                    input={firstName}
                     onInput={InputHandler}
                     ind={0}
                 ></Field>
                 <Field
                     page="register"
-                    text="Password"
-                    input={password}
+                    text="Last name"
+                    input={lastName}
                     onInput={InputHandler}
                     ind={1}
                 ></Field>
                 <Field
                     page="register"
-                    text="Password again"
-                    input={password2}
+                    text="Email"
+                    input={email}
                     onInput={InputHandler}
                     ind={2}
                 ></Field>
@@ -51,7 +52,7 @@ function LoginPage() {
                     sx={{ mt: '4.5rem', width: 200 }}
                     variant="outlined"
                 >
-                    Next
+                    Register
                 </Button>
             </Container>
         </Container>

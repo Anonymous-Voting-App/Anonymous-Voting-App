@@ -3,6 +3,7 @@ import './App.scss';
 import NavBar from './NavBar';
 import PollCreationPage from './PollCreationPage';
 import RegisterPage from './RegisterPage';
+import RegisterPage2 from './RegisterPage2';
 import LoginPage from './LoginPage';
 import BasicSnackbar from './BasicSnackbar';
 import PollAnsweringPage from './PollAnsweringPage';

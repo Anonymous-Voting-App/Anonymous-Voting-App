@@ -8,11 +8,7 @@ function LoginPage(props: any) {
     const [password, setPassword] = useState('');
 
     const InputHandler = (value: string, index: number) => {
-        if (index === 0) {
-            setUsername(value);
-        } else {
-            setPassword(value);
-        }
+        index === 0 ? setUsername(value) : setPassword(value);
     };
 
     return (
@@ -24,12 +20,14 @@ function LoginPage(props: any) {
                 <Field
                     page="login"
                     text="Username"
+                    input={username}
                     onInput={InputHandler}
                     ind={0}
                 ></Field>
                 <Field
                     page="login"
                     text="Password"
+                    input={password}
                     onInput={InputHandler}
                     ind={1}
                 ></Field>

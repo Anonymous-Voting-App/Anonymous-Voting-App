@@ -2,23 +2,22 @@ import { useState } from 'react';
 import { FormControl, InputLabel, OutlinedInput } from '@mui/material';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import LockIcon from '@mui/icons-material/Lock';
+import EmailIcon from '@mui/icons-material/Email';
 import './Field.scss';
 
 function Field(props: any) {
-    const [info, setInfo] = useState('');
     //MUI TextField automatically shrinks the label if there's a start adornment
     //so it's controlled through state
     const [shrink, setShrink] = useState(false);
     const [notched, setNotched] = useState(false);
     //With just shrink={false}, the label and adornment overlap.
-    //Label needs to be moved to the right when it's not shrunken,
-    //more when on login page.
+    //Label needs to be moved to the right when it's not shrunken.
+    //More when on login page, bit less on register.
     const [move, setMove] = useState(
         props.page === 'login' ? 'label move-login' : 'label move-register'
     );
 
     const inputHandler = (value: string) => {
-        setInfo(value);
         props.onInput(value, props.ind);
     };
 
@@ -57,20 +56,30 @@ function Field(props: any) {
                 </InputLabel>
 
                 <OutlinedInput
-                    type={props.text === 'Username' ? 'text' : 'password'}
+                    type={props.text.includes('Password') ? 'password' : 'text'}
                     onChange={(event) => inputHandler(event.target.value)}
                     onFocus={handleFocus}
                     onBlur={(event) => handleBlur(event.target.value)}
-                    value={info}
+                    value={props.input}
                     className="input-field"
                     label={props.text}
-                    id={props.text}
-                    autoComplete="off"
+                    id={props.ind}
+                    autoComplete="no"
                     notched={notched}
                     //Adornment also needs to be moved right based on page view.
                     startAdornment={
-                        props.text === 'Username' ? (
+                        props.text.includes('ame') ? (
                             <AccountCircle
+                                fontSize="small"
+                                className={
+                                    props.page === 'login'
+                                        ? 'input-field-icon-login'
+                                        : 'input-field-icon-register'
+                                }
+                            />
+                        ) : props.text.includes('Password') ? (
+                            <LockIcon
+                                fontSize="small"
                                 className={
                                     props.page === 'login'
                                         ? 'input-field-icon-login'
@@ -78,12 +87,9 @@ function Field(props: any) {
                                 }
                             />
                         ) : (
-                            <LockIcon
-                                className={
-                                    props.page === 'login'
-                                        ? 'input-field-icon-login'
-                                        : 'input-field-icon-register'
-                                }
+                            <EmailIcon
+                                fontSize="small"
+                                className="input-field-icon-register"
                             />
                         )
                     }
