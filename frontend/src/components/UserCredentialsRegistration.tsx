@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Typography, Container, Button } from '@mui/material';
-import './LoginAndRegisterPage.scss';
+import './LoginAndRegister.scss';
 import Field from './Field';
 
-function LoginPage() {
+function UserCredentialsRegistration() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [password2, setPassword2] = useState('');
@@ -58,4 +58,4 @@ function LoginPage() {
     );
 }
 
-export default LoginPage;
+export default UserCredentialsRegistration;
