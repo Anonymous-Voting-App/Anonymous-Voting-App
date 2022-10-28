@@ -24,7 +24,7 @@ export const createPoll = async (title: string, questions: any) => {
     };
 
     // await fetch(`${window.location.origin}/api/poll`, {
-    const response = await fetch('/api/poll', {
+    const response = await fetch('http://localhost:8080/api/poll', {
         method: 'POST',
         body: JSON.stringify(pollContent),
         headers: {
@@ -35,6 +35,17 @@ export const createPoll = async (title: string, questions: any) => {
     if (response.status !== 201) {
         throw new Error('Request Failed');
     }
+    const data = await response.json();
+    return data;
+};
+
+export const fetchPollResult = async (pollId: string) => {
+    const response = await fetch('dummyApi.json', {
+        headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json'
+        }
+    });
     const data = await response.json();
     return data;
 };
