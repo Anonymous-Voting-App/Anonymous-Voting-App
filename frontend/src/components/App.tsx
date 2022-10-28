@@ -6,6 +6,7 @@ import NavBar from './NavBar';
 import PollCreationPage from './PollCreationPage';
 import BasicSnackbar from './BasicSnackbar';
 import PollAnsweringPage from './PollAnsweringPage';
+import AdminView from './AdminView';
 
 function App() {
     const [open, setOpen] = useState(false);
@@ -14,6 +15,7 @@ function App() {
         severity: ''
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const handleNotification = (status: {
         severity: string;
         message: string;
@@ -44,6 +46,7 @@ function App() {
                         }
                     />
                     <Route path="answer" element={<PollAnsweringPage />} />
+                    <Route path="admin" element={<AdminView />} />
                 </Routes>
             </BrowserRouter>
             <BasicSnackbar
