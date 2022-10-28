@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import './App.scss';
 import NavBar from './NavBar';
-import PollCreationPage from './PollCreationPage';
+import PollCreation from './PollCreation';
 import UserCredentialsRegistration from './UserCredentialsRegistration';
 import UserInfoRegistration from './UserInfoRegistration';
 import Login from './Login';
 import BasicSnackbar from './BasicSnackbar';
-import PollAnsweringPage from './PollAnsweringPage';
+import PollAnswering from './PollAnswering';
 import AdminView from './AdminView';
 
 function App() {
@@ -38,10 +38,8 @@ function App() {
             <NavBar></NavBar>
             {/*For now since we don't have routing, comment out the components
             you don't want to see.*/}
-            <PollCreationPage
-                showNotification={handleNotification}
-            ></PollCreationPage>
-            {/*<PollAnsweringPage></PollAnsweringPage>*/}
+            <PollCreation showNotification={handleNotification}></PollCreation>
+            {/*<PollAnswering></PollAnswering>*/}
             <AdminView></AdminView>
             <BasicSnackbar
                 open={open}
