@@ -441,4 +441,58 @@ export default class Answer {
             );
         }
     }
+
+    /**
+     *
+     */
+
+    isLeafAnswer(): boolean {
+        return Object.keys(this.subAnswers()).length === 0;
+    }
+
+    /**
+     *
+     */
+
+    leafSubAnswerCount(): number {
+        let result = 0;
+
+        for (const id in this.subAnswers()) {
+            const subAnswer = this.subAnswers()[id];
+
+            if (subAnswer.isLeafAnswer()) {
+                result += 1;
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     *
+     */
+
+    subAnswerCount(): number {
+        let result = this.leafSubAnswerCount();
+
+        for (const id in this.subAnswers()) {
+            const subAnswer = this.subAnswers()[id];
+
+            result += subAnswer.subAnswerCount();
+        }
+
+        return result;
+    }
+
+    /**
+     *
+     */
+
+    count(): number {
+        if (this.isLeafAnswer()) {
+            return 1;
+        } else {
+            return this.subAnswerCount();
+        }
+    }
 }

@@ -73,6 +73,7 @@ describe('Poll', () => {
                     pollId: '1',
                     type: 'type',
                     typeName: 'free',
+                    visualType: 'default',
                     title: 'title',
                     description: 'description',
                     parentId: null,
@@ -117,6 +118,7 @@ describe('Poll', () => {
                     pollId: '1',
                     type: 'type',
                     typeName: 'free',
+                    visualType: 'default',
                     title: 'title',
                     description: 'description',
                     parentId: null,
@@ -244,6 +246,44 @@ describe('Poll', () => {
         });
     });
 
+    describe('resultDataObj', () => {
+        test('Create new result object for poll', () => {
+            const poll = new Poll(prismaMock, new QuestionFactory(prismaMock));
+
+            poll.setFromDatabaseData(dummyDatabaseData as IPoll.DatabaseData);
+            poll.owner().setId('d1b44abe-b336-497d-8148-11166b7c2489');
+            poll.questions()['1'].setAnswerCount(2);
+            poll.questions()['1'].setAnswerPercentage(0.2);
+
+            const data = poll.resultDataObj();
+
+            expect(data).toEqual({
+                name: 'name',
+                publicId: 'publicId',
+                type: '',
+                questions: [
+                    {
+                        title: '',
+                        description: '',
+                        type: 'free',
+                        visualType: 'default',
+                        id: '1',
+                        pollId: '1',
+                        answerCount: 2,
+                        answerPercentage: 0.2,
+                        answerValueStatistics: [
+                            {
+                                count: 1,
+                                percentage: 0.5,
+                                value: 'value'
+                            }
+                        ]
+                    }
+                ]
+            });
+        });
+    });
+
     const dummyDatabaseData: PrismaPoll & {
         questions: (PrismaQuestion & {
             options: PrismaOption[];
@@ -268,6 +308,7 @@ describe('Poll', () => {
                 parentId: null,
                 step: null,
                 typeName: 'free',
+                visualType: 'default',
                 description: '',
                 title: '',
                 id: '1',

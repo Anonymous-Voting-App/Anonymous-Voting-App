@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { AnswerData } from './IQuestion';
+import * as IBooleanQuestion from './IBooleanQuestion';
 import Question from './Question';
 
 /**
@@ -25,4 +26,53 @@ export default class BooleanQuestion extends Question {
             typeof answerData.answer === 'boolean'
         );
     }
+
+    /**
+     *
+     */
+
+    trueAnswerCount(): number {
+        return this.countAnswersWithValue('true');
+    }
+
+    /**
+     *
+     */
+
+    falseAnswerCount(): number {
+        return this.countAnswersWithValue('false');
+    }
+
+    /**
+     *
+     */
+
+    trueAnswerPercentage(): number {
+        return this.trueAnswerCount() / this.answerCount();
+    }
+
+    /**
+     *
+     */
+
+    falseAnswerPercentage(): number {
+        return this.falseAnswerCount() / this.answerCount();
+    }
+
+    /**
+     *
+     */
+
+    /* resultDataObj(  ): IBooleanQuestion.ResultData {
+        
+        const result = super.resultDataObj(  );
+        
+        result.trueAnswerCount = this.trueAnswerCount(  );
+        result.falseAnswerCount = this.falseAnswerCount(  );
+        result.trueAnswerPercentage = this.trueAnswerPercentage(  );
+        result.falseAnswerPercentage = this.falseAnswerPercentage(  );
+
+        return result as IBooleanQuestion.ResultData;
+        
+    } */
 }

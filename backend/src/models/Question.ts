@@ -22,6 +22,69 @@ export default class Question {
     _answers: { [id: string]: Answer } = {};
     _databaseData!: IQuestion.DatabaseData;
     _parentId = '';
+    _answerCount = 0;
+    _answerPercentage = 1;
+    _visualType!: string;
+
+    /**  */
+
+    visualType(): string {
+        return this._visualType;
+    }
+
+    /** Sets value of visualType. */
+
+    setVisualType(visualType: string): void {
+        pre(
+            'argument visualType is of type string',
+            typeof visualType === 'string'
+        );
+
+        this._visualType = visualType;
+
+        post('_visualType is visualType', this._visualType === visualType);
+    }
+
+    /**  */
+
+    answerPercentage(): number {
+        return this._answerPercentage;
+    }
+
+    /** Sets value of answerPercentage. */
+
+    setAnswerPercentage(answerPercentage: number): void {
+        pre(
+            'argument answerPercentage is of type number',
+            typeof answerPercentage === 'number'
+        );
+
+        this._answerPercentage = answerPercentage;
+
+        post(
+            '_answerPercentage is answerPercentage',
+            this._answerPercentage === answerPercentage
+        );
+    }
+
+    /**  */
+
+    answerCount(): number {
+        return this._answerCount;
+    }
+
+    /** Sets value of answerCount. */
+
+    setAnswerCount(answerCount: number): void {
+        pre(
+            'argument answerCount is of type number',
+            typeof answerCount === 'number'
+        );
+
+        this._answerCount = answerCount;
+
+        post('_answerCount is answerCount', this._answerCount === answerCount);
+    }
 
     /** Id of possible parent Question of the Question. */
 
@@ -168,6 +231,20 @@ export default class Question {
     }
 
     /**
+     *
+     */
+
+    _setAnswerFromDatabaseData(answerData: IAnswer.DatabaseData): Answer {
+        const answer = new Answer();
+
+        answer.setFromDatabaseData(answerData);
+
+        this.answers()[answer.id()] = answer;
+
+        return answer;
+    }
+
+    /**
      * Makes new Answer instances from given database data objects
      * and sets them as question's answers.
      */
@@ -175,14 +252,13 @@ export default class Question {
     _setAnswersFromDatabaseData(
         answersData: Array<IAnswer.DatabaseData>
     ): void {
+        let answerCount = this.answerCount();
         for (let i = 0; i < answersData.length; i++) {
-            const answerData = answersData[i];
-            const answer = new Answer();
-
-            answer.setFromDatabaseData(answerData);
-
-            this.answers()[answer.id()] = answer;
+            answerCount += this._setAnswerFromDatabaseData(
+                answersData[i]
+            ).count();
         }
+        this.setAnswerCount(answerCount);
     }
 
     /**
@@ -221,6 +297,54 @@ export default class Question {
                 `Question ${this.id()} could not be found in database.`
             );
         }
+    }
+
+    /**
+     *
+     */
+
+    _countAnswerValue(counts: { [id: string]: number }, value: string): void {
+        if (counts[value] === undefined) {
+            counts[value] = 0;
+        }
+
+        counts[value]++;
+    }
+
+    /**
+     *
+     */
+
+    _answerValueCounts(): { [id: string]: number } {
+        const result: { [id: string]: number } = {};
+
+        for (const id in this.answers()) {
+            const answer = this.answers()[id];
+
+            this._countAnswerValue(result, answer.value().toString());
+        }
+
+        return result;
+    }
+
+    /**
+     *
+     */
+
+    _answerValuePercentages(answerCounts: { [id: string]: number }): {
+        [id: string]: number;
+    } {
+        const result: { [id: string]: number } = {};
+
+        const totalAnswerCount = this.answerCount();
+
+        for (const value in answerCounts) {
+            const answerCount = answerCounts[value];
+
+            result[value] = answerCount / totalAnswerCount;
+        }
+
+        return result;
     }
 
     constructor(database?: PrismaClient) {
@@ -263,7 +387,7 @@ export default class Question {
      * be added to Prisma database.
      */
     newDatabaseObject(): IQuestion.NewQuestionData {
-        return {
+        const result: IQuestion.NewQuestionData = {
             // A test type that is in the database already.
             // The schema demands some kind of typeId
             // even though question type are not currently used for anything.
@@ -274,6 +398,12 @@ export default class Question {
             title: this.title(),
             description: this.description()
         };
+
+        if (typeof this.visualType() === 'string') {
+            result.visualType = this.visualType();
+        }
+
+        return result;
     }
 
     /**
@@ -315,6 +445,11 @@ export default class Question {
             this.setDescription(questionData.description);
         }
 
+        pre(
+            'questionData.visualType is of type string',
+            typeof questionData.visualType === 'string'
+        );
+
         // Not actually ever a string. Just a quick fix so unit tests don't break.
         if (typeof questionData.type === 'string') {
             this.setType(questionData.type);
@@ -333,6 +468,7 @@ export default class Question {
         this.setId(questionData.id);
         this.setPollId(questionData.pollId);
         this.setType(questionData.typeName);
+        this.setVisualType(questionData.visualType);
 
         this.setDatabaseData(questionData);
     }
@@ -406,25 +542,6 @@ export default class Question {
     }
 
     /**
-     * Gives an answer to the question but
-     * treating the answer instance in the database
-     * through the 'option' table.
-     */
-    /* async answerAsOption(
-        answerData: IQuestion.AnswerData,
-        answerer: User,
-        parentId: string
-    ): Promise<Answer> {
-        pre('answerer is of type User', answerer instanceof User);
-
-        if (this.answerDataIsAcceptable(answerData)) {
-            return await this._addNewAnswer(answerData, answerer, parentId);
-        } else {
-            throw new Error('Answer data is not acceptable.');
-        }
-    } */
-
-    /**
      * Whether given answer data is of acceptable format.
      * In other words, whether the given answer is really an
      * answer to the question. In the Question base class, any kind
@@ -449,7 +566,45 @@ export default class Question {
             title: this.title(),
             description: this.description(),
             type: this.type(),
+            visualType: this.visualType(),
             pollId: this.pollId()
+        };
+    }
+
+    /**
+     *
+     */
+
+    answerValueStatistics(): Array<IQuestion.AnswerValueStatistic> {
+        const answerCounts = this._answerValueCounts();
+        const answerPercentages = this._answerValuePercentages(answerCounts);
+        const result: Array<IQuestion.AnswerValueStatistic> = [];
+
+        for (const value in answerCounts) {
+            result.push({
+                value: value,
+                count: answerCounts[value],
+                percentage: answerPercentages[value]
+            });
+        }
+
+        return result;
+    }
+
+    /**
+     *
+     */
+    resultDataObj(): IQuestion.ResultData {
+        return {
+            id: this.id(),
+            title: this.title(),
+            description: this.description(),
+            type: this.type(),
+            visualType: this.visualType(),
+            pollId: this.pollId(),
+            answerCount: this.answerCount(),
+            answerPercentage: this.answerPercentage(),
+            answerValueStatistics: this.answerValueStatistics()
         };
     }
 
@@ -461,6 +616,10 @@ export default class Question {
         this.setType(request.type);
         this.setTitle(request.title);
         this.setDescription(request.description);
+
+        if (typeof request.visualType === 'string') {
+            this.setVisualType(request.visualType);
+        }
     }
 
     /**
@@ -493,5 +652,23 @@ export default class Question {
 
         this.setTitle(optionData.option);
         this.setId(optionData.id);
+    }
+
+    /**
+     *
+     */
+
+    countAnswersWithValue(value: string): number {
+        let result = 0;
+
+        for (const id in this.answers()) {
+            const answer = this.answers()[id];
+
+            if (answer.value() === value) {
+                result++;
+            }
+        }
+
+        return result;
     }
 }

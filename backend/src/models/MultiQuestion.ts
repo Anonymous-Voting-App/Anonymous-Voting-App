@@ -100,18 +100,31 @@ export default class MultiQuestion extends Question {
     }
 
     /**
+     *
+     */
+
+    _setSubQuestionAnswerPercentage(subQuestion: Question): void {
+        if (this.answerCount() !== 0) {
+            subQuestion.setAnswerPercentage(
+                subQuestion.answerCount() / this.answerCount()
+            );
+        }
+    }
+
+    /**
      * Makes sub-Questions from given database data
-     * and adds them as sub-questions.
+     * and adds them as sub-questions. Assumes that the MultiQuestion's
+     * own info has been set beforehand.
      */
 
     _setSubQuestionsFromDatabaseData(
         subQuestions: Array<IQuestion.DatabaseData>
     ): void {
         for (let i = 0; i < subQuestions.length; i++) {
-            const subQuestionData = subQuestions[i];
             const subQuestion = new Question();
 
-            subQuestion.setFromDatabaseData(subQuestionData);
+            subQuestion.setFromDatabaseData(subQuestions[i]);
+            this._setSubQuestionAnswerPercentage(subQuestion);
 
             this.subQuestions()[subQuestion.id()] = subQuestion;
         }
@@ -256,6 +269,7 @@ export default class MultiQuestion extends Question {
      * and adds it as a sub-question.
      */
     _setSubQuestionFromRequest(
+        id: number,
         subQuestionData: IMultiQuestion.QuestionRequest
     ): void {
         const subQuestion = new Question();
@@ -263,7 +277,7 @@ export default class MultiQuestion extends Question {
         subQuestion.setDatabase(this.database());
         subQuestion.setFromRequest(subQuestionData);
 
-        this.subQuestions()[subQuestion.id()] = subQuestion;
+        this.subQuestions()[id.toString()] = subQuestion;
     }
 
     /**
@@ -543,8 +557,40 @@ export default class MultiQuestion extends Question {
     ): void {
         pre('subQuestions is of type Array', Array.isArray(subQuestions));
 
+        let id = 0;
+
         for (let i = 0; i < subQuestions.length; i++) {
-            this._setSubQuestionFromRequest(subQuestions[i]);
+            this._setSubQuestionFromRequest(id, subQuestions[i]);
+            id++;
         }
+    }
+
+    /**
+     *
+     */
+
+    subQuestionResultDataObjs(): Array<IQuestion.ResultData> {
+        const dataObjs = [];
+
+        for (const id in this.subQuestions()) {
+            const subQuestion = this.subQuestions()[id];
+
+            dataObjs.push(subQuestion.resultDataObj());
+        }
+
+        return dataObjs;
+    }
+
+    /**
+     *
+     */
+
+    resultDataObj(): IMultiQuestion.ResultData {
+        const result = super.resultDataObj();
+
+        result.subQuestions = this.subQuestionResultDataObjs();
+        result.answerValueStatistics = [];
+
+        return result as IMultiQuestion.ResultData;
     }
 }

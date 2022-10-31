@@ -5,6 +5,7 @@ export interface QuestionData {
     title: string;
     description: string;
     type: string;
+    visualType: string;
     id: string;
     pollId: string;
     answers?: Array<AnswerData>;
@@ -52,4 +53,11 @@ export interface PollRequest {
         accountId: string;
     };
     questions: Array<IQuestion.QuestionRequest>;
+}
+
+export interface ResultData {
+    name: string;
+    type: string;
+    publicId: string;
+    questions: IQuestion.ResultData[];
 }

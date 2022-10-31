@@ -422,7 +422,11 @@ export default class Poll {
                     // - Joonas Halinen 16.10.2022
                     where: { parentId: null },
                     include: {
-                        subQuestions: true,
+                        subQuestions: {
+                            include: {
+                                votes: true
+                            }
+                        },
                         votes: {
                             include: {
                                 subVotes: true
@@ -726,5 +730,36 @@ export default class Poll {
     generateIds(): void {
         this.generatePrivateId();
         this.generatePublicId();
+    }
+
+    /**
+     *
+     */
+
+    questionsResultObjs(): Array<IQuestion.ResultData> {
+        const result: IQuestion.ResultData[] = [];
+
+        for (const id in this.questions()) {
+            const question = this.questions()[id];
+
+            result.push(question.resultDataObj());
+        }
+
+        return result;
+    }
+
+    /**
+     *
+     */
+
+    resultDataObj(): IPolling.ResultData {
+        const result: IPolling.ResultData = {
+            name: this.name(),
+            publicId: this.publicId(),
+            type: this.type(),
+            questions: this.questionsResultObjs()
+        };
+
+        return result;
     }
 }
