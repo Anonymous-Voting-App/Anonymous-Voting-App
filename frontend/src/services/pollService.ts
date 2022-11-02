@@ -40,36 +40,95 @@ export const createPoll = async (title: string, questions: any) => {
 };
 
 export const fetchPollResult = async (pollId: string) => {
-    const response = await fetch('dummyApi.json', {
+    const response = await fetch('http://localhost:3000/dummyApi.json', {
         headers: {
             'Content-Type': 'application/json',
             Accept: 'application/json'
         }
     });
     const data = await response.json();
+
     return data;
 };
 
 export const fetchPollResult2 = async (pollId: string) => {
-    const response = await fetch('data.json', {
+    const response = await fetch(`http://localhost:8080/api/poll/${pollId}`, {
+        method: 'GET',
         headers: {
             'Content-Type': 'application/json',
             Accept: 'application/json'
         }
     });
     const data = await response.json();
-    formatData(data);
+    const newResponse = await fetch('http://localhost:3000/dummyApi.json', {
+        headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json'
+        }
+    });
+    const dataList = await response.json();
+    console.log(formatData(dataList));
     return data;
 };
 
-const quesType = (type: string) => {};
 const formatData = (data: any) => {
-    const quesList = [];
     const newList = data.questions.map((item: any) => {
-        setArrayObject(item);
+        setQuesObject(item);
     });
+
+    return { title: data.questions.name, questions: newList };
 };
 
-const setArrayObject = (item: any) => {
-    return { title: item.title };
+const setQuesObject = (item: any) => {
+    let options;
+    switch (item.visualType) {
+        case 'radioBtn':
+        case 'checkBox':
+        case 'yes/No':
+            return (options = formatMultiTypeOptions(
+                item.subQuestions.answerValueStatistics
+            ));
+        case 'star':
+            return (options = formatRatingOptions(item.answerValueStatistics));
+    }
+    return {
+        title: item.title,
+        type: item.visualType,
+        totalCount: item.answerCount,
+        options: options
+    };
+};
+
+const formatMultiTypeOptions = (options: [any]) => {
+    const newOptions = options.map((option) => {
+        return {
+            title: option.value,
+            count: option.count,
+            percentage: option.percentage
+        };
+    });
+    return newOptions;
+};
+
+const formatRatingOptions = (options: [any]) => {
+    let newOptions;
+    for (let i = 0; i <= 5; i++) {
+        newOptions = options.map((option) => {
+            if (option.value === i) {
+                return {
+                    title: option.value,
+                    count: option.count,
+                    percentage: option.percentage
+                };
+            } else {
+                return {
+                    title: i,
+                    count: 0,
+                    percentage: 0
+                };
+            }
+        });
+    }
+
+    return newOptions;
 };

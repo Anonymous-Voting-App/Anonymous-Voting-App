@@ -23,6 +23,7 @@ export interface ResultQuesObj {
     type: string;
     options?: [ResultOptionObj];
     totalCount: number;
+    value?: [string];
 }
 
 export interface ResultOptionObj {

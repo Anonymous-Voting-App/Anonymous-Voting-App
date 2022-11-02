@@ -7,6 +7,7 @@ import PollCreationPage from './PollCreationPage';
 import BasicSnackbar from './BasicSnackbar';
 import PollAnsweringPage from './PollAnsweringPage';
 import AdminView from './AdminView';
+import PollResult from './PollResult';
 
 function App() {
     const [open, setOpen] = useState(false);
@@ -47,6 +48,12 @@ function App() {
                     />
                     <Route path="answer" element={<PollAnsweringPage />} />
                     <Route path="admin" element={<AdminView />} />
+                    <Route
+                        path="admin/result"
+                        element={
+                            <PollResult showNotification={handleNotification} />
+                        }
+                    />
                 </Routes>
             </BrowserRouter>
             <BasicSnackbar

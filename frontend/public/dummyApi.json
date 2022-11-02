@@ -22,24 +22,22 @@
             {
                 "title": "what vehicles do you own",
                 "type": "checkBox",
+                "totalCount": 1000,
                 "options": [
                     {
                         "title": "car",
                         "percentage": 60,
-                        "count": 800,
-                        "totalCount": 1000
+                        "count": 800
                     },
                     {
                         "title": "bike",
                         "percentage": 30,
-                        "count": 150,
-                        "totalCount": 1000
+                        "count": 150
                     },
                     {
                         "title": "motorbike",
                         "percentage": 10,
-                        "count": 20,
-                        "totalCount": 1000
+                        "count": 20
                     }
                 ]
             }
