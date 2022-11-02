@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.scss';
 import './NavBar.scss';
 import NavBar from './NavBar';
 import PollCreationPage from './PollCreationPage';
 import BasicSnackbar from './BasicSnackbar';
 import PollAnsweringPage from './PollAnsweringPage';
-import PollResult from './PollResult';
+import AdminView from './AdminView';
 
 function App() {
     const [open, setOpen] = useState(false);
@@ -14,6 +15,7 @@ function App() {
         severity: ''
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const handleNotification = (status: {
         severity: string;
         message: string;
@@ -33,15 +35,20 @@ function App() {
     return (
         <div className="App">
             <NavBar></NavBar>
-            {/* <PollResultPage></PollResultPage> */}
-            {/*For now since we don't have routing, comment out the components
-            you don't want to see.*/}
-            {/* <PollCreationPage
-                showNotification={handleNotification}
-        ></PollCreationPage> */}
-            {/* <PollAnsweringPage></PollAnsweringPage> */}
-            <PollResult showNotification={handleNotification}></PollResult>
-
+            <BrowserRouter>
+                <Routes>
+                    <Route
+                        index
+                        element={
+                            <PollCreationPage
+                                showNotification={handleNotification}
+                            ></PollCreationPage>
+                        }
+                    />
+                    <Route path="answer" element={<PollAnsweringPage />} />
+                    <Route path="admin" element={<AdminView />} />
+                </Routes>
+            </BrowserRouter>
             <BasicSnackbar
                 open={open}
                 onClose={handleClose}

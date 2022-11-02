@@ -1,0 +1,77 @@
+@import '../styles/colors';
+
+@mixin for-phone-only {
+    @media (max-width: 599px) {
+        @content;
+    }
+}
+
+.MuiContainer-root {
+    margin-top: 180px;
+}
+
+.title {
+    font-weight: 600;
+}
+
+.itemsContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.button {
+    width: 260px;
+    height: 40px;
+    border-radius: 20px !important;
+    text-transform: none !important;
+    border: 1px solid $main-color !important;
+}
+
+.searchFormControl {
+    align-items: center;
+}
+
+.searchBy {
+    @extend .button;
+    margin-top: 76px;
+
+    .MuiSvgIcon-root {
+        left: 1.875rem;
+    }
+}
+
+.searchField {
+    input {
+        text-align: center;
+    }
+    .MuiOutlinedInput-root {
+        @extend .button;
+    }
+}
+
+.searchButton {
+    @extend .button;
+    background-color: $main-color !important;
+    color: $background-color !important;
+}
+
+.listItems {
+    padding-top: 83px;
+}
+
+.listItem {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    padding-bottom: 20px;
+}
+
+.pinkLink {
+    color: $lollipop;
+}
+
+.deleteLink {
+    color: $cancel-background-color;
+}
