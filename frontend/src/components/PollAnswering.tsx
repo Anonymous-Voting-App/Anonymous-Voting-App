@@ -9,9 +9,9 @@ import {
     Radio
 } from '@mui/material';
 import { ArrowBack, ArrowForward } from '@mui/icons-material';
-import './PollAnsweringPage.scss';
+import './PollAnswering.scss';
 
-const PollAnsweringPage = () => {
+const PollAnswering = () => {
     return (
         <Container>
             <Typography className="questionType" variant="h4">
@@ -51,4 +51,4 @@ const PollAnsweringPage = () => {
     );
 };
 
-export default PollAnsweringPage;
+export default PollAnswering;

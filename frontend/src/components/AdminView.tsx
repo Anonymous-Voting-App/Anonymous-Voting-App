@@ -16,7 +16,7 @@ import './AdminView.scss';
 
 const TEST_USERS = ['Martti', 'user123'];
 
-const PollAnsweringPage = () => {
+const PollAnswering = () => {
     const [searchBy, setSearchBy] = useState('');
     const [showSearchResults, setShowSearchResults] = useState(false);
 
@@ -93,4 +93,4 @@ const PollAnsweringPage = () => {
     );
 };
 
-export default PollAnsweringPage;
+export default PollAnswering;

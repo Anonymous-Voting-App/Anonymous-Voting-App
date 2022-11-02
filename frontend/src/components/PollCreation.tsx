@@ -8,11 +8,11 @@ import {
 } from '@mui/material';
 import React, { useState, useEffect } from 'react';
 import { ArrowRightAlt, AddCircleOutline } from '@mui/icons-material';
-import './PollCreationPage.scss';
-import QuestionComponent from './QuestionComponent';
+import './PollCreation.scss';
+import Question from './Question';
 import { createPoll } from '../services/pollService';
 
-function PollCreationPage(props: any) {
+function PollCreation(props: any) {
     const [showQuesContainer, setShowQuesContainer] = useState(false);
     const [questions, setQuestions] = useState([
         {
@@ -228,14 +228,14 @@ function PollCreationPage(props: any) {
                     <div className="question-container">
                         {questions.map((question, index) => (
                             <div key={index}>
-                                <QuestionComponent
+                                <Question
                                     ques={question}
                                     ind={index}
                                     typeChangehandler={onTypeChange}
                                     questionInputHandler={onQuestionInput}
                                     questionRemovalHandler={onQuestionRemove}
                                     optionInputHandler={onOptionInput}
-                                ></QuestionComponent>
+                                ></Question>
                             </div>
                         ))}
                     </div>
@@ -287,4 +287,4 @@ function PollCreationPage(props: any) {
     );
 }
 
-export default PollCreationPage;
+export default PollCreation;
