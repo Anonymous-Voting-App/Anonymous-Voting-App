@@ -21,12 +21,12 @@ export interface PollResultObj {
 export interface ResultQuesObj {
     title: string;
     type: string;
-    options: [ResultOptionObj];
+    options?: [ResultOptionObj];
+    totalCount: number;
 }
 
 export interface ResultOptionObj {
     count: number;
-    totalCount: number;
     title: string;
     percentage: number;
 }

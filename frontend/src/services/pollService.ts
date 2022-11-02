@@ -49,3 +49,27 @@ export const fetchPollResult = async (pollId: string) => {
     const data = await response.json();
     return data;
 };
+
+export const fetchPollResult2 = async (pollId: string) => {
+    const response = await fetch('data.json', {
+        headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json'
+        }
+    });
+    const data = await response.json();
+    formatData(data);
+    return data;
+};
+
+const quesType = (type: string) => {};
+const formatData = (data: any) => {
+    const quesList = [];
+    const newList = data.questions.map((item: any) => {
+        setArrayObject(item);
+    });
+};
+
+const setArrayObject = (item: any) => {
+    return { title: item.title };
+};

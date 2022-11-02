@@ -2,34 +2,53 @@ import { Paper, Typography } from '@mui/material';
 import React, { useState } from 'react';
 import './ResultCard.scss';
 import { ResultOptionObj, ResultQuesObj } from '../utils/types';
+import ResultOption from './ResultOption';
 
 const ResultCard = (props: any) => {
-    console.log(props, 'IN RESULT CARD');
-    const [options, setOptions] = useState<ResultOptionObj[] | []>(
+    const [options, setOptions] = useState<ResultOptionObj[]>(
         props.ques.options
     );
 
+    const setQuesType = (type: string) => {
+        switch (type) {
+            case 'multi':
+                return 'Multi-choice';
+            case 'radioBtn':
+                return 'Pick one';
+            case 'star':
+                return 'Star rating';
+            case 'textfield':
+                return 'Free text';
+            case 'yesNo':
+                return 'Yes/No';
+            case 'up/down':
+                return 'Thumbs Up/Down';
+            default:
+                return 'Pick One';
+        }
+    };
+
+    const quesType = setQuesType(props.ques.type);
+
+    const highestCount = options.reduce((prev, current) => {
+        return prev.count > current.count ? prev : current;
+    });
+
     return (
         <Paper className="question-wrapper" elevation={3}>
-            <Typography className="question-type">{props.ques.type}</Typography>
+            <Typography className="question-type">{quesType}</Typography>
             <Typography className="question-title">
                 {props.ques.title}
             </Typography>
             <div className="options-wrapper">
                 {options.map((option, index) => (
                     <div key={index} className="option-row">
-                        <Typography>
-                            <span className="option-title">
-                                {' '}
-                                {option.title}{' '}
-                            </span>
-                            <span className="option-percent">
-                                {option.percentage}
-                            </span>
-                            <span className="option-count">
-                                ({option.count}/{option.totalCount})
-                            </span>
-                        </Typography>
+                        <ResultOption
+                            totalCount={props.ques.totalCount}
+                            highestCount={highestCount.count}
+                            type={props.ques.type}
+                            optionData={option}
+                        ></ResultOption>
                     </div>
                 ))}
             </div>

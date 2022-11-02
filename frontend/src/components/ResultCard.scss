@@ -1,23 +1,95 @@
 @import '../styles/colors';
 
+@mixin for-phone-only {
+    @media (max-width: 599px) {
+        @content;
+    }
+}
+
+@mixin for-tablet-portrait-up {
+    @media (min-width: 600px) {
+        @content;
+    }
+}
+
+@mixin for-tablet-landscape-up {
+    @media (min-width: 900px) {
+        @content;
+    }
+}
+
 .question-wrapper {
     margin-top: 1.65rem !important;
+    margin-bottom: 4rem;
+    padding: 1.563rem 7.5rem 3.125rem 7.5rem;
     display: flex !important;
     flex-direction: column !important;
     align-items: center;
     border-radius: 1.25rem !important;
     border: 1px solid $black;
     background-color: $background-color !important;
+    min-width: 50rem !important;
+
+    @include for-phone-only {
+        min-width: 3rem !important;
+        padding: 1.563rem 3.5rem 3.125rem 3.5rem;
+    }
+
+    @include for-tablet-portrait-up {
+        min-width: 6rem !important;
+        padding: 1.563rem 4.5rem 3.125rem 4.5rem;
+    }
+
+    @include for-tablet-landscape-up {
+        min-width: 20rem !important;
+        padding: 1.563rem 7rem 3.125rem 7rem;
+    }
 
     .question-type {
         font-weight: 600 !important;
+        font-size: 20px !important;
+
         padding-bottom: 2.813rem;
+
+        @include for-phone-only {
+            padding-bottom: 1.813rem;
+            font-size: 20px !important;
+            line-height: 0.8;
+        }
+
+        @include for-tablet-portrait-up {
+            padding-bottom: 1.813rem;
+            font-size: 25px !important;
+            line-height: 0.8;
+        }
+
+        @include for-tablet-landscape-up {
+            font-size: 30px !important;
+            padding-bottom: 1.813rem;
+            line-height: 0.8;
+        }
     }
 
     .question-title {
         font-size: 40px !important;
-    }
-    .option-title {
-        margin-right: 3.438rem;
+        margin-bottom: 2.5rem !important;
+
+        @include for-phone-only {
+            font-size: 25px !important;
+            line-height: 0.8;
+            margin-bottom: 1.25rem;
+        }
+
+        @include for-tablet-portrait-up {
+            font-size: 25px !important;
+            line-height: 0.8;
+            margin-bottom: 1.25rem;
+        }
+
+        @include for-tablet-landscape-up {
+            font-size: 30px !important;
+            line-height: 0.8;
+            margin-bottom: 1.25rem;
+        }
     }
 }

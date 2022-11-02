@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Typography } from '@mui/material';
-import './PollResultPage.scss';
+import './PollResult.scss';
 import { fetchPollResult } from '../services/pollService';
 import ResultCard from './ResultCard';
 
-const PollResultPage = (props: any) => {
+const PollResult = (props: any) => {
     const [pollName, setPollName] = useState('');
     const [pollResult, setPollResult] = useState([]);
 
@@ -50,4 +50,4 @@ const PollResultPage = (props: any) => {
     );
 };
 
-export default PollResultPage;
+export default PollResult;

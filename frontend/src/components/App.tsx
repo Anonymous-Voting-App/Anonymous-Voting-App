@@ -5,7 +5,7 @@ import NavBar from './NavBar';
 import PollCreationPage from './PollCreationPage';
 import BasicSnackbar from './BasicSnackbar';
 import PollAnsweringPage from './PollAnsweringPage';
-import PollResultPage from './PollResultPage';
+import PollResult from './PollResult';
 
 function App() {
     const [open, setOpen] = useState(false);
@@ -40,9 +40,7 @@ function App() {
                 showNotification={handleNotification}
         ></PollCreationPage> */}
             {/* <PollAnsweringPage></PollAnsweringPage> */}
-            <PollResultPage
-                showNotification={handleNotification}
-            ></PollResultPage>
+            <PollResult showNotification={handleNotification}></PollResult>
 
             <BasicSnackbar
                 open={open}

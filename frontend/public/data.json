@@ -1,0 +1,92 @@
+{
+    "name": "testPoll1",
+    "publicId": "eef61039-cde8-4863-8078-03d3c4bf1174",
+    "type": "",
+    "questions": [
+        {
+            "id": "66b77fb3-53aa-4ad0-9737-56d66fa157db",
+            "title": "questionTitle",
+            "description": "questionDescription",
+            "type": "multi",
+            "visualType": "default",
+            "pollId": "a0a8d1d7-6a70-4a29-aeef-1a8a4573684d",
+            "answerCount": 4,
+            "answerPercentage": 1,
+            "answerValueStatistics": [],
+            "subQuestions": [
+                {
+                    "id": "e6666b9c-8a70-4166-8811-36901a655ee7",
+                    "title": "sub-title",
+                    "description": "sub-description",
+                    "type": "free",
+                    "visualType": "visual-type",
+                    "pollId": "a0a8d1d7-6a70-4a29-aeef-1a8a4573684d",
+                    "answerCount": 3,
+                    "answerPercentage": 0.75,
+                    "answerValueStatistics": [
+                        {
+                            "value": "true",
+                            "count": 1,
+                            "percentage": 0.3333333333333333
+                        },
+                        {
+                            "value": "test2",
+                            "count": 2,
+                            "percentage": 0.6666666666666666
+                        }
+                    ]
+                },
+                {
+                    "id": "97fdefab-9dfb-455c-9e31-ecefecdfc90c",
+                    "title": "sub-title",
+                    "description": "sub-description",
+                    "type": "free",
+                    "visualType": "visual-type",
+                    "pollId": "a0a8d1d7-6a70-4a29-aeef-1a8a4573684d",
+                    "answerCount": 1,
+                    "answerPercentage": 0.25,
+                    "answerValueStatistics": [
+                        {
+                            "value": "test2",
+                            "count": 1,
+                            "percentage": 1
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "d72c0ecc-0421-4186-b72f-4f52ecb5e263",
+            "title": "questionTitle",
+            "description": "questionDescription",
+            "type": "scale",
+            "visualType": "default",
+            "pollId": "a0a8d1d7-6a70-4a29-aeef-1a8a4573684d",
+            "answerCount": 0,
+            "answerPercentage": 1,
+            "answerValueStatistics": []
+        },
+        {
+            "id": "64d60549-e3b4-45b9-8b8f-bd381461ac98",
+            "title": "questionTitle",
+            "description": "questionDescription",
+            "type": "number",
+            "visualType": "default",
+            "pollId": "a0a8d1d7-6a70-4a29-aeef-1a8a4573684d",
+            "answerCount": 0,
+            "answerPercentage": 1,
+            "answerValueStatistics": []
+        },
+        {
+            "id": "a6692dbf-ece8-4032-9735-36d33a7da824",
+            "title": "questionTitle",
+            "description": "questionDescription",
+            "type": "boolean",
+            "visualType": "default",
+            "pollId": "a0a8d1d7-6a70-4a29-aeef-1a8a4573684d",
+            "answerCount": 0,
+            "answerPercentage": 1,
+            "answerValueStatistics": []
+        }
+    ]
+}
