@@ -12,7 +12,6 @@ const updatePollBody = (questions: PollObj[]) => {
 };
 
 export const createPoll = async (title: string, questions: any) => {
-    // console.log(title, questions, 'api called');
     const updatedQuestions = updatePollBody(questions);
     const pollContent = {
         name: title,
@@ -39,7 +38,7 @@ export const createPoll = async (title: string, questions: any) => {
     return data;
 };
 
-export const fetchPollResult = async (pollId: string) => {
+export const fetchPollResultDummy = async (pollId: string) => {
     const response = await fetch('http://localhost:3000/dummyApi.json', {
         headers: {
             'Content-Type': 'application/json',
@@ -51,84 +50,146 @@ export const fetchPollResult = async (pollId: string) => {
     return data;
 };
 
-export const fetchPollResult2 = async (pollId: string) => {
-    const response = await fetch(`http://localhost:8080/api/poll/${pollId}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json'
+export const fetchPollResult = async (pollId: string) => {
+    // const response = await fetch(`http://localhost:8080/api/poll/${pollId}`, {
+    //     method: 'GET',
+    //     headers: {
+    //         'Content-Type': 'application/json',
+    //         Accept: 'application/json'
+    //     }
+    // });
+    // const data = await response.json();
+    const newResponse = await fetch(
+        'http://localhost:3000/data_formatted_demo.json',
+        {
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json'
+            }
         }
-    });
-    const data = await response.json();
-    const newResponse = await fetch('http://localhost:3000/dummyApi.json', {
-        headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json'
-        }
-    });
-    const dataList = await response.json();
-    console.log(formatData(dataList));
-    return data;
+    );
+    const dataList = await newResponse.json();
+    console.log(dataList, 'dataList');
+    const formattedData = formatData(dataList);
+    console.log(formattedData, 'data');
+    return formattedData;
 };
 
+/**
+ * functions for formatting response data
+ * formatData, setQuesArray, formatMultiTypeOptions,
+ * formatRatingOptions, formatBooleanOptions
+ */
 const formatData = (data: any) => {
     const newList = data.questions.map((item: any) => {
-        setQuesObject(item);
+        return setQuesArray(item);
     });
-
-    return { title: data.questions.name, questions: newList };
+    return { pollName: data.name, questions: newList };
 };
 
-const setQuesObject = (item: any) => {
+const setQuesArray = (item: any) => {
     let options;
     switch (item.visualType) {
         case 'radioBtn':
         case 'checkBox':
-        case 'yes/No':
-            return (options = formatMultiTypeOptions(
-                item.subQuestions.answerValueStatistics
-            ));
+            options = formatMultiTypeOptions(
+                item.subQuestions[0].answerValueStatistics
+            );
+            break;
         case 'star':
-            return (options = formatRatingOptions(item.answerValueStatistics));
+            options = formatRatingOptions(item.answerValueStatistics);
+            break;
+        case 'yesNo':
+        case 'upDown':
+            options = formatBooleanOptions(item.answerValueStatistics);
+            break;
     }
     return {
         title: item.title,
         type: item.visualType,
-        totalCount: item.answerCount,
+        totalCount:
+            item.type === 'multi'
+                ? item.subQuestions[0].answerCount
+                : item.answerCount,
         options: options
     };
 };
 
 const formatMultiTypeOptions = (options: [any]) => {
-    const newOptions = options.map((option) => {
+    console.log(options);
+    const formattedOptions = options.map((option) => {
         return {
             title: option.value,
             count: option.count,
-            percentage: option.percentage
+            percentage: (option.percentage * 100).toFixed(1)
         };
     });
-    return newOptions;
+    return formattedOptions;
 };
 
 const formatRatingOptions = (options: [any]) => {
-    let newOptions;
-    for (let i = 0; i <= 5; i++) {
-        newOptions = options.map((option) => {
-            if (option.value === i) {
-                return {
-                    title: option.value,
-                    count: option.count,
-                    percentage: option.percentage
-                };
-            } else {
-                return {
-                    title: i,
-                    count: 0,
-                    percentage: 0
-                };
-            }
+    const respOptions = options.map((option) => {
+        return { ...option, percentage: (option.percentage * 100).toFixed(1) };
+    });
+    const newArray = Array(5)
+        .fill({
+            title: 0,
+            count: 0,
+            percentage: 0
+        })
+        .map((option, index) => {
+            return {
+                title: index + 1,
+                count: 0,
+                percentage: 0
+            };
         });
-    }
+    // console.log(newArray);
+    let ratingTypeOptions = newArray.map((arr) => {
+        const obj =
+            respOptions.findIndex((option) => option.value === arr.title) === -1
+                ? arr
+                : respOptions.find((item) => item.value === arr.title);
+        return obj;
+    });
+    console.log(ratingTypeOptions);
+    // for fixing title - value keys
+    ratingTypeOptions = ratingTypeOptions.map((option) => {
+        return {
+            title: option.value | option.title,
+            count: option.count,
+            percentage: Number(option.percentage)
+        };
+    });
+    console.log(ratingTypeOptions);
+    return ratingTypeOptions;
+};
 
-    return newOptions;
+const formatBooleanOptions = (options: [any]) => {
+    const respOptions = options.map((option) => {
+        return {
+            ...option,
+            percentage: Number((option.percentage * 100).toFixed(1))
+        };
+    });
+    const newArray = [
+        { title: true, count: 0, percentage: 0 },
+        { title: false, count: 0, percentage: 0 }
+    ];
+    let booleanTypeOptions = newArray.map((arr) => {
+        const obj =
+            respOptions.findIndex((option) => option.value === arr.title) === -1
+                ? arr
+                : respOptions.find((op) => op.value === arr.title);
+        return obj;
+    });
+    // for fixing title - value keys
+    booleanTypeOptions = booleanTypeOptions.map((option) => {
+        return {
+            title: option.value | option.title ? 'true' : 'false',
+            count: option.count,
+            percentage: Number(option.percentage)
+        };
+    });
+    return booleanTypeOptions;
 };

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Typography } from '@mui/material';
 import './PollResult.scss';
-import { fetchPollResult, fetchPollResult2 } from '../services/pollService';
+import { fetchPollResult } from '../services/pollService';
 import ResultCard from './ResultCard';
 
 const PollResult = (props: any) => {
@@ -13,33 +13,34 @@ const PollResult = (props: any) => {
     }, []);
 
     const getResultData = (pollId: string) => {
-        fetchPollResult2(pollId)
+        fetchPollResult(pollId)
             .then((response) => {
                 console.log(response);
+                setPollName(response.pollName);
+                setPollResult(response.questions);
             })
             .catch((error) => {
-                console.log(error);
+                // console.log(error);
                 props.showNotification({
                     severity: 'error',
                     message:
                         'Sorry, An error encountered while fetching your poll'
                 });
             });
-
-        fetchPollResult(pollId)
-            .then((response) => {
-                console.log(response);
-                setPollName(response.data.pollName);
-                setPollResult(response.data.questions);
-            })
-            .catch((error) => {
-                console.log(error);
-                // props.showNotification({
-                //     severity: 'error',
-                //     message:
-                //         'Sorry, An error encountered while fetching your poll'
-                // });
-            });
+        // fetchPollResult(pollId)
+        //     .then((response) => {
+        //         console.log(response);
+        //         setPollName(response.data.pollName);
+        //         setPollResult(response.data.questions);
+        //     })
+        //     .catch((error) => {
+        //         console.log(error);
+        //         // props.showNotification({
+        //         //     severity: 'error',
+        //         //     message:
+        //         //         'Sorry, An error encountered while fetching your poll'
+        //         // });
+        //     });
     };
 
     return (

@@ -1,6 +1,6 @@
 import React from 'react';
 import './ResultOption.scss';
-import { Paper, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 
 const ResultOption = (props: any) => {

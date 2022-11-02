@@ -1,17 +1,18 @@
 import { Paper, Typography } from '@mui/material';
-import React, { useState } from 'react';
+// import React, { useState } from 'react';
 import './ResultCard.scss';
-import { ResultOptionObj, ResultQuesObj } from '../utils/types';
+import { ResultOptionObj } from '../utils/types';
 import ResultOption from './ResultOption';
 
 const ResultCard = (props: any) => {
-    const [options, setOptions] = useState<ResultOptionObj[]>(
-        props.ques.options
-    );
+    // const [options, setOptions] = useState<ResultOptionObj[]>(
+    //     props.ques.options
+    // );
+    const options: ResultOptionObj[] = props.ques.options;
 
     const setQuesType = (type: string) => {
         switch (type) {
-            case 'multi':
+            case 'checkBox':
                 return 'Multi-choice';
             case 'radioBtn':
                 return 'Pick one';
@@ -21,7 +22,7 @@ const ResultCard = (props: any) => {
                 return 'Free text';
             case 'yesNo':
                 return 'Yes/No';
-            case 'up/down':
+            case 'upDown':
                 return 'Thumbs Up/Down';
             default:
                 return 'Pick One';
