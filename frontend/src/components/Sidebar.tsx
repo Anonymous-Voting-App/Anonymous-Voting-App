@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import KnowitLogo from './knowit.svg';
 import {
     Box,
@@ -13,13 +14,25 @@ import './Sidebar.scss';
 const pages = ['Create poll', 'My polls'];
 
 const Sidebar = () => {
+    const navigate = useNavigate();
+
+    const handlePageClick = (page: string) => {
+        if (page === 'Create poll') {
+            navigate('/');
+        } else if (page === 'My polls') {
+            navigate('/admin');
+        }
+    };
+
     return (
         <Slide direction="right" in={true}>
             <Box className="sidebar" role="presentation">
                 <List className="list">
                     {pages.map((page) => (
                         <ListItem key={page} disablePadding>
-                            <ListItemButton>
+                            <ListItemButton
+                                onClick={() => handlePageClick(page)}
+                            >
                                 <ListItemText
                                     className="page"
                                     primary={
