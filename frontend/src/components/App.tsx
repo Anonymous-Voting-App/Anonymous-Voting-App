@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.scss';
-import './NavBar.scss';
 import NavBar from './NavBar';
-import PollCreationPage from './PollCreationPage';
+import PollCreation from './PollCreation';
+import UserCredentialsRegistration from './UserCredentialsRegistration';
+import UserInfoRegistration from './UserInfoRegistration';
+import Login from './Login';
 import BasicSnackbar from './BasicSnackbar';
-import PollAnsweringPage from './PollAnsweringPage';
+import PollAnswering from './PollAnswering';
 import AdminView from './AdminView';
 import PollResult from './PollResult';
 
@@ -41,12 +43,12 @@ function App() {
                     <Route
                         index
                         element={
-                            <PollCreationPage
+                            <PollCreation
                                 showNotification={handleNotification}
-                            ></PollCreationPage>
+                            ></PollCreation>
                         }
                     />
-                    <Route path="answer" element={<PollAnsweringPage />} />
+                    <Route path="answer" element={<PollAnswering />} />
                     <Route path="admin" element={<AdminView />} />
                     <Route
                         path="admin/result"

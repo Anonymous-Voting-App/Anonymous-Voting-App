@@ -1,0 +1,68 @@
+@import '../styles/colors';
+
+@mixin for-phone-only {
+    @media (max-width: 599px) {
+        @content;
+    }
+}
+
+.page-heading {
+    display: flex;
+    justify-content: center;
+    font-size: 2.5rem !important;
+    color: $main-color;
+    //font-weight: 600 !important;
+    .MuiTypography-root {
+        font-size: 2.5rem !important;
+        @include for-phone-only {
+            font-size: 2rem;
+        }
+    }
+}
+
+.MuiContainer-root {
+    margin-top: 180px;
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+}
+
+.login-btn {
+    border-radius: 20px !important;
+    width: 16.25rem !important;
+    color: $main-color !important;
+    background-color: $btn-background-color !important;
+    text-transform: none !important;
+    border: 2px solid $main-color !important;
+    margin: 0px !important;
+    margin-bottom: 1.25rem !important;
+    font-weight: 600 !important;
+    font-size: 1rem !important;
+    color: $black !important;
+    @include for-phone-only {
+        font-size: 2.5rem;
+    }
+}
+
+.bottom-text {
+    display: inline-block !important;
+    margin: 0rem 10px !important;
+    font-size: 1rem !important;
+}
+
+.texts {
+    margin-top: 0px !important;
+    display: inline-block !important;
+    margin-right: 20px !important;
+    font-size: 16px !important;
+}
+
+.link {
+    cursor: pointer;
+    color: $link-color;
+    text-decoration-color: $link-color;
+}
+
+.fields {
+    margin-top: 81px;
+}
