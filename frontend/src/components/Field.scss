@@ -1,0 +1,48 @@
+@import '../styles/colors';
+
+.user-field {
+    .MuiInputBase-root {
+        width: 16.25rem !important;
+        border-radius: 1.25rem;
+        max-height: 2.5rem;
+        margin-bottom: 1rem;
+    }
+}
+
+.MuiOutlinedInput-notchedOutline {
+    border: 1px solid $main-color !important;
+}
+
+.MuiInputLabel-shrink {
+    position: absolute;
+    left: 2px;
+}
+
+.label {
+    color: $main-color !important;
+    font-size: medium !important;
+}
+
+.input-field-icon-login {
+    padding-left: 3.8rem;
+    margin-right: 0.5rem;
+    color: $black !important;
+}
+
+.input-field-icon-register {
+    padding-left: 2.7rem;
+    margin-right: 0.5rem;
+    color: $black !important;
+}
+
+.move-login {
+    padding-left: 5.8rem !important;
+    color: $placeholder-text-color !important;
+    font-size: 1rem !important;
+}
+
+.move-register {
+    padding-left: 4.7rem !important;
+    color: $placeholder-text-color !important;
+    font-size: 1rem !important;
+}

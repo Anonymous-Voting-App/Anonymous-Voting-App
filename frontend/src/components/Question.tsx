@@ -15,10 +15,10 @@ import {
     HighlightOff
 } from '@mui/icons-material';
 import InputAdornment from '@mui/material/InputAdornment';
-import './QuestionComponent.scss';
+import './Question.scss';
 // import { QUESTION_TYPES } from './constants';
 
-function QuestionComponent(props: any) {
+function Question(props: any) {
     // console.log(props);
     const [showOptionBtn, setShowOptionBtn] = useState(false);
     const [quesOptions, setQuesOptions] = useState([
@@ -188,4 +188,4 @@ function QuestionComponent(props: any) {
     );
 }
 
-export default QuestionComponent;
+export default Question;

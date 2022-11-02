@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import QuestionComponent from '../QuestionComponent';
+import Question from '../Question';
 import UserEvent from '@testing-library/user-event';
 
 test('Renders one text field for question options when question type is selected', () => {
@@ -16,7 +16,7 @@ test('Renders one text field for question options when question type is selected
     const onOptionInput = jest.fn();
 
     render(
-        <QuestionComponent
+        <Question
             ques={question}
             ind={1}
             typeChangehandler={onTypeChange}
@@ -45,7 +45,7 @@ test('onTypeChange is called when question type is selected', () => {
     const onOptionInput = jest.fn();
 
     render(
-        <QuestionComponent
+        <Question
             ques={question}
             ind={1}
             typeChangehandler={onTypeChange}
@@ -73,7 +73,7 @@ test('onQuestionInput is called when question is entered in the text field', () 
     const onOptionInput = jest.fn();
 
     render(
-        <QuestionComponent
+        <Question
             ques={question}
             ind={1}
             typeChangehandler={onTypeChange}
@@ -102,7 +102,7 @@ test('optionInputHandler is called when options are entered in the text field', 
     const onOptionInput = jest.fn();
 
     render(
-        <QuestionComponent
+        <Question
             ques={question}
             ind={1}
             typeChangehandler={onTypeChange}
@@ -133,7 +133,7 @@ test('option is removed delete icon is clicked', () => {
     const onQuestionInput = jest.fn();
     const onOptionInput = jest.fn();
     render(
-        <QuestionComponent
+        <Question
             ques={question}
             ind={1}
             typeChangehandler={onTypeChange}
@@ -162,7 +162,7 @@ test('new option field is added add an option btn is clicked', () => {
     const onQuestionInput = jest.fn();
     const onOptionInput = jest.fn();
     render(
-        <QuestionComponent
+        <Question
             ques={question}
             ind={1}
             typeChangehandler={onTypeChange}
