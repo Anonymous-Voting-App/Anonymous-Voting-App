@@ -46,7 +46,7 @@ jobs:
 
     frontend-lint:
         name: Lint frontend
-        needs: check-style-frontend
+        needs: scan-code
         runs-on: ubuntu-latest
 
         defaults:
@@ -65,7 +65,7 @@ jobs:
     frontend-test:
         name: Test frontend
         runs-on: ubuntu-latest
-        needs: frontend-lint
+        needs: [check-style-frontend, frontend-lint]
 
         defaults:
             run:
@@ -100,7 +100,7 @@ jobs:
 
     backend-lint:
         name: Lint backend
-        needs: check-style-backend
+        needs: scan-code
         runs-on: ubuntu-latest
 
         defaults:
@@ -118,7 +118,7 @@ jobs:
 
     backend-validate-swagger:
         name: Validate Swagger/OpenAPI
-        needs: backend-lint
+        needs: scan-code
         runs-on: ubuntu-latest
 
         defaults:
@@ -135,7 +135,7 @@ jobs:
 
     backend-test:
         name: Test backend
-        needs: backend-validate-swagger
+        needs: [check-style-backend, backend-lint, backend-validate-swagger]
         runs-on: ubuntu-latest
 
         defaults:

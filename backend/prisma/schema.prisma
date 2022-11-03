@@ -8,17 +8,18 @@ datasource db {
 }
 
 model Poll {
-  id         String     @id @default(uuid()) @db.Uuid
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
-  name       String
-  creatorId  String     @db.Uuid
-  adminLink  String
-  pollLink   String
-  resultLink String
-  isActive   Boolean    @default(true)
-  creator    User       @relation("PollUser", fields: [creatorId], references: [id])
-  questions  Question[] @relation("PollQuestions")
+  id          String     @id @default(uuid()) @db.Uuid
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  name        String
+  creatorId   String     @db.Uuid
+  adminLink   String
+  pollLink    String
+  resultLink  String
+  isActive    Boolean    @default(true)
+  creator     User       @relation("PollUser", fields: [creatorId], references: [id])
+  questions   Question[] @relation("PollQuestions")
+  answerCount Int        @default(0)
 }
 
 model Question {
@@ -32,6 +33,7 @@ model Question {
   parentId     String?    @db.Uuid
   step         Float?
   typeName     String     @default("free")
+  visualType   String     @default("default")
   description  String     @default("")
   title        String     @default("")
   parent       Question?  @relation("SubQuestions", fields: [parentId], references: [id])

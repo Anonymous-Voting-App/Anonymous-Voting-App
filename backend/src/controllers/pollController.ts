@@ -98,6 +98,16 @@ export const getPollAnswers = async (req: Request, res: Response) => {
     return await callService('getPollAnswers', req, res);
 };
 
+export const getPollResults = async (req: Request, res: Response) => {
+    try {
+        req.body = req.params.publicId;
+    } catch (e) {
+        return responses.badRequest(req, res);
+    }
+
+    return await callService('getPollResults', req, res);
+};
+
 export const getPublicPoll = async (req: Request, res: Response) => {
     try {
         req.body = req.params.publicId;
