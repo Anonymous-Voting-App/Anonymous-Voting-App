@@ -1,0 +1,33 @@
+@import '../styles/colors';
+
+.sidebar {
+    margin-top: 80px;
+    position: absolute;
+    color: $main-color;
+    background-color: $sand;
+    border-right: 1px solid $main-color;
+    width: 300px;
+    height: calc(100vh - 80px);
+}
+
+.list {
+    padding-top: 100px;
+}
+
+.page {
+    padding-left: 60px;
+
+    .text {
+        font-size: 24px;
+    }
+}
+
+.knowit {
+    position: absolute;
+    bottom: 40px;
+    left: 49px;
+
+    filter: brightness(0) saturate(100%) invert(15%) sepia(1%)
+        hue-rotate(318deg) contrast(86%);
+    cursor: pointer;
+}

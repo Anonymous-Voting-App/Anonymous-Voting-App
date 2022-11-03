@@ -10,16 +10,26 @@
     background-color: $main-color;
 }
 
-.know-it {
-    position: absolute;
-
-    width: 202.03px;
-    height: 45.8px;
+.hamburgerMenu {
+    width: 40px;
+    height: 30px;
     left: 40px;
-    top: 17px;
+    top: 25px;
 
     color: $background-color;
     cursor: pointer;
+
+    .menuIcon {
+        color: $background-color;
+        width: 40px;
+        height: 30px;
+    }
+
+    .closeIcon {
+        color: $background-color;
+        width: 40px;
+        height: 40px;
+    }
 }
 
 .logo {
@@ -27,7 +37,7 @@
 
     width: 80px;
     height: 63px;
-    left: 262.03px;
+    left: 120px;
     top: 9px;
 
     color: $background-color;
