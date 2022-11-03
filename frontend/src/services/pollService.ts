@@ -1,4 +1,3 @@
-import { ContactSupportOutlined } from '@mui/icons-material';
 import { PollObj } from '../utils/types';
 
 // function to modify question type before calling api
@@ -56,7 +55,7 @@ export const fetchPollResult = async (pollId: string) => {
     // to be replaced with above api call once 'visualTypes' have
     // expected values
     const newResponse = await fetch(
-        'http://localhost:3000/data_formatted_demo.json',
+        `${window.location.origin}/data_formatted_demo.json`,
         {
             headers: {
                 'Content-Type': 'application/json',
