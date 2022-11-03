@@ -35,9 +35,10 @@ function App() {
         setOpen(false);
     };
     return (
-        <div className="App">
-            <NavBar></NavBar>
-            <BrowserRouter>
+        <BrowserRouter>
+            <div className="App">
+                <NavBar></NavBar>
+
                 <Routes>
                     <Route
                         index
@@ -47,17 +48,18 @@ function App() {
                             ></PollCreation>
                         }
                     />
-                    <Route path="answer" element={<PollAnswering />} />
-                    <Route path="admin" element={<AdminView />} />
+                    <Route path="/answer" element={<PollAnswering />} />
+                    <Route path="/admin" element={<AdminView />} />
                 </Routes>
-            </BrowserRouter>
-            <BasicSnackbar
-                open={open}
-                onClose={handleClose}
-                severity={notificationObj.severity}
-                message={notificationObj.message}
-            />
-        </div>
+
+                <BasicSnackbar
+                    open={open}
+                    onClose={handleClose}
+                    severity={notificationObj.severity}
+                    message={notificationObj.message}
+                />
+            </div>
+        </BrowserRouter>
     );
 }
 
