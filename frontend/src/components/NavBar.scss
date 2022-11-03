@@ -57,14 +57,14 @@
 }
 
 .profile {
-    position: absolute;
+    position: absolute !important;
 
     background: #f1f0ed;
 
     height: 40px !important;
     width: 40px !important;
-    right: 40px;
-    top: 20px;
+    right: 40px !important;
+    top: 20px !important;
 
     font-size: large;
     cursor: pointer;

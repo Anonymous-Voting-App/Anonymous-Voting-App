@@ -13,10 +13,12 @@ import {
 } from '@mui/material';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import './AdminView.scss';
+import { useNavigate } from 'react-router-dom';
 
 const TEST_USERS = ['Martti', 'user123'];
 
 const PollAnswering = () => {
+    let navigate = useNavigate();
     const [searchBy, setSearchBy] = useState('');
     const [showSearchResults, setShowSearchResults] = useState(false);
 
@@ -28,6 +30,10 @@ const PollAnswering = () => {
         setShowSearchResults(true);
     };
 
+    const handleResult = (user: string) => {
+        // navigate('/result', {replace: true});
+        navigate(`result`);
+    };
     return (
         <Container>
             <Typography className="title" variant="h4">
@@ -75,7 +81,10 @@ const PollAnswering = () => {
                                 <Link className="pinkLink" href="#">
                                     Edit
                                 </Link>
-                                <Link className="pinkLink" href="#">
+                                <Link
+                                    className="pinkLink"
+                                    onClick={() => handleResult(user)}
+                                >
                                     View Results
                                 </Link>
                                 <Link className="pinkLink" href="#">
