@@ -5,7 +5,7 @@
     "questions": [
         {
             "id": "66b77fb3-53aa-4ad0-9737-56d66fa157db",
-            "title": "Which vehicle do you own",
+            "title": "Which vehicle do you own?",
             "description": "questionDescription",
             "type": "multi",
             "visualType": "checkBox",
@@ -45,7 +45,7 @@
         },
         {
             "id": "66b77fb3-53aa-4ad0-9737-56d66fa157db",
-            "title": "what is the best food",
+            "title": "what is the best food?",
             "description": "questionDescription",
             "type": "multi",
             "visualType": "radioBtn",
@@ -80,7 +80,7 @@
         },
         {
             "id": "66b77fb3-53aa-4ad0-9737-56d66fa157db",
-            "title": "Which restaurant to go for lunch today",
+            "title": "Where to go for lunch today?",
             "description": "questionDescription",
             "type": "multi",
             "visualType": "radioBtn",

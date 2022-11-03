@@ -1,3 +1,4 @@
+import { ContactSupportOutlined } from '@mui/icons-material';
 import { PollObj } from '../utils/types';
 
 // function to modify question type before calling api
@@ -38,19 +39,8 @@ export const createPoll = async (title: string, questions: any) => {
     return data;
 };
 
-export const fetchPollResultDummy = async (pollId: string) => {
-    const response = await fetch('http://localhost:3000/dummyApi.json', {
-        headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json'
-        }
-    });
-    const data = await response.json();
-
-    return data;
-};
-
 export const fetchPollResult = async (pollId: string) => {
+    // pollId = 'eef61039-cde8-4863-8078-03d3c4bf1174uiuiiu';
     // const response = await fetch(`http://localhost:8080/api/poll/${pollId}`, {
     //     method: 'GET',
     //     headers: {
@@ -59,6 +49,12 @@ export const fetchPollResult = async (pollId: string) => {
     //     }
     // });
     // const data = await response.json();
+    // if (response.status !== 201) {
+    //     throw new Error('Request Failed');
+    // }
+
+    // to be replaced with above api call once 'visualTypes' have
+    // expected values
     const newResponse = await fetch(
         'http://localhost:3000/data_formatted_demo.json',
         {
@@ -69,9 +65,8 @@ export const fetchPollResult = async (pollId: string) => {
         }
     );
     const dataList = await newResponse.json();
-    console.log(dataList, 'dataList');
     const formattedData = formatData(dataList);
-    console.log(formattedData, 'data');
+    // console.log(formattedData, 'data');
     return formattedData;
 };
 
