@@ -21,4 +21,5 @@ export interface DatabaseData {
     adminLink: string;
     creator?: IUser.DatabaseData;
     questions?: Array<IQuestion.DatabaseData>;
+    answerCount: number;
 }

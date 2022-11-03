@@ -100,18 +100,6 @@ export default class MultiQuestion extends Question {
     }
 
     /**
-     *
-     */
-
-    _setSubQuestionAnswerPercentage(subQuestion: Question): void {
-        if (this.answerCount() !== 0) {
-            subQuestion.setAnswerPercentage(
-                subQuestion.answerCount() / this.answerCount()
-            );
-        }
-    }
-
-    /**
      * Makes sub-Questions from given database data
      * and adds them as sub-questions. Assumes that the MultiQuestion's
      * own info has been set beforehand.
@@ -123,8 +111,8 @@ export default class MultiQuestion extends Question {
         for (let i = 0; i < subQuestions.length; i++) {
             const subQuestion = new Question();
 
+            subQuestion.setParentAnswerCount(this.answerCount());
             subQuestion.setFromDatabaseData(subQuestions[i]);
-            this._setSubQuestionAnswerPercentage(subQuestion);
 
             this.subQuestions()[subQuestion.id()] = subQuestion;
         }
@@ -566,7 +554,7 @@ export default class MultiQuestion extends Question {
     }
 
     /**
-     *
+     * Answer result statistics of sub-questions.
      */
 
     subQuestionResultDataObjs(): Array<IQuestion.ResultData> {
@@ -582,7 +570,9 @@ export default class MultiQuestion extends Question {
     }
 
     /**
-     *
+     * Data object containing the answer result statistics
+     * of the multi-question. Contains result statistics
+     * for sub-questions as well.
      */
 
     resultDataObj(): IMultiQuestion.ResultData {

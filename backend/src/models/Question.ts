@@ -25,8 +25,34 @@ export default class Question {
     _answerCount = 0;
     _answerPercentage = 1;
     _visualType!: string;
+    _parentAnswerCount = 0;
 
-    /**  */
+    /**
+     * How many times the parent of the question has been answered.
+     * For a question with no multi-question owning it, the parent is the poll.
+     */
+
+    parentAnswerCount(): number {
+        return this._parentAnswerCount;
+    }
+
+    /** Sets value of parentAnswerCount. */
+
+    setParentAnswerCount(parentAnswerCount: number): void {
+        pre(
+            'argument parentAnswerCount is of type number',
+            typeof parentAnswerCount === 'number'
+        );
+
+        this._parentAnswerCount = parentAnswerCount;
+
+        post(
+            '_parentAnswerCount is parentAnswerCount',
+            this._parentAnswerCount === parentAnswerCount
+        );
+    }
+
+    /** Type property indicating what the question should look like in a UI. */
 
     visualType(): string {
         return this._visualType;
@@ -45,7 +71,7 @@ export default class Question {
         post('_visualType is visualType', this._visualType === visualType);
     }
 
-    /**  */
+    /** Ratio of the question's answers to its parent's answers. */
 
     answerPercentage(): number {
         return this._answerPercentage;
@@ -67,7 +93,7 @@ export default class Question {
         );
     }
 
-    /**  */
+    /** How many times the question has been answered. */
 
     answerCount(): number {
         return this._answerCount;
@@ -231,7 +257,8 @@ export default class Question {
     }
 
     /**
-     *
+     * Makes new Answer from given database data
+     * and adds it to the question's answers.
      */
 
     _setAnswerFromDatabaseData(answerData: IAnswer.DatabaseData): Answer {
@@ -242,6 +269,43 @@ export default class Question {
         this.answers()[answer.id()] = answer;
 
         return answer;
+    }
+
+    /**
+     * The ratio of answerCount to parentAnswerCount.
+     * If parentAnswerCount is 0, returns 1.
+     */
+
+    _calculateAnswerPercentage(
+        answerCount: number,
+        parentAnswerCount: number
+    ): number {
+        return parentAnswerCount !== 0 ? answerCount / parentAnswerCount : 1;
+    }
+
+    /**
+     * Sets the answerPercentage of the instance
+     * as the ratio of answerCount to parentAnswerCount.
+     * If parentAnswerCount is 0, answerPercentage is always 1.
+     */
+
+    _updateAnswerPercentage(): void {
+        const percentage = this._calculateAnswerPercentage(
+            this.answerCount(),
+            this.parentAnswerCount()
+        );
+
+        this.setAnswerPercentage(percentage);
+    }
+
+    /**
+     * Sets the answer count and percentage
+     * of the question instance based on given answerCount.
+     */
+
+    _setOwnAnswerCounts(answerCount: number): void {
+        this.setAnswerCount(answerCount);
+        this._updateAnswerPercentage();
     }
 
     /**
@@ -258,7 +322,7 @@ export default class Question {
                 answersData[i]
             ).count();
         }
-        this.setAnswerCount(answerCount);
+        this._setOwnAnswerCounts(answerCount);
     }
 
     /**
@@ -300,7 +364,9 @@ export default class Question {
     }
 
     /**
-     *
+     * Increments value at given property string in
+     * given counts hash map by 1. The value does not need
+     * to be set to 0 beforehand if it is undefined.
      */
 
     _countAnswerValue(counts: { [id: string]: number }, value: string): void {
@@ -312,7 +378,8 @@ export default class Question {
     }
 
     /**
-     *
+     * How many times each answer value of question
+     * has been answered.
      */
 
     _answerValueCounts(): { [id: string]: number } {
@@ -328,7 +395,10 @@ export default class Question {
     }
 
     /**
-     *
+     * Answer percentages for each answer value given in
+     * answerCounts. Answer percentages are calculated
+     * as the percentage of the answer value in relation to
+     * the question's answerCount in total.
      */
 
     _answerValuePercentages(answerCounts: { [id: string]: number }): {
@@ -336,12 +406,13 @@ export default class Question {
     } {
         const result: { [id: string]: number } = {};
 
-        const totalAnswerCount = this.answerCount();
-
         for (const value in answerCounts) {
             const answerCount = answerCounts[value];
 
-            result[value] = answerCount / totalAnswerCount;
+            result[value] = this._calculateAnswerPercentage(
+                answerCount,
+                this.answerCount()
+            );
         }
 
         return result;
@@ -572,12 +643,15 @@ export default class Question {
     }
 
     /**
-     *
+     * Answer statistics for each value given as answer to the question.
+     * If an answer value is missing from the returned statistics, then
+     * that answer value has 0 answers given to it.
      */
 
     answerValueStatistics(): Array<IQuestion.AnswerValueStatistic> {
         const answerCounts = this._answerValueCounts();
         const answerPercentages = this._answerValuePercentages(answerCounts);
+
         const result: Array<IQuestion.AnswerValueStatistic> = [];
 
         for (const value in answerCounts) {
@@ -592,7 +666,8 @@ export default class Question {
     }
 
     /**
-     *
+     * Data object with the answer result statistics
+     * of the question.
      */
     resultDataObj(): IQuestion.ResultData {
         return {
@@ -655,7 +730,7 @@ export default class Question {
     }
 
     /**
-     *
+     * How many answers given to the question have the given value.
      */
 
     countAnswersWithValue(value: string): number {

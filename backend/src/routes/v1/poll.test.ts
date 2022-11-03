@@ -156,6 +156,11 @@ describe.skip('integration tests using server api', () => {
 
             sendAnswerToFreeQuestion(questionId, 'test2', resolve);
         });
+        test('send another answer to another question for next tests', (resolve) => {
+            const questionId = createdPoll.questions[1].id;
+
+            sendAnswerToScaleQuestion(questionId, resolve);
+        });
     });
 
     describe('get public poll', () => {
@@ -226,10 +231,18 @@ describe.skip('integration tests using server api', () => {
     ) {
         const command = `curl -i -X POST -H "Content-Type: application/json" -d "{\\"publicId\\": \\"${createdPoll.publicId}\\", \\"questionId\\": \\"${createdPoll.questions[0].id}\\", \\"answer\\": { \\"subQuestionIds\\": [\\"${id}\\"], \\"answer\\": [ { \\"answer\\": \\"${value}\\" } ] } }" http://localhost:8080/api/poll/${createdPoll.publicId}/answers`;
 
-        exec(command, handleFreeQuestionAnswerResponse.bind(null, resolve));
+        console.log(command);
+
+        exec(command, handleAnswerResponse.bind(null, resolve));
     }
 
-    function handleFreeQuestionAnswerResponse(
+    function sendAnswerToScaleQuestion(id: string, resolve: jest.DoneCallback) {
+        const command = `curl -i -X POST -H "Content-Type: application/json" -d "{\\"publicId\\": \\"${createdPoll.publicId}\\", \\"questionId\\": \\"${id}\\", \\"answer\\": { \\"answer\\": 0.002 } }" http://localhost:8080/api/poll/${createdPoll.publicId}/answers`;
+
+        exec(command, handleAnswerResponse.bind(null, resolve));
+    }
+
+    function handleAnswerResponse(
         resolve: jest.DoneCallback,
         err: ExecException | null,
         stdout: string
@@ -248,6 +261,7 @@ describe.skip('integration tests using server api', () => {
     }
 
     function checkResults(results: IPolling.ResultData) {
+        expect(results.answerCount).toBe(5);
         expect(results.questions.length).toBe(4);
         expect(Object.keys(results.questions)).toEqual(
             Object.keys(createdPoll.questions)
@@ -257,9 +271,16 @@ describe.skip('integration tests using server api', () => {
 
     function checkQuestionResults(questions: Array<IQuestion.ResultData>) {
         checkMultiQuestionResults(questions[0] as IMultiQuestion.ResultData);
-        checkAnswerlessQuestionResult(questions[1], 'scale');
+        checkScaleQuestionResult(questions[1]);
         checkAnswerlessQuestionResult(questions[2], 'number');
-        checkAnswerlessQuestionResult(questions[3], 'boolean');
+        checkBooleanQuestionResult(questions[3]);
+    }
+
+    function checkScaleQuestionResult(question: IQuestion.ResultData) {
+        checkGenericQuestionResult(question);
+
+        expect(question.answerCount).toBe(1);
+        expect(question.answerPercentage).toBe(0.2);
     }
 
     function checkMultiQuestionResults(
@@ -267,7 +288,7 @@ describe.skip('integration tests using server api', () => {
     ) {
         checkGenericQuestionResult(multiQuestion);
         expect(multiQuestion.answerCount).toBe(4);
-        expect(multiQuestion.answerPercentage).toBe(1);
+        expect(multiQuestion.answerPercentage).toBe(0.8);
         expect(multiQuestion.type).toBe('multi');
         expect(multiQuestion.subQuestions.length).toBe(2);
         checkFirstSubQuestionResults(multiQuestion.subQuestions[0]);
@@ -335,13 +356,20 @@ describe.skip('integration tests using server api', () => {
         expect(question.pollId).toBe(createdPoll.id);
     }
 
+    function checkBooleanQuestionResult(question: IQuestion.ResultData) {
+        checkGenericQuestionResult(question);
+
+        expect(question.answerCount).toBe(5);
+        expect(question.answerPercentage).toBe(1);
+    }
+
     function checkAnswerlessQuestionResult(
         question: IQuestion.ResultData,
         type: string
     ) {
         checkGenericQuestionResult(question);
         expect(question.answerCount).toBe(0);
-        expect(question.answerPercentage).toBe(1);
+        expect(question.answerPercentage).toBe(0);
     }
 
     function checkAnswers(answers: IPolling.AnswersData) {

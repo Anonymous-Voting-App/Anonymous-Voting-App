@@ -8,17 +8,18 @@ datasource db {
 }
 
 model Poll {
-  id         String     @id @default(uuid()) @db.Uuid
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
-  name       String
-  creatorId  String     @db.Uuid
-  adminLink  String
-  pollLink   String
-  resultLink String
-  isActive   Boolean    @default(true)
-  creator    User       @relation("PollUser", fields: [creatorId], references: [id])
-  questions  Question[] @relation("PollQuestions")
+  id          String     @id @default(uuid()) @db.Uuid
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  name        String
+  creatorId   String     @db.Uuid
+  adminLink   String
+  pollLink    String
+  resultLink  String
+  isActive    Boolean    @default(true)
+  creator     User       @relation("PollUser", fields: [creatorId], references: [id])
+  questions   Question[] @relation("PollQuestions")
+  answerCount Int        @default(0)
 }
 
 model Question {

@@ -60,6 +60,8 @@ describe('Poll', () => {
                 },
                 user
             );
+            expect(poll.answerCount()).toBe(1);
+            expect(prismaMock.poll.update).toHaveBeenCalled();
         });
     });
 
@@ -111,6 +113,7 @@ describe('Poll', () => {
             const poll = new Poll(prismaMock, new QuestionFactory(prismaMock));
 
             poll.setId('1');
+            poll.setAnswerCount(2);
 
             poll.setQuestionsFromDatabaseData([
                 {
@@ -133,6 +136,7 @@ describe('Poll', () => {
             expect(question.id()).toBe('1');
             expect(question.pollId()).toBe('1');
             expect(question.type()).toBe('free');
+            expect(question.answerPercentage()).toBe(0);
         });
     });
 
@@ -204,7 +208,8 @@ describe('Poll', () => {
                 adminLink: 'link',
                 pollLink: 'link',
                 resultLink: 'link',
-                isActive: true
+                isActive: true,
+                answerCount: 0
             });
 
             const poll = new Poll(prismaMock, new QuestionFactory(prismaMock));
@@ -261,6 +266,7 @@ describe('Poll', () => {
                 name: 'name',
                 publicId: 'publicId',
                 type: '',
+                answerCount: 0,
                 questions: [
                     {
                         title: '',
@@ -299,6 +305,7 @@ describe('Poll', () => {
         resultLink: 'publicId',
         isActive: true,
         creatorId: '1',
+        answerCount: 0,
         questions: [
             {
                 createdAt: new Date(),

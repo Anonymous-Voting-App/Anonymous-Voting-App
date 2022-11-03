@@ -59,5 +59,6 @@ export interface ResultData {
     name: string;
     type: string;
     publicId: string;
+    answerCount: number;
     questions: IQuestion.ResultData[];
 }
