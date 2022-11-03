@@ -33,6 +33,26 @@ export default class Poll {
     _loadedFromDatabase = false;
     _createdInDatabase = false;
     _questionFactory: QuestionFactory;
+    _answerCount = 0;
+
+    /** How many times the poll has been answered. */
+
+    answerCount(): number {
+        return this._answerCount;
+    }
+
+    /** Sets value of answerCount. */
+
+    setAnswerCount(answerCount: number): void {
+        pre(
+            'argument answerCount is of type number',
+            typeof answerCount === 'number'
+        );
+
+        this._answerCount = answerCount;
+
+        post('_answerCount is answerCount', this._answerCount === answerCount);
+    }
 
     /** A QuestionFactory the Poll uses to create new Questions. */
 
@@ -299,6 +319,8 @@ export default class Poll {
         question.setDatabase(this.database());
 
         await question.answer(answerData, user);
+
+        await this.incrementAnswerCount();
     }
 
     /**
@@ -319,6 +341,42 @@ export default class Poll {
         question.setFromRequest(request);
 
         this.questions()[id.toString()] = question;
+    }
+
+    /**
+     * Sets the parentAnswerCount property of all
+     * the poll's questions to be the poll's answerCount.
+     */
+
+    _setQuestionsParentAnswerCount(): void {
+        for (const id in this.questions()) {
+            const question = this.questions()[id];
+
+            question.setParentAnswerCount(this.answerCount());
+        }
+    }
+
+    /**
+     * Makes new question from given database data
+     * and adds it to the poll's questions.
+     */
+
+    _setQuestionFromDatabaseData(questionData: IQuestion.DatabaseData): void {
+        // Question database data (questionData) is used here as an options object
+        // to the factory. The database field names happen to match
+        // with the options object interfaces. This should
+        // be changed in the future in case the database objects become
+        // different from the options objects.
+        // - Joonas Halinen 17.10.2022
+        const question = this.questionFactory().createFromType(
+            questionData.typeName,
+            questionData
+        );
+
+        question.setParentAnswerCount(this.answerCount());
+        question.setFromDatabaseData(questionData);
+
+        this.questions()[question.id()] = question;
     }
 
     constructor(database: PrismaClient, questionFactory: QuestionFactory) {
@@ -422,7 +480,11 @@ export default class Poll {
                     // - Joonas Halinen 16.10.2022
                     where: { parentId: null },
                     include: {
-                        subQuestions: true,
+                        subQuestions: {
+                            include: {
+                                votes: true
+                            }
+                        },
                         votes: {
                             include: {
                                 subVotes: true
@@ -499,11 +561,10 @@ export default class Poll {
 
         this.setId(pollData.id);
         this.setName(pollData.name);
-
         this.setOwnerFromDatabaseData(pollData);
-
         this.setPublicId(pollData.pollLink);
         this.setPrivateId(pollData.adminLink);
+        this.setAnswerCount(pollData.answerCount);
 
         if (!omitQuestions) {
             this.setQuestionsFromDatabaseData(pollData.questions || []);
@@ -515,6 +576,8 @@ export default class Poll {
     /**
      * Manually populates info of the poll's questions with data
      * that's been retrieved from the database beforehand.
+     * The properties of Poll are assumed to have already been
+     * set from database data.
      */
     setQuestionsFromDatabaseData(
         questionsData: Array<IQuestion.DatabaseData>
@@ -522,20 +585,7 @@ export default class Poll {
         for (let i = 0; i < questionsData.length; i++) {
             const questionData = questionsData[i];
 
-            // Question database data (questionData) is used here as an options object
-            // to the factory. The database field names happen to match
-            // with the options object interfaces. This should
-            // be changed in the future in case the database objects become
-            // different from the options objects.
-            // - Joonas Halinen 17.10.2022
-            const question = this.questionFactory().createFromType(
-                questionData.typeName,
-                questionData
-            );
-
-            question.setFromDatabaseData(questionData);
-
-            this.questions()[question.id()] = question;
+            this._setQuestionFromDatabaseData(questionData);
         }
     }
 
@@ -572,7 +622,7 @@ export default class Poll {
         );
 
         if (this.userHasRightToAnswerPoll(user)) {
-            this._answerWithRights(questionId, answerData, user);
+            await this._answerWithRights(questionId, answerData, user);
         } else {
             throw new Error(
                 `User does not have right to answer poll ${this.id()}.`
@@ -726,5 +776,58 @@ export default class Poll {
     generateIds(): void {
         this.generatePrivateId();
         this.generatePublicId();
+    }
+
+    /**
+     * Answer result statistics for all the poll's questions.
+     */
+
+    questionsResultObjs(): Array<IQuestion.ResultData> {
+        const result: IQuestion.ResultData[] = [];
+
+        for (const id in this.questions()) {
+            const question = this.questions()[id];
+
+            result.push(question.resultDataObj());
+        }
+
+        return result;
+    }
+
+    /**
+     * A data object containing the poll's answer result
+     * statistics for the poll and its whole question tree.
+     */
+
+    resultDataObj(): IPolling.ResultData {
+        const result: IPolling.ResultData = {
+            name: this.name(),
+            publicId: this.publicId(),
+            type: this.type(),
+            answerCount: this.answerCount(),
+            questions: this.questionsResultObjs()
+        };
+
+        return result;
+    }
+
+    /**
+     * Increments the answerCount property of the instance
+     * and in the database by 1.
+     */
+
+    async incrementAnswerCount(): Promise<void> {
+        await this.database().poll.update({
+            where: { id: this.id() },
+
+            data: {
+                answerCount: {
+                    increment: 1
+                }
+            }
+        });
+
+        this.setAnswerCount(this.answerCount() + 1);
+        this._setQuestionsParentAnswerCount();
     }
 }

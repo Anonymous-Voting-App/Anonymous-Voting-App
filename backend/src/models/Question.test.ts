@@ -1,6 +1,7 @@
 import Question from './Question';
 import User from './User';
 import { prismaMock } from '../utils/prisma_singleton';
+import Answer from './Answer';
 
 describe('Question', () => {
     beforeEach(() => {
@@ -62,7 +63,7 @@ describe('Question', () => {
     });
 
     describe('setFromDatabaseData', () => {
-        test('Set answer from database', () => {
+        test('Set question from database data', () => {
             const question = new Question();
 
             question.setFromDatabaseData({
@@ -73,17 +74,27 @@ describe('Question', () => {
                 parentId: null,
                 type: 'test-type',
                 typeName: 'free',
-                votes: []
+                visualType: 'default',
+                votes: [
+                    {
+                        id: 'v1',
+                        parentId: '',
+                        questionId: 'test-id',
+                        value: 'test',
+                        voterId: 'voter1'
+                    }
+                ]
             });
 
             expect(question.id()).toBe('test-id');
             expect(question.type()).toBe('free');
             expect(question.pollId()).toBe('test-pollId');
+            expect(question.answerCount()).toBe(1);
         });
     });
 
     describe('newDatabaseObject', () => {
-        test('Create a new database object for answer', () => {
+        test('Create a new database object for question', () => {
             const question = new Question();
 
             question.setTitle('test-title');
@@ -95,6 +106,49 @@ describe('Question', () => {
             expect(
                 typeof question.newDatabaseObject().typeId === 'string'
             ).toBe(true);
+        });
+    });
+
+    describe('resultDataObj', () => {
+        test('Create a new result object for question', () => {
+            const question = new Question();
+
+            question.setId('test-id');
+            question.setTitle('test-title');
+            question.setDescription('test-description');
+            question.setType('test-type');
+            question.setPollId('test-poll-id');
+            question.setAnswerCount(3);
+
+            question.answers()['1'] = new Answer();
+            question.answers()['1'].setValue('test1');
+            question.answers()['2'] = new Answer();
+            question.answers()['2'].setValue('test1');
+            question.answers()['3'] = new Answer();
+            question.answers()['3'].setValue('test2');
+
+            expect(question.resultDataObj()).toEqual({
+                id: 'test-id',
+                title: 'test-title',
+                description: 'test-description',
+                type: 'test-type',
+                pollId: 'test-poll-id',
+                answerCount: 3,
+                answerPercentage: 1,
+                answerValueStatistics: [
+                    {
+                        value: 'test1',
+                        count: 2,
+                        percentage: 2 / 3
+                    },
+
+                    {
+                        value: 'test2',
+                        count: 1,
+                        percentage: 1 / 3
+                    }
+                ]
+            });
         });
     });
 

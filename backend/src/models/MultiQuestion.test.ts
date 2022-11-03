@@ -139,6 +139,10 @@ describe('MultiQuestion', () => {
         test('Set multi question from database data', () => {
             const question = new MultiQuestion();
 
+            Question.prototype.answerCount = jest.fn(() => 2);
+            Question.prototype.setAnswerCount = jest.fn();
+            Question.prototype.setAnswerPercentage = jest.fn();
+
             question.setFromDatabaseData({
                 id: 'id',
                 title: 'title',
@@ -147,6 +151,7 @@ describe('MultiQuestion', () => {
                 parentId: null,
                 type: 'type',
                 typeName: 'multi',
+                visualType: 'default',
                 minValue: 1,
                 maxValue: 1,
                 votes: [],
@@ -158,6 +163,7 @@ describe('MultiQuestion', () => {
                         pollId: 'pollId',
                         parentId: 'id',
                         type: 'type',
+                        visualType: 'default',
                         typeName: 'free',
                         votes: []
                     }
@@ -176,6 +182,20 @@ describe('MultiQuestion', () => {
             expect(subQuestion.id()).toBe('sub-id');
             expect(subQuestion.title()).toBe('title');
             expect(subQuestion.type()).toBe('free');
+
+            expect(Question.prototype.setAnswerCount).toHaveBeenNthCalledWith(
+                1,
+                2
+            );
+            expect(Question.prototype.setAnswerCount).toHaveBeenNthCalledWith(
+                2,
+                2
+            );
+            expect(
+                Question.prototype.setAnswerPercentage
+            ).toHaveBeenNthCalledWith(1, 1);
+            expect(Question.prototype.setAnswerCount).toHaveBeenCalledTimes(2);
+            expect(Question.prototype.setAnswerPercentage).toHaveBeenCalled();
         });
     });
 

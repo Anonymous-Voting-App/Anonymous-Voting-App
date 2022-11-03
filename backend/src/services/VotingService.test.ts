@@ -34,6 +34,7 @@ describe('VotingService', () => {
                         title: '',
                         description: '',
                         type: 'question-type',
+                        visualType: 'default',
                         id: 'q1',
                         pollId: '1'
                     }
@@ -208,6 +209,7 @@ describe('VotingService', () => {
                         title: '',
                         description: '',
                         type: 'question-type',
+                        visualType: 'default',
                         id: 'q1',
                         pollId: '1'
                     }
@@ -270,6 +272,32 @@ describe('VotingService', () => {
         });
     });
 
+    describe('getPollResults', () => {
+        test('getPollResults for existing poll', async () => {
+            const mockResultObj = { test: '1' };
+
+            Poll.prototype.existsInDatabase = jest
+                .fn()
+                .mockReturnValueOnce(true);
+            Poll.prototype.setPublicId = jest.fn();
+            Poll.prototype.loadFromDatabase = jest.fn();
+            Poll.prototype.resultDataObj = jest
+                .fn()
+                .mockReturnValueOnce(mockResultObj);
+
+            const service = new VotingService(
+                prismaMock,
+                new QuestionFactory(prismaMock)
+            );
+
+            const results = await service.getPollResults('test-id');
+
+            expect(results).toEqual(mockResultObj);
+            expect(Poll.prototype.loadFromDatabase).toHaveBeenCalled();
+            expect(Poll.prototype.setPublicId).toHaveBeenCalledWith('test-id');
+        });
+    });
+
     const createMockUser = () => {
         const user = new User();
         user.setDatabase(prismaMock);
@@ -295,6 +323,7 @@ describe('VotingService', () => {
                 title: '',
                 description: '',
                 type: 'question-type',
+                visualType: 'default',
                 id: 'q1',
                 pollId: '1'
             }

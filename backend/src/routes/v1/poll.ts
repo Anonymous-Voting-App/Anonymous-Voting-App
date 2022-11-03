@@ -4,7 +4,8 @@ import {
     answerPoll,
     getPublicPoll,
     getPrivatePoll,
-    getPollAnswers
+    getPollAnswers,
+    getPollResults
 } from '../../controllers/pollController';
 
 export const router = Router();
@@ -18,6 +19,11 @@ router.post('/', createPoll);
  * Get answers of a poll
  */
 router.get('/:publicId/answers', getPollAnswers);
+
+/**
+ * Get results of a poll
+ */
+router.get('/:publicId/results', getPollResults);
 
 /**
  * Answer poll

@@ -12,6 +12,7 @@ export interface NewOptionData {
 
 export interface NewQuestionData {
     typeName: string;
+    visualType?: string;
     typeId: string;
     pollId: string;
     title: string;
@@ -32,6 +33,7 @@ export interface DatabaseData {
     pollId: string;
     type?: string;
     typeName: string;
+    visualType: string;
     votes?: Array<IAnswer.DatabaseData>;
     parentId: string | null;
     [extra: string]: unknown;
@@ -47,6 +49,7 @@ export interface QuestionRequest {
     title: string;
     description: string;
     type: string;
+    visualType?: string;
     subQuestions?: Array<QuestionRequest>;
     minValue?: number;
     maxValue?: number;
@@ -54,4 +57,23 @@ export interface QuestionRequest {
     minAnswers?: number;
     maxAnswers?: number;
     [extra: string]: number | string | object | boolean | undefined;
+}
+
+export interface ResultData {
+    title: string;
+    description: string;
+    type: string;
+    visualType: string;
+    id: string;
+    pollId: string;
+    answerCount: number;
+    answerPercentage: number;
+    answerValueStatistics: Array<AnswerValueStatistic>;
+    [extra: string]: unknown;
+}
+
+export interface AnswerValueStatistic {
+    value: string;
+    count: number;
+    percentage: number;
 }
