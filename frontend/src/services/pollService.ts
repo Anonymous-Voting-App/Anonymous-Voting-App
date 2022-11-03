@@ -92,21 +92,30 @@ const setQuesArray = (item: any) => {
     switch (item.visualType) {
         case 'radioBtn':
         case 'checkBox':
-            options = formatMultiTypeOptions(
-                item.subQuestions[0].answerValueStatistics
-            );
+            const multiOptions = item.subQuestions[0]?.answerValueStatistics
+                ? item.subQuestions[0].answerValueStatistics
+                : [];
+            options = formatMultiTypeOptions(multiOptions);
             break;
         case 'star':
-            options = formatRatingOptions(item.answerValueStatistics);
+            const ratingOptions =
+                item.answerValueStatistics?.length > 0
+                    ? item.answerValueStatistics
+                    : [];
+            options = formatRatingOptions(ratingOptions);
             break;
         case 'yesNo':
         case 'upDown':
-            options = formatBooleanOptions(item.answerValueStatistics);
+            const booleanOptions =
+                item.answerValueStatistics?.length > 0
+                    ? item.answerValueStatistics
+                    : [];
+            options = formatBooleanOptions(booleanOptions);
             break;
     }
     return {
-        title: item.title,
-        type: item.visualType,
+        title: item.title ? item.title : '',
+        type: item.visualType ? item.visualType : 'radioBtn',
         totalCount:
             item.type === 'multi'
                 ? item.subQuestions[0].answerCount
@@ -124,6 +133,7 @@ const formatMultiTypeOptions = (options: [any]) => {
             percentage: (option.percentage * 100).toFixed(1)
         };
     });
+
     return formattedOptions;
 };
 
@@ -162,7 +172,7 @@ const formatRatingOptions = (options: [any]) => {
         };
     });
     console.log(ratingTypeOptions);
-    return ratingTypeOptions;
+    return ratingTypeOptions.length > 0 ? ratingTypeOptions : newArray;
 };
 
 const formatBooleanOptions = (options: [any]) => {
@@ -191,5 +201,6 @@ const formatBooleanOptions = (options: [any]) => {
             percentage: Number(option.percentage)
         };
     });
-    return booleanTypeOptions;
+
+    return booleanTypeOptions.length > 0 ? booleanTypeOptions : newArray;
 };

@@ -3,9 +3,6 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.scss';
 import NavBar from './NavBar';
 import PollCreation from './PollCreation';
-import UserCredentialsRegistration from './UserCredentialsRegistration';
-import UserInfoRegistration from './UserInfoRegistration';
-import Login from './Login';
 import BasicSnackbar from './BasicSnackbar';
 import PollAnswering from './PollAnswering';
 import AdminView from './AdminView';
@@ -36,9 +33,10 @@ function App() {
         setOpen(false);
     };
     return (
-        <div className="App">
-            <NavBar></NavBar>
-            <BrowserRouter>
+        <BrowserRouter>
+            <div className="App">
+                <NavBar></NavBar>
+
                 <Routes>
                     <Route
                         index
@@ -57,14 +55,15 @@ function App() {
                         }
                     />
                 </Routes>
-            </BrowserRouter>
-            <BasicSnackbar
-                open={open}
-                onClose={handleClose}
-                severity={notificationObj.severity}
-                message={notificationObj.message}
-            />
-        </div>
+
+                <BasicSnackbar
+                    open={open}
+                    onClose={handleClose}
+                    severity={notificationObj.severity}
+                    message={notificationObj.message}
+                />
+            </div>
+        </BrowserRouter>
     );
 }
 

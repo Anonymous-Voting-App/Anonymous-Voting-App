@@ -31,6 +31,7 @@ const ResultCard = (props: any) => {
 
     const quesType = setQuesType(props.ques.type);
 
+    // for setting highest flag - tick icon for highest voted options
     const highestCount = options.reduce((prev, current) => {
         return prev.count > current.count ? prev : current;
     });
