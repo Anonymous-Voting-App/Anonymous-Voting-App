@@ -23,7 +23,7 @@ function UserCredentialsRegistration() {
             <Typography variant="h4" className="page-heading">
                 Register
             </Typography>
-            <Container className="fields">
+            <Container>
                 <Field
                     page="register"
                     text="Username"

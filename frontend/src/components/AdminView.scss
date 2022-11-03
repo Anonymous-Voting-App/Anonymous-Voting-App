@@ -6,12 +6,9 @@
     }
 }
 
-.MuiContainer-root {
-    margin-top: 180px;
-}
-
 .title {
     font-weight: 600;
+    margin-top: 60px;
 }
 
 .itemsContainer {
@@ -24,9 +21,9 @@
 .button {
     width: 260px;
     height: 40px;
-    border-radius: 20px !important;
-    text-transform: none !important;
-    border: 1px solid $main-color !important;
+    border-radius: 20px;
+    text-transform: none;
+    border: 1px solid $main-color;
 }
 
 .searchFormControl {
@@ -40,6 +37,16 @@
     .MuiSvgIcon-root {
         left: 1.875rem;
     }
+    .MuiInputBase-root {
+        width: 14.5rem;
+        border-radius: 1.25rem;
+        height: 2.5rem;
+        border: 1px solid $main-color;
+        margin-bottom: 0.625rem;
+    }
+    .MuiOutlinedInput-notchedOutline {
+        border: none;
+    }
 }
 
 .searchField {
@@ -49,12 +56,16 @@
     .MuiOutlinedInput-root {
         @extend .button;
     }
+    .MuiOutlinedInput-notchedOutline {
+        border: none;
+    }
 }
 
-.searchButton {
+.searchButton,
+.searchButton:hover {
     @extend .button;
-    background-color: $main-color !important;
-    color: $background-color !important;
+    background-color: $main-color;
+    color: $background-color;
 }
 
 .listItems {

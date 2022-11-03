@@ -23,7 +23,7 @@ function UserInfoRegistration() {
             <Typography variant="h4" className="page-heading">
                 Register
             </Typography>
-            <Container className="fields">
+            <Container>
                 <Field
                     className="field"
                     page="register"

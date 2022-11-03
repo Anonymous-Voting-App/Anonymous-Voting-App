@@ -1,7 +1,7 @@
-import { useState } from 'react';
-import { Typography, Container, Button, Link } from '@mui/material';
 import Field from './Field';
 import './LoginAndRegister.scss';
+import { useState } from 'react';
+import { Typography, Button, Link } from '@mui/material';
 
 function Login(props: any) {
     const [username, setUsername] = useState('');
@@ -12,11 +12,11 @@ function Login(props: any) {
     };
 
     return (
-        <Container className="main-wrapper">
+        <div className="main-wrapper">
             <Typography variant="h4" className="page-heading">
                 Login
             </Typography>
-            <Container className="fields">
+            <div className="fields">
                 <Field
                     page="login"
                     text="Username"
@@ -39,15 +39,15 @@ function Login(props: any) {
                 >
                     Login
                 </Button>
-            </Container>
+            </div>
 
-            <Container className="texts">
+            <div className="texts">
                 <Typography className="bottom-text">
                     Don't have an account?
                 </Typography>
                 <Link className="bottom-text link">Register</Link>
-            </Container>
-        </Container>
+            </div>
+        </div>
     );
 }
 
