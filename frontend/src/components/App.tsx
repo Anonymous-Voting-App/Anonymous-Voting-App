@@ -3,9 +3,9 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.scss';
 import NavBar from './NavBar';
 import PollCreation from './PollCreation';
-import UserCredentialsRegistration from './UserCredentialsRegistration';
-import UserInfoRegistration from './UserInfoRegistration';
-import Login from './Login';
+/* import UserCredentialsRegistration from './UserCredentialsRegistration'; */
+/* import UserInfoRegistration from './UserInfoRegistration'; */
+/* import Login from './Login'; */
 import BasicSnackbar from './BasicSnackbar';
 import PollAnswering from './PollAnswering';
 import AdminView from './AdminView';
