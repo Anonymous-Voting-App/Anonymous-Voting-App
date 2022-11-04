@@ -9,39 +9,39 @@ const PollResult = (props: any) => {
     const [pollResult, setPollResult] = useState([]);
 
     useEffect(() => {
-        getResultData('eef61039-cde8-4863-8078-03d3c4bf1174');
-    }, []);
-
-    const getResultData = (pollId: string) => {
-        fetchPollResult(pollId)
-            .then((response) => {
-                console.log(response);
-                setPollName(response.pollName);
-                setPollResult(response.questions);
-            })
-            .catch((error) => {
-                // console.log(error);
-                props.showNotification({
-                    severity: 'error',
-                    message:
-                        'Sorry, An error encountered while fetching your poll'
+        const getResultData = (pollId: string) => {
+            fetchPollResult(pollId)
+                .then((response) => {
+                    console.log(response);
+                    setPollName(response.pollName);
+                    setPollResult(response.questions);
+                })
+                .catch((error) => {
+                    // console.log(error);
+                    props.showNotification({
+                        severity: 'error',
+                        message:
+                            'Sorry, An error encountered while fetching your poll'
+                    });
                 });
-            });
-        // fetchPollResult(pollId)
-        //     .then((response) => {
-        //         console.log(response);
-        //         setPollName(response.data.pollName);
-        //         setPollResult(response.data.questions);
-        //     })
-        //     .catch((error) => {
-        //         console.log(error);
-        //         // props.showNotification({
-        //         //     severity: 'error',
-        //         //     message:
-        //         //         'Sorry, An error encountered while fetching your poll'
-        //         // });
-        //     });
-    };
+            // fetchPollResult(pollId)
+            //     .then((response) => {
+            //         console.log(response);
+            //         setPollName(response.data.pollName);
+            //         setPollResult(response.data.questions);
+            //     })
+            //     .catch((error) => {
+            //         console.log(error);
+            //         // props.showNotification({
+            //         //     severity: 'error',
+            //         //     message:
+            //         //         'Sorry, An error encountered while fetching your poll'
+            //         // });
+            //     });
+        };
+
+        getResultData('eef61039-cde8-4863-8078-03d3c4bf1174');
+    }, [props]);
 
     return (
         <Container>
