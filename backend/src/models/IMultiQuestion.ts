@@ -1,5 +1,4 @@
 import * as IQuestion from './IQuestion';
-import * as IAnswer from './IAnswer';
 
 export interface AnswerData {
     subQuestionIds: Array<string>;

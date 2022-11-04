@@ -5,6 +5,7 @@ import * as IPolling from './IPolling';
 import * as IQuestion from './IQuestion';
 import * as IAnswer from './IAnswer';
 import { PrismaClient } from '@prisma/client';
+import BadRequestError from '../utils/badRequestError';
 
 /**
  * A question that a Poll can have. Connected to Prisma database.
@@ -459,10 +460,6 @@ export default class Question {
      */
     newDatabaseObject(): IQuestion.NewQuestionData {
         const result: IQuestion.NewQuestionData = {
-            // A test type that is in the database already.
-            // The schema demands some kind of typeId
-            // even though question type are not currently used for anything.
-            typeId: '7b76d1c6-8f40-4509-8317-ce444892b1ee',
             typeName: this.type(),
             pollId: this.pollId(),
             parentId: this.parentId().length > 0 ? this.parentId() : undefined,
@@ -608,7 +605,7 @@ export default class Question {
                 parentAnswerId
             );
         } else {
-            throw new Error('Answer data is not acceptable.');
+            throw new BadRequestError('Answer data is not acceptable.');
         }
     }
 

@@ -94,6 +94,7 @@ export default class VotingService {
         const user = await this.userManager().getUser(userData);
 
         if (!(user instanceof User)) {
+            // Make this return 401
             throw new Error('User not found.');
         }
 

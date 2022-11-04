@@ -6,6 +6,7 @@ import * as IQuestion from './IQuestion';
 import * as IMultiQuestion from './IMultiQuestion';
 import { PrismaClient } from '@prisma/client';
 import Answer from './Answer';
+import BadRequestError from '../utils/badRequestError';
 
 /**
  * A Question that can have sub-questions.
@@ -414,7 +415,7 @@ export default class MultiQuestion extends Question {
         if (this.answerDataIsAcceptable(answerData)) {
             await this._answerWithAcceptableData(answerData, answerer);
         } else {
-            throw new Error('Invalid answer data.');
+            throw new BadRequestError('Invalid answer data.');
         }
     }
 
