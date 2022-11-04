@@ -7,7 +7,10 @@ import prisma from '../utils/prismaHandler';
 export const checkHealth = async (req: Request, res: Response) => {
     try {
         // Test the connection to the database
+        logger.debug('Checking health of database');
         await prisma.poll.findFirst();
+        logger.debug('Check for database health was successful');
+
         return res.json({
             server: true,
             database: true
