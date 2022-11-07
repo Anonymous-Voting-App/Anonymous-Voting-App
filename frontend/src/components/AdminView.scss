@@ -36,6 +36,9 @@
 .searchBy {
     @extend .button;
     margin-top: 76px;
+    .MuiOutlinedInput-notchedOutline {
+        border: none;
+    }
 
     .MuiSvgIcon-root {
         left: 1.875rem;
@@ -48,6 +51,12 @@
     }
     .MuiOutlinedInput-root {
         @extend .button;
+    }
+    .MuiInputBase-root {
+        border: 1px solid $main-color;
+    }
+    .MuiOutlinedInput-notchedOutline {
+        border: none;
     }
 }
 
