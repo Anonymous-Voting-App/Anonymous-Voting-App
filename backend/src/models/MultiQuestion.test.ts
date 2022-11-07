@@ -13,7 +13,7 @@ describe('MultiQuestion', () => {
 
     describe('answerDataIsAcceptable', () => {
         test('Answer data correct', () => {
-            const question = new MultiQuestion();
+            const question = new MultiQuestion(prismaMock);
             const subQuestion = new Question();
 
             subQuestion.setId('sub-id');
@@ -65,7 +65,7 @@ describe('MultiQuestion', () => {
 
             const user = makeAnswerer();
 
-            const question = new MultiQuestion();
+            const question = new MultiQuestion(prismaMock);
             const subQuestion = new Question();
 
             question.setId('q1');
@@ -105,7 +105,7 @@ describe('MultiQuestion', () => {
         });
 
         test('Question not found', async () => {
-            const question = new MultiQuestion();
+            const question = new MultiQuestion(prismaMock);
             const subQuestion = new Question();
 
             subQuestion.setId('sub-id');
@@ -137,7 +137,7 @@ describe('MultiQuestion', () => {
 
     describe('setFromDatabaseData', () => {
         test('Set multi question from database data', () => {
-            const question = new MultiQuestion();
+            const question = new MultiQuestion(prismaMock);
 
             Question.prototype.answerCount = jest.fn(() => 2);
             Question.prototype.setAnswerCount = jest.fn();
@@ -201,7 +201,7 @@ describe('MultiQuestion', () => {
 
     describe('newDatabaseObject', () => {
         test('Create new multi question database object', () => {
-            const question = new MultiQuestion();
+            const question = new MultiQuestion(prismaMock);
 
             question.setId('id');
             question.setType('type');
