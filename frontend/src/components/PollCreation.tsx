@@ -183,7 +183,8 @@ function PollCreation(props: any) {
 
         createPoll(pollName, questions)
             .then((response) => {
-                // console.log(response);
+                console.log(response.publicId);
+                props.setPollId(response.publicId); // TO BE REMOVED WHEN ADMIN POLLS IMPLEMENTED
                 props.showNotification({
                     severity: 'success',
                     message: 'Poll Created successfully'

@@ -12,6 +12,12 @@ const updatePollBody = (questions: PollObj[]) => {
     return updatedQuestions;
 };
 
+/**
+ * function called when creating a poll
+ * @param title
+ * @param questions
+ * @returns
+ */
 export const createPoll = async (title: string, questions: any) => {
     const updatedQuestions = updatePollBody(questions);
     const pollContent = {
@@ -22,16 +28,14 @@ export const createPoll = async (title: string, questions: any) => {
         },
         questions: updatedQuestions
     };
-    // console.log(pollContent, 'request body');
     // await fetch(`${window.location.origin}/api/poll`, {
-    const response = await fetch('http://localhost:8080/api/poll', {
+    const response = await fetch(`${window.location.origin}/api/poll`, {
         method: 'POST',
         body: JSON.stringify(pollContent),
         headers: {
             'Content-type': 'application/json; charset=UTF-8'
         }
     });
-    // console.log(response.status);
     if (response.status !== 201) {
         throw new Error('Request Failed');
     }
@@ -39,31 +43,29 @@ export const createPoll = async (title: string, questions: any) => {
     return data;
 };
 
+/**
+ * Function for fetching poll result
+ * @param pollId
+ * @returns
+ */
 export const fetchPollResult = async (pollId: string) => {
-    // pollId = 'eef61039-cde8-4863-8078-03d3c4bf1174uiuiiu';
-    // const response = await fetch(`http://localhost:8080/api/poll/${pollId}`, {
-    //     method: 'GET',
-    //     headers: {
-    //         'Content-Type': 'application/json',
-    //         Accept: 'application/json'
-    //     }
-    // });
-    // const data = await response.json();
-    // if (response.status !== 201) {
-    //     throw new Error('Request Failed');
-    // }
+    console.log(pollId, 'poll results');
 
-    // to be replaced with above api call once 'visualTypes' have
-    // expected values
-    const newResponse = await fetch(`${window.location.origin}/data.json`, {
-        headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json'
+    const newResponse = await fetch(
+        `${window.location.origin}/api/poll/${pollId}/results`,
+        {
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json'
+            }
         }
-    });
+    );
+    if (newResponse.status !== 200) {
+        throw new Error('Request Failed');
+    }
     const dataList = await newResponse.json();
     const formattedData = formatData(dataList);
-    // console.log(formattedData, 'data');
+    console.log(formattedData, 'data');
     return formattedData;
 };
 

@@ -7,10 +7,9 @@ import ResultCard from './ResultCard';
 const PollResult = (props: any) => {
     const [pollName, setPollName] = useState('');
     const [pollResult, setPollResult] = useState([]);
-
     useEffect(() => {
-        const getResultData = (pollId: string) => {
-            fetchPollResult(pollId)
+        const getResultData = (id: string) => {
+            fetchPollResult(id)
                 .then((response) => {
                     console.log(response);
                     setPollName(response.pollName);
@@ -18,30 +17,17 @@ const PollResult = (props: any) => {
                 })
                 .catch((error) => {
                     // console.log(error);
+                    setPollName('Oops!! No data fetched');
                     props.showNotification({
                         severity: 'error',
                         message:
-                            'Sorry, An error encountered while fetching your poll'
+                            'Sorry, An error encountered while fetching your poll result'
                     });
                 });
-            // fetchPollResult(pollId)
-            //     .then((response) => {
-            //         console.log(response);
-            //         setPollName(response.data.pollName);
-            //         setPollResult(response.data.questions);
-            //     })
-            //     .catch((error) => {
-            //         console.log(error);
-            //         // props.showNotification({
-            //         //     severity: 'error',
-            //         //     message:
-            //         //         'Sorry, An error encountered while fetching your poll'
-            //         // });
-            //     });
         };
 
-        getResultData('eef61039-cde8-4863-8078-03d3c4bf1174');
-    }, [props]);
+        getResultData(props.pollId);
+    }, []);
 
     return (
         <Container>
