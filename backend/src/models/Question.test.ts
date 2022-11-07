@@ -103,9 +103,6 @@ describe('Question', () => {
             question.setPollId('test-poll-id');
 
             expect(question.newDatabaseObject().pollId).toBe('test-poll-id');
-            expect(
-                typeof question.newDatabaseObject().typeId === 'string'
-            ).toBe(true);
         });
     });
 

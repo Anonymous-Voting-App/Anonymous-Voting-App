@@ -219,7 +219,6 @@ describe('MultiQuestion', () => {
             question.subQuestions()[subQuestion.id()] = subQuestion;
 
             expect(question.newDatabaseObject()).toEqual({
-                typeId: '7b76d1c6-8f40-4509-8317-ce444892b1ee',
                 pollId: 'pollId',
                 maxValue: 1,
                 minValue: 1,

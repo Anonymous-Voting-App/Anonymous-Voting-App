@@ -6,9 +6,9 @@ import * as IPolling from './IPolling';
 import * as IPoll from './IPoll';
 import * as IQuestion from './IQuestion';
 import * as IUser from './IUser';
-import * as IAnswer from './IAnswer';
-import MultiQuestionCollection from './MultiQuestionCollection';
-import MultiQuestion from './MultiQuestion';
+/* import * as IAnswer from './IAnswer'; */
+/* import MultiQuestionCollection from './MultiQuestionCollection'; */
+/* import MultiQuestion from './MultiQuestion'; */
 import { PrismaClient } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 import QuestionFactory from './QuestionFactory';
@@ -624,6 +624,7 @@ export default class Poll {
         if (this.userHasRightToAnswerPoll(user)) {
             await this._answerWithRights(questionId, answerData, user);
         } else {
+            // Make this return 403! - Joonas Hiltunen 04.11.2022
             throw new Error(
                 `User does not have right to answer poll ${this.id()}.`
             );
@@ -635,6 +636,7 @@ export default class Poll {
      * A user might not have a right to answer if they
      * have already answered the poll, for example.
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     userHasRightToAnswerPoll(user: User): boolean {
         return true;
     }

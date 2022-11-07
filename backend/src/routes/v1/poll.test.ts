@@ -272,7 +272,7 @@ describe.skip('integration tests using server api', () => {
     function checkQuestionResults(questions: Array<IQuestion.ResultData>) {
         checkMultiQuestionResults(questions[0] as IMultiQuestion.ResultData);
         checkScaleQuestionResult(questions[1]);
-        checkAnswerlessQuestionResult(questions[2], 'number');
+        checkAnswerlessQuestionResult(questions[2] /*, 'number' */);
         checkBooleanQuestionResult(questions[3]);
     }
 
@@ -364,8 +364,8 @@ describe.skip('integration tests using server api', () => {
     }
 
     function checkAnswerlessQuestionResult(
-        question: IQuestion.ResultData,
-        type: string
+        question: IQuestion.ResultData
+        /* type: string */
     ) {
         checkGenericQuestionResult(question);
         expect(question.answerCount).toBe(0);

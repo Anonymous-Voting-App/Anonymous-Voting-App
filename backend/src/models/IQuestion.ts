@@ -13,7 +13,6 @@ export interface NewOptionData {
 export interface NewQuestionData {
     typeName: string;
     visualType?: string;
-    typeId: string;
     pollId: string;
     title: string;
     description: string;
