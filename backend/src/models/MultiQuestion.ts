@@ -7,6 +7,7 @@ import * as IMultiQuestion from './IMultiQuestion';
 import { PrismaClient } from '@prisma/client';
 import Answer from './Answer';
 import BadRequestError from '../utils/badRequestError';
+import QuestionFactory from './QuestionFactory';
 
 /**
  * A Question that can have sub-questions.
@@ -16,6 +17,26 @@ export default class MultiQuestion extends Question {
     _subQuestions: { [id: string]: Question } = {};
     _minAnswers = 1;
     _maxAnswers = 1;
+    _factory: QuestionFactory;
+
+    /**  */
+
+    factory(): QuestionFactory {
+        return this._factory;
+    }
+
+    /** Sets value of factory. */
+
+    setFactory(factory: QuestionFactory): void {
+        pre(
+            'factory is of type QuestionFactory',
+            factory instanceof QuestionFactory
+        );
+
+        this._factory = factory;
+
+        post('_factory is factory', this._factory === factory);
+    }
 
     /**
      * Maximum amount of sub-answers the question can
@@ -110,7 +131,10 @@ export default class MultiQuestion extends Question {
         subQuestions: Array<IQuestion.DatabaseData>
     ): void {
         for (let i = 0; i < subQuestions.length; i++) {
-            const subQuestion = new Question();
+            const subQuestion = this._factory.createFromType(
+                subQuestions[i].typeName,
+                subQuestions[i]
+            );
 
             subQuestion.setParentAnswerCount(this.answerCount());
             subQuestion.setFromDatabaseData(subQuestions[i]);
@@ -261,7 +285,10 @@ export default class MultiQuestion extends Question {
         id: number,
         subQuestionData: IMultiQuestion.QuestionRequest
     ): void {
-        const subQuestion = new Question();
+        const subQuestion = this._factory.createFromType(
+            subQuestionData.type,
+            subQuestionData
+        );
 
         subQuestion.setDatabase(this.database());
         subQuestion.setFromRequest(subQuestionData);
@@ -306,8 +333,9 @@ export default class MultiQuestion extends Question {
         return subQuestion;
     }
 
-    constructor(database?: PrismaClient) {
+    constructor(database: PrismaClient) {
         super(database);
+        this._factory = new QuestionFactory(database);
     }
 
     /**

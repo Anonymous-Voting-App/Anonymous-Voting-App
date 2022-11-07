@@ -28,7 +28,7 @@ export default class MultiQuestionCollection extends QuestionCollection {
     ): void {
         questionData.votes = [];
 
-        const question = new MultiQuestion();
+        const question = new MultiQuestion(this.database());
         question.setFromDatabaseData(questionData);
 
         this.questions()[questionData.id] = question;
