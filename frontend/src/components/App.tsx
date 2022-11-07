@@ -14,6 +14,9 @@ function App() {
         message: '',
         severity: ''
     });
+    const [pollId, setPollId] = useState(
+        '4c5365d6-a32f-4c86-b088-85cb0c4f64ea'
+    );
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const handleNotification = (status: {
@@ -32,6 +35,11 @@ function App() {
     const handleClose = () => {
         setOpen(false);
     };
+
+    const handlePollId = (id: string) => {
+        setPollId(id);
+    };
+
     return (
         <BrowserRouter>
             <div className="App">
@@ -43,6 +51,7 @@ function App() {
                         element={
                             <PollCreation
                                 showNotification={handleNotification}
+                                setPollId={handlePollId}
                             ></PollCreation>
                         }
                     />
@@ -51,7 +60,10 @@ function App() {
                     <Route
                         path="admin/result"
                         element={
-                            <PollResult showNotification={handleNotification} />
+                            <PollResult
+                                pollId={pollId}
+                                showNotification={handleNotification}
+                            />
                         }
                     />
                 </Routes>

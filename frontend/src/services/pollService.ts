@@ -3,14 +3,21 @@ import { PollObj } from '../utils/types';
 // function to modify question type before calling api
 const updatePollBody = (questions: PollObj[]) => {
     const updatedQuestions = questions.map((element) => {
+        console.log(element.type);
         if (element.type === 'radioBtn' || element.type === 'checkBox')
-            return { ...element, type: 'multi' };
+            return { ...element, visualType: element.type, type: 'multi' };
         else return element;
     });
     // console.log(updatedQuestions);
     return updatedQuestions;
 };
 
+/**
+ * function called when creating a poll
+ * @param title
+ * @param questions
+ * @returns
+ */
 export const createPoll = async (title: string, questions: any) => {
     const updatedQuestions = updatePollBody(questions);
     const pollContent = {
@@ -21,16 +28,14 @@ export const createPoll = async (title: string, questions: any) => {
         },
         questions: updatedQuestions
     };
-
     // await fetch(`${window.location.origin}/api/poll`, {
-    const response = await fetch('http://localhost:8080/api/poll', {
+    const response = await fetch(`${window.location.origin}/api/poll`, {
         method: 'POST',
         body: JSON.stringify(pollContent),
         headers: {
             'Content-type': 'application/json; charset=UTF-8'
         }
     });
-    // console.log(response.status);
     if (response.status !== 201) {
         throw new Error('Request Failed');
     }
@@ -38,24 +43,16 @@ export const createPoll = async (title: string, questions: any) => {
     return data;
 };
 
+/**
+ * Function for fetching poll result
+ * @param pollId
+ * @returns
+ */
 export const fetchPollResult = async (pollId: string) => {
-    // pollId = 'eef61039-cde8-4863-8078-03d3c4bf1174uiuiiu';
-    // const response = await fetch(`http://localhost:8080/api/poll/${pollId}`, {
-    //     method: 'GET',
-    //     headers: {
-    //         'Content-Type': 'application/json',
-    //         Accept: 'application/json'
-    //     }
-    // });
-    // const data = await response.json();
-    // if (response.status !== 201) {
-    //     throw new Error('Request Failed');
-    // }
+    console.log(pollId, 'poll results');
 
-    // to be replaced with above api call once 'visualTypes' have
-    // expected values
     const newResponse = await fetch(
-        `${window.location.origin}/data_formatted_demo.json`,
+        `${window.location.origin}/api/poll/${pollId}/results`,
         {
             headers: {
                 'Content-Type': 'application/json',
@@ -63,9 +60,12 @@ export const fetchPollResult = async (pollId: string) => {
             }
         }
     );
+    if (newResponse.status !== 200) {
+        throw new Error('Request Failed');
+    }
     const dataList = await newResponse.json();
     const formattedData = formatData(dataList);
-    // console.log(formattedData, 'data');
+    console.log(formattedData, 'data');
     return formattedData;
 };
 
@@ -86,9 +86,7 @@ const setQuesArray = (item: any) => {
     switch (item.visualType) {
         case 'radioBtn':
         case 'checkBox':
-            const multiOptions = item.subQuestions[0]?.answerValueStatistics
-                ? item.subQuestions[0].answerValueStatistics
-                : [];
+            const multiOptions = item.subQuestions ? item.subQuestions : [];
             options = formatMultiTypeOptions(multiOptions);
             break;
         case 'star':
@@ -122,9 +120,15 @@ const formatMultiTypeOptions = (options: [any]) => {
     console.log(options);
     const formattedOptions = options.map((option) => {
         return {
-            title: option.value,
-            count: option.count,
-            percentage: (option.percentage * 100).toFixed(1)
+            title: option.title,
+            count: option.trueAnswerCount,
+            percentage:
+                (option.trueAnswerPercentage * 100)
+                    .toFixed(1)
+                    .toString()
+                    .split('.')[1] === '0'
+                    ? Math.round(option.trueAnswerPercentage * 100)
+                    : (option.trueAnswerPercentage * 100).toFixed(1)
         };
     });
 
@@ -170,29 +174,21 @@ const formatRatingOptions = (options: [any]) => {
 };
 
 const formatBooleanOptions = (options: [any]) => {
-    const respOptions = options.map((option) => {
-        return {
-            ...option,
-            percentage: Number((option.percentage * 100).toFixed(1))
-        };
-    });
     const newArray = [
         { title: true, count: 0, percentage: 0 },
         { title: false, count: 0, percentage: 0 }
     ];
-    let booleanTypeOptions = newArray.map((arr) => {
-        const obj =
-            respOptions.findIndex((option) => option.value === arr.title) === -1
-                ? arr
-                : respOptions.find((op) => op.value === arr.title);
-        return obj;
-    });
-    // for fixing title - value keys
-    booleanTypeOptions = booleanTypeOptions.map((option) => {
+    const booleanTypeOptions = options.map((option) => {
         return {
-            title: option.value | option.title ? 'true' : 'false',
+            title: option.value ? 'Yes' : 'No',
             count: option.count,
-            percentage: Number(option.percentage)
+            percentage:
+                (option.percentage * 100)
+                    .toFixed(1)
+                    .toString()
+                    .split('.')[1] === '0'
+                    ? Math.round(option.percentage * 100)
+                    : (option.percentage * 100).toFixed(1)
         };
     });
 
