@@ -27,6 +27,7 @@ const PollResult = (props: any) => {
         };
 
         getResultData(props.pollId);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (

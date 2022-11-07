@@ -13,20 +13,16 @@ export const checkHealth = async (req: Request, res: Response) => {
 export const checkDbHealth = async (req: Request, res: Response) => {
     try {
         // Test the connection to the database
-        console.debug('Checking health of database');
+        logger.debug('Checking health of database');
         await prisma.poll.findFirst();
-        console.debug('Check for database health was successful');
+        logger.debug('Check for database health was successful');
 
         return res.json({
             server: true,
             database: true
         });
-    } catch (e: any) {
-        console.error('Unable to reach database');
+    } catch (e: unknown) {
         logger.error('Unable to reach database');
-
-        console.debug(e.message);
-        console.debug(e.stack);
 
         if (e instanceof PrismaClientInitializationError) {
             logger.error(e.message);
