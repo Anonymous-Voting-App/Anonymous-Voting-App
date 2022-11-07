@@ -320,7 +320,6 @@ describe('Poll', () => {
                 title: '',
                 id: '1',
                 pollId: '1',
-                typeId: '1',
                 votes: [
                     {
                         createdAt: new Date(),

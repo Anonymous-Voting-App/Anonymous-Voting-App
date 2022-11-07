@@ -3,7 +3,7 @@ FROM node:lts
 WORKDIR /app
 COPY . .
 
-RUN npm install --production
+RUN npm ci
 RUN npx prisma generate
 RUN npm run build
 

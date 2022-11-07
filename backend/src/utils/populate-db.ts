@@ -21,16 +21,9 @@ async function run() {
         }
     });
 
-    const type = await prisma.type.create({
-        data: {
-            type: 'test'
-        }
-    });
-
     await prisma.question.create({
         data: {
-            pollId: poll.id,
-            typeId: type.id
+            pollId: poll.id
         }
     });
 }
