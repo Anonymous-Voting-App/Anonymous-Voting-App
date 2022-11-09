@@ -51,6 +51,11 @@ variable "db_url" {
   description = "The connection string for the database to be used with the application"
 }
 
+variable "cors_allow_origin" {
+  type        = string
+  description = "The URL to set as Access-Control-Allow-Origin header"
+}
+
 variable "container_repository_address" {
   type        = string
   description = "Address of the container repository used"
