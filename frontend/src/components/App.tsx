@@ -3,9 +3,8 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.scss';
 import NavBar from './NavBar';
 import PollCreation from './PollCreation';
-/* import UserCredentialsRegistration from './UserCredentialsRegistration'; */
-/* import UserInfoRegistration from './UserInfoRegistration'; */
-/* import Login from './Login'; */
+import Registration from './Registration';
+import Login from './Login';
 import BasicSnackbar from './BasicSnackbar';
 import PollAnswering from './PollAnswering';
 import AdminView from './AdminView';
@@ -55,6 +54,11 @@ function App() {
                             />
                             <Route path="/answer" element={<PollAnswering />} />
                             <Route path="/admin" element={<AdminView />} />
+                            <Route path="/login" element={<Login />} />
+                            <Route
+                                path="/register"
+                                element={<Registration />}
+                            />
                         </Routes>
 
                         <BasicSnackbar

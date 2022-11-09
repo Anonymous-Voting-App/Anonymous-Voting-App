@@ -207,8 +207,8 @@ function PollCreation(props: any) {
     };
 
     return (
-        <div className="main-wrapper">
-            <div className="page-heading">
+        <div className="main-wrap">
+            <div className="page-header">
                 <Typography variant="h4"> Create poll </Typography>
                 <ArrowRightAlt />
             </div>

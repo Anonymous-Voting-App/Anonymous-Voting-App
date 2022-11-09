@@ -6,19 +6,17 @@
     }
 }
 
-.main-wrapper {
-    margin-top: 160px;
+.main-wrap {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
 }
 
-.page-heading {
+.page-header {
+    margin-top: 173px;
     display: flex;
     justify-content: center;
-    margin-top: 280;
-    font-size: 2.5rem;
     .MuiTypography-root {
         font-weight: 600;
         @include for-phone-only {

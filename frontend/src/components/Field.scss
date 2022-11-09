@@ -13,6 +13,12 @@
     }
 }
 
+.user-field:last-child {
+    .MuiInputBase-root {
+        margin-bottom: 13px;
+    }
+}
+
 .label.Mui-focused {
     color: $main-color;
 }

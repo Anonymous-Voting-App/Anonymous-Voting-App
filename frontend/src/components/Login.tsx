@@ -2,6 +2,7 @@ import Field from './Field';
 import './LoginAndRegister.scss';
 import { useState } from 'react';
 import { Typography, Button, Link } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 function Login(props: any) {
     const [username, setUsername] = useState('');
@@ -9,6 +10,12 @@ function Login(props: any) {
 
     const InputHandler = (value: string, index: number) => {
         index === 0 ? setUsername(value) : setPassword(value);
+    };
+
+    const navigate = useNavigate();
+
+    const handleClick = () => {
+        navigate('/register');
     };
 
     return (
@@ -45,7 +52,9 @@ function Login(props: any) {
                 <Typography className="bottom-text">
                     Don't have an account?
                 </Typography>
-                <Link className="bottom-text link">Register</Link>
+                <Link className="bottom-text link" onClick={handleClick}>
+                    Register
+                </Link>
             </div>
         </div>
     );

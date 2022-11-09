@@ -7,11 +7,10 @@
 }
 
 .page-heading {
-    font-size: 2.5rem;
     font-weight: 600;
-    margin-top: 80px;
+    margin-top: 160px;
+    margin-bottom: 70px;
     .MuiTypography-root {
-        font-size: 2.5rem;
         @include for-phone-only {
             font-size: 2rem;
         }
@@ -20,31 +19,38 @@
 
 .main-wrapper,
 .fields {
-    margin-top: 80px;
+    margin-top: 13px;
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+.fields-wrapper {
+    border-radius: 20px;
+    border: 1px solid $black;
+    padding: 0rem 3.5rem;
+    background-color: $background-color;
+    margin-bottom: 25px;
+}
+.fields-wrapper:first-of-type {
+    margin-bottom: 1rem;
 }
 
 .login-btn {
     border-radius: 20px;
     width: 16.25rem;
     color: $main-color;
-    background-color: $btn-background-color;
+    background-color: $sand;
     text-transform: none;
     border: 2px solid $main-color;
-    margin: 0px;
+    margin-top: 0px;
     margin-bottom: 1.25rem;
     font-weight: 600;
     font-size: 1rem;
     color: $black;
-    @include for-phone-only {
-        font-size: 2.5rem;
-    }
 }
 
 .login-btn:hover {
-    background-color: $btn-background-color;
+    background-color: $sand;
     border: 2px solid $main-color;
 }
 
@@ -57,7 +63,6 @@
 .texts {
     margin-top: 0px;
     display: inline-block;
-    margin-right: 20px;
     font-size: 16px;
 }
 
