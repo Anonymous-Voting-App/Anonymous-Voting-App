@@ -117,7 +117,7 @@ jobs:
             - run: npm ci
             - name: Create .env-file
               run: |
-                  echo "$BACKEND_URL" >> .env
+                  echo "REACT_APP_BACKEND_URL=$BACKEND_URL" >> .env
             - run: npm run build:ci
             - name: Configure AWS credentials
               uses: aws-actions/configure-aws-credentials@v1
