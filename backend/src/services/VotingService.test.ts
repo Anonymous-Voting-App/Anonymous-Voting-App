@@ -136,15 +136,23 @@ describe('VotingService', () => {
                 new QuestionFactory(prismaMock)
             );
 
+            const answersData = [
+                {
+                    questionId: 'q1',
+                    data: {
+                        answer: {
+                            subQuestionId: 'o1',
+                            answer: {
+                                answer: true
+                            }
+                        }
+                    }
+                }
+            ];
+
             await service.answerPoll({
                 publicId: '1',
-                questionId: 'q1',
-                answer: {
-                    subQuestionId: 'o1',
-                    answer: {
-                        answer: true
-                    }
-                },
+                answers: answersData,
                 answerer: {
                     ip: '1',
                     cookie: '2',
@@ -154,13 +162,7 @@ describe('VotingService', () => {
 
             expect(Poll.prototype.answer).toHaveBeenCalledTimes(1);
             expect(Poll.prototype.answer).toHaveBeenCalledWith(
-                'q1',
-                {
-                    subQuestionId: 'o1',
-                    answer: {
-                        answer: true
-                    }
-                },
+                answersData,
                 createMockUser()
             );
         });
@@ -174,10 +176,14 @@ describe('VotingService', () => {
             try {
                 await service.answerPoll({
                     publicId: '1',
-                    questionId: 'q1',
-                    answer: {
-                        answer: true
-                    },
+                    answers: [
+                        {
+                            questionId: 'q1',
+                            data: {
+                                answer: true
+                            }
+                        }
+                    ],
                     answerer: {
                         ip: '1',
                         cookie: '2',

@@ -16,10 +16,8 @@ export default class NumberQuestion extends Question {
 
     /**
      * A discrete step the given number must consist of.
-     * For example, step = 1 would mean only whole integers
-     * are allowed. Or if step = 0.01 then only values such as
-     * -0.01, 0.01, 0.02, etc. are allowed. Note: The step
-     * value can have at most 6 decimal places of precision.
+     * Or in other words, any valid value must be divisible
+     * by step. Step must be an integer.
      * Step = -1 means no step value is set.
      */
 
@@ -63,7 +61,7 @@ export default class NumberQuestion extends Question {
 
     isValidValue(num: number): boolean {
         if (this.isDiscrete()) {
-            return this._round(num) % this._round(this.step()) === 0;
+            return num % this.step() === 0;
         } else {
             return true;
         }
