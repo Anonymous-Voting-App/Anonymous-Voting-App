@@ -14,6 +14,7 @@ env:
     ECS_TASK: ava-production-backend-task
     CONTAINER_NAME: ava-production-backend-container
     FRONTEND_BUCKET: ava-production-s3-frontend
+    BACKEND_URL: 'https://lb.knowit-anonymous-voting-app.aws.cybercom.dev'
 
     # Secrets
     DATABASE_URL: ${{ secrets.PRODUCTION_DB_URL }}
@@ -114,8 +115,10 @@ jobs:
                   node-version: lts/*
                   cache: npm
             - run: npm ci
+            - name: Create .env-file
+              run: |
+                  echo "REACT_APP_BACKEND_URL=$BACKEND_URL" >> .env
             - run: npm run build:ci
-
             - name: Configure AWS credentials
               uses: aws-actions/configure-aws-credentials@v1
               with:

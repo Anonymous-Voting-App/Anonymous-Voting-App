@@ -56,6 +56,14 @@ resource "aws_ecs_task_definition" "app" {
         {
           "name" : "ENVIRONMENT",
           "value" : "${local.environment}"
+        },
+        {
+          "name" : "NODE_ENV",
+          "value" : "${local.environment}"
+        },
+        {
+          "name" : "CORS_ALLOW_ORIGIN",
+          "value" : "${var.cors_allow_origin}"
         }
       ],
       "logConfiguration" : {
