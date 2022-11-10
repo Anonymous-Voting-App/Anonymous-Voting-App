@@ -60,6 +60,8 @@ describe('Poll', () => {
                 },
                 user
             );
+            expect(poll.answerCount()).toBe(1);
+            expect(prismaMock.poll.update).toHaveBeenCalled();
         });
     });
 
@@ -73,6 +75,7 @@ describe('Poll', () => {
                     pollId: '1',
                     type: 'type',
                     typeName: 'free',
+                    visualType: 'default',
                     title: 'title',
                     description: 'description',
                     parentId: null,
@@ -110,6 +113,7 @@ describe('Poll', () => {
             const poll = new Poll(prismaMock, new QuestionFactory(prismaMock));
 
             poll.setId('1');
+            poll.setAnswerCount(2);
 
             poll.setQuestionsFromDatabaseData([
                 {
@@ -117,6 +121,7 @@ describe('Poll', () => {
                     pollId: '1',
                     type: 'type',
                     typeName: 'free',
+                    visualType: 'default',
                     title: 'title',
                     description: 'description',
                     parentId: null,
@@ -131,6 +136,7 @@ describe('Poll', () => {
             expect(question.id()).toBe('1');
             expect(question.pollId()).toBe('1');
             expect(question.type()).toBe('free');
+            expect(question.answerPercentage()).toBe(0);
         });
     });
 
@@ -202,7 +208,8 @@ describe('Poll', () => {
                 adminLink: 'link',
                 pollLink: 'link',
                 resultLink: 'link',
-                isActive: true
+                isActive: true,
+                answerCount: 0
             });
 
             const poll = new Poll(prismaMock, new QuestionFactory(prismaMock));
@@ -244,6 +251,45 @@ describe('Poll', () => {
         });
     });
 
+    describe('resultDataObj', () => {
+        test('Create new result object for poll', () => {
+            const poll = new Poll(prismaMock, new QuestionFactory(prismaMock));
+
+            poll.setFromDatabaseData(dummyDatabaseData as IPoll.DatabaseData);
+            poll.owner().setId('d1b44abe-b336-497d-8148-11166b7c2489');
+            poll.questions()['1'].setAnswerCount(2);
+            poll.questions()['1'].setAnswerPercentage(0.2);
+
+            const data = poll.resultDataObj();
+
+            expect(data).toEqual({
+                name: 'name',
+                publicId: 'publicId',
+                type: '',
+                answerCount: 0,
+                questions: [
+                    {
+                        title: '',
+                        description: '',
+                        type: 'free',
+                        visualType: 'default',
+                        id: '1',
+                        pollId: '1',
+                        answerCount: 2,
+                        answerPercentage: 0.2,
+                        answerValueStatistics: [
+                            {
+                                count: 1,
+                                percentage: 0.5,
+                                value: 'value'
+                            }
+                        ]
+                    }
+                ]
+            });
+        });
+    });
+
     const dummyDatabaseData: PrismaPoll & {
         questions: (PrismaQuestion & {
             options: PrismaOption[];
@@ -259,6 +305,7 @@ describe('Poll', () => {
         resultLink: 'publicId',
         isActive: true,
         creatorId: '1',
+        answerCount: 0,
         questions: [
             {
                 createdAt: new Date(),
@@ -268,11 +315,11 @@ describe('Poll', () => {
                 parentId: null,
                 step: null,
                 typeName: 'free',
+                visualType: 'default',
                 description: '',
                 title: '',
                 id: '1',
                 pollId: '1',
-                typeId: '1',
                 votes: [
                     {
                         createdAt: new Date(),

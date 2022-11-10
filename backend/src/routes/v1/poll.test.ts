@@ -1,7 +1,14 @@
 import * as IPolling from '../../models/IPolling';
-import { ChildProcessWithoutNullStreams, exec, spawn } from 'child_process';
+import * as IQuestion from '../../models/IQuestion';
+import * as IMultiQuestion from '../../models/IMultiQuestion';
+import {
+    ChildProcessWithoutNullStreams,
+    exec,
+    ExecException,
+    spawn
+} from 'child_process';
 
-jest.setTimeout(10000);
+jest.setTimeout(20000);
 
 describe.skip('integration tests using server api', () => {
     // The tests first create a poll and then this created
@@ -9,6 +16,14 @@ describe.skip('integration tests using server api', () => {
     let createdPoll: IPolling.PollData;
 
     let serverProcess: ChildProcessWithoutNullStreams;
+
+    // These set how long to wait after booting / shutting down server
+    // to give the server time to actually finish starting / shutting down.
+    // Depending on how fast your computer is you may need to increase these
+    // to give the server process enough time.
+    // - Joonas Halinen 31.10.2022
+    const bootWait = 10000;
+    const shutdownWait = 5000;
 
     beforeEach(async () => {
         serverProcess = spawn(
@@ -19,7 +34,7 @@ describe.skip('integration tests using server api', () => {
         await new Promise((resolve) => {
             setTimeout(() => {
                 resolve(null);
-            }, 3000);
+            }, bootWait);
         });
     });
 
@@ -29,11 +44,11 @@ describe.skip('integration tests using server api', () => {
         await new Promise((resolve) => {
             setTimeout(() => {
                 resolve(null);
-            }, 2000);
+            }, shutdownWait);
         });
     });
 
-    describe('api commands', () => {
+    describe('create poll', () => {
         test('create poll successfully', (resolve) => {
             let command = `curl -i -X POST -H "Content-Type: application/json" -d "{
                 \\"name\\": \\"testPoll1\\", 
@@ -49,7 +64,14 @@ describe.skip('integration tests using server api', () => {
                             { 
                                 \\"title\\": \\"sub-title\\", 
                                 \\"description\\": \\"sub-description\\", 
-                                \\"type\\": \\"free\\" 
+                                \\"type\\": \\"boolean\\",
+                                \\"visualType\\": \\"visual-type\\"
+                            },
+                            { 
+                                \\"title\\": \\"sub-title\\", 
+                                \\"description\\": \\"sub-description\\", 
+                                \\"type\\": \\"free\\",
+                                \\"visualType\\": \\"visual-type\\"
                             } 
                         ] 
                     }, 
@@ -91,6 +113,8 @@ describe.skip('integration tests using server api', () => {
 
                 const resultJson = extractJson(stdout);
 
+                console.log(resultJson);
+
                 const poll: IPolling.PollData = JSON.parse(resultJson);
 
                 checkPrivatePoll(poll);
@@ -105,32 +129,52 @@ describe.skip('integration tests using server api', () => {
 
     describe('answer poll', () => {
         test('answer poll successfully', (resolve) => {
-            exec(
-                `curl -i -X POST -H "Content-Type: application/json" -d "{\\"publicId\\": \\"${
-                    createdPoll.publicId
-                }\\", \\"questionId\\": \\"${
-                    createdPoll.questions[0].id
-                }\\", \\"answer\\": { \\"subQuestionIds\\": [\\"${
-                    (createdPoll.questions[0] as IPolling.MultiQuestionData)
-                        .subQuestions[0].id
-                }\\"], \\"answer\\": [ { \\"answer\\": \\"true\\" } ] } }" http://localhost:8080/api/poll/${
-                    createdPoll.publicId
-                }/answers`,
-                (err, stdout) => {
-                    if (err) {
-                        throw err;
-                    }
+            const questionId = (
+                createdPoll.questions[0] as IPolling.MultiQuestionData
+            ).subQuestions[0].id;
 
-                    const resultJson = extractJson(stdout);
-
-                    const result = JSON.parse(resultJson);
-
-                    expect(result).toEqual({ success: true });
-
-                    resolve();
-                }
-            );
+            sendAnswerToBooleanSubQuestion(questionId, resolve);
         });
+        test('answer poll successfully', (resolve) => {
+            const questionId = (
+                createdPoll.questions[0] as IPolling.MultiQuestionData
+            ).subQuestions[0].id;
+
+            sendAnswerToBooleanSubQuestion(questionId, resolve);
+        });
+        /* test('answer poll successfully', (resolve) => {
+            const questionId = (
+                createdPoll.questions[0] as IPolling.MultiQuestionData
+            ).subQuestions[0].id;
+
+            sendAnswerToFreeQuestion(questionId, 'true', resolve);
+        }); */
+        /* test('send another answer to first sub-question for next tests', (resolve) => {
+            const questionId = (
+                createdPoll.questions[0] as IPolling.MultiQuestionData
+            ).subQuestions[0].id;
+
+            sendAnswerToFreeQuestion(questionId, 'test2', resolve);
+        });
+        test('send another answer to first sub-question for next tests', (resolve) => {
+            const questionId = (
+                createdPoll.questions[0] as IPolling.MultiQuestionData
+            ).subQuestions[0].id;
+
+            sendAnswerToFreeQuestion(questionId, 'test2', resolve);
+        }); */
+        /* test('send another answer to another sub-question for next tests', (resolve) => {
+            const questionId = (
+                createdPoll.questions[0] as IPolling.MultiQuestionData
+            ).subQuestions[1].id;
+
+            sendAnswerToFreeQuestion(questionId, 'test2', resolve);
+        });
+        test('send another answer to another question for next tests', (resolve) => {
+            const questionId = createdPoll.questions[1].id;
+
+            sendAnswerToScaleQuestion(questionId, resolve);
+        }); */
     });
 
     describe('get public poll', () => {
@@ -144,7 +188,9 @@ describe.skip('integration tests using server api', () => {
 
                     const resultJson = extractJson(stdout);
 
-                    checkPublicPoll(JSON.parse(resultJson));
+                    console.log(resultJson);
+
+                    //checkPublicPoll(JSON.parse(resultJson));
 
                     resolve();
                 }
@@ -152,7 +198,7 @@ describe.skip('integration tests using server api', () => {
         });
     });
 
-    describe('get public poll answers', () => {
+    describe.skip('get public poll answers', () => {
         test('get poll answers with public id', (resolve) => {
             exec(
                 `curl -i -X GET http://localhost:8080/api/poll/${createdPoll.publicId}/answers`,
@@ -163,7 +209,7 @@ describe.skip('integration tests using server api', () => {
 
                     const resultJson = extractJson(stdout);
 
-                    checkAnswers(JSON.parse(resultJson));
+                    //checkAnswers(JSON.parse(resultJson));
 
                     resolve();
                 }
@@ -171,8 +217,188 @@ describe.skip('integration tests using server api', () => {
         });
     });
 
+    describe('get public poll results', () => {
+        test('get poll results with public id', (resolve) => {
+            exec(
+                `curl -i -X GET http://localhost:8080/api/poll/${createdPoll.publicId}/results`,
+                (err, stdout) => {
+                    if (err) {
+                        throw err;
+                    }
+
+                    const resultJson = extractJson(stdout);
+
+                    console.log(resultJson);
+
+                    //checkResults(JSON.parse(resultJson));
+
+                    resolve();
+                }
+            );
+        });
+    });
+
+    function sendAnswerToFreeQuestion(
+        id: string,
+        value: string,
+        resolve: jest.DoneCallback
+    ) {
+        const command = `curl -i -X POST -H "Content-Type: application/json" -d "{\\"publicId\\": \\"${createdPoll.publicId}\\", \\"questionId\\": \\"${createdPoll.questions[0].id}\\", \\"answer\\": { \\"subQuestionIds\\": [\\"${id}\\"], \\"answer\\": [ { \\"answer\\": \\"${value}\\" } ] } }" http://localhost:8080/api/poll/${createdPoll.publicId}/answers`;
+
+        console.log(command);
+
+        exec(command, handleAnswerResponse.bind(null, resolve));
+    }
+
+    function sendAnswerToBooleanSubQuestion(
+        id: string,
+        resolve: jest.DoneCallback
+    ) {
+        const command = `curl -i -X POST -H "Content-Type: application/json" -d "{\\"publicId\\": \\"${createdPoll.publicId}\\", \\"questionId\\": \\"${createdPoll.questions[0].id}\\", \\"answer\\": { \\"subQuestionIds\\": [\\"${id}\\"], \\"answer\\": [ { \\"answer\\": true } ] } }" http://localhost:8080/api/poll/${createdPoll.publicId}/answers`;
+
+        console.log(command);
+
+        exec(command, handleAnswerResponse.bind(null, resolve));
+    }
+
+    function sendAnswerToScaleQuestion(id: string, resolve: jest.DoneCallback) {
+        const command = `curl -i -X POST -H "Content-Type: application/json" -d "{\\"publicId\\": \\"${createdPoll.publicId}\\", \\"questionId\\": \\"${id}\\", \\"answer\\": { \\"answer\\": 0.002 } }" http://localhost:8080/api/poll/${createdPoll.publicId}/answers`;
+
+        exec(command, handleAnswerResponse.bind(null, resolve));
+    }
+
+    function handleAnswerResponse(
+        resolve: jest.DoneCallback,
+        err: ExecException | null,
+        stdout: string
+    ) {
+        if (err) {
+            throw err;
+        }
+
+        const resultJson = extractJson(stdout);
+
+        const result = JSON.parse(resultJson);
+
+        expect(result).toEqual({ success: true });
+
+        resolve();
+    }
+
+    function checkResults(results: IPolling.ResultData) {
+        expect(results.answerCount).toBe(5);
+        expect(results.questions.length).toBe(4);
+        expect(Object.keys(results.questions)).toEqual(
+            Object.keys(createdPoll.questions)
+        );
+        checkQuestionResults(results.questions);
+    }
+
+    function checkQuestionResults(questions: Array<IQuestion.ResultData>) {
+        checkMultiQuestionResults(questions[0] as IMultiQuestion.ResultData);
+        checkScaleQuestionResult(questions[1]);
+        checkAnswerlessQuestionResult(questions[2] /*, 'number' */);
+        checkBooleanQuestionResult(questions[3]);
+    }
+
+    function checkScaleQuestionResult(question: IQuestion.ResultData) {
+        checkGenericQuestionResult(question);
+
+        expect(question.answerCount).toBe(1);
+        expect(question.answerPercentage).toBe(0.2);
+    }
+
+    function checkMultiQuestionResults(
+        multiQuestion: IMultiQuestion.ResultData
+    ) {
+        checkGenericQuestionResult(multiQuestion);
+        expect(multiQuestion.answerCount).toBe(4);
+        expect(multiQuestion.answerPercentage).toBe(0.8);
+        expect(multiQuestion.type).toBe('multi');
+        expect(multiQuestion.subQuestions.length).toBe(2);
+        checkFirstSubQuestionResults(multiQuestion.subQuestions[0]);
+        checkSecondSubQuestionResults(multiQuestion.subQuestions[1]);
+    }
+
+    function checkFirstSubQuestionResults(question: IQuestion.ResultData) {
+        checkGenericSubQuestionResult(question);
+        expect(question.answerCount).toBe(3);
+        expect(question.answerPercentage).toBe(0.75);
+        expect(question.type).toBe('free');
+        expect(question.visualType).toBe('visual-type');
+
+        const valueStatisticTrue = {
+            value: 'true',
+            count: 1,
+            percentage: 0.3333333333333333
+        };
+
+        const valueStatisticTest2 = {
+            value: 'test2',
+            count: 2,
+            percentage: 0.6666666666666666
+        };
+
+        if (question.answerValueStatistics[0].value === 'true') {
+            expect(question.answerValueStatistics).toEqual([
+                valueStatisticTrue,
+                valueStatisticTest2
+            ]);
+        } else {
+            expect(question.answerValueStatistics).toEqual([
+                valueStatisticTest2,
+                valueStatisticTrue
+            ]);
+        }
+    }
+
+    function checkSecondSubQuestionResults(question: IQuestion.ResultData) {
+        checkGenericSubQuestionResult(question);
+        expect(question.answerCount).toBe(1);
+        expect(question.answerPercentage).toBe(0.25);
+        expect(question.type).toBe('free');
+        expect(question.visualType).toBe('visual-type');
+        expect(question.answerValueStatistics).toEqual([
+            {
+                value: 'test2',
+                count: 1,
+                percentage: 1
+            }
+        ]);
+    }
+
+    function checkGenericSubQuestionResult(question: IQuestion.ResultData) {
+        expect(question.title).toBe('sub-title');
+        expect(question.description).toBe('sub-description');
+        expect(question.id.length > 0).toBe(true);
+        expect(question.pollId).toBe(createdPoll.id);
+    }
+
+    function checkGenericQuestionResult(question: IQuestion.ResultData) {
+        expect(question.title).toBe('questionTitle');
+        expect(question.description).toBe('questionDescription');
+        expect(question.id.length > 0).toBe(true);
+        expect(question.pollId).toBe(createdPoll.id);
+    }
+
+    function checkBooleanQuestionResult(question: IQuestion.ResultData) {
+        checkGenericQuestionResult(question);
+
+        expect(question.answerCount).toBe(5);
+        expect(question.answerPercentage).toBe(1);
+    }
+
+    function checkAnswerlessQuestionResult(
+        question: IQuestion.ResultData
+        /* type: string */
+    ) {
+        checkGenericQuestionResult(question);
+        expect(question.answerCount).toBe(0);
+        expect(question.answerPercentage).toBe(0);
+    }
+
     function checkAnswers(answers: IPolling.AnswersData) {
-        expect(answers.answers.length).toBe(1);
+        expect(answers.answers.length).toBe(4);
 
         checkAnswer(answers.answers[0]);
     }
@@ -215,21 +441,19 @@ describe.skip('integration tests using server api', () => {
         question: IPolling.MultiQuestionData,
         poll: IPolling.PollData
     ) {
-        expect(question.id.length > 0).toBe(true);
-        expect(question.subQuestions.length).toBe(1);
-        expect(question.pollId).toBe(poll.id);
+        checkGenericQuestion(question, poll, 'multi');
+        expect(question.subQuestions.length).toBe(2);
         expect(question.minAnswers).toBe(1);
         expect(question.maxAnswers).toBe(4);
-        expect(question.type).toBe('multi');
-        expect(question.title).toBe('questionTitle');
-        expect(question.description).toBe('questionDescription');
 
-        checkSubQuestion(question.subQuestions[0]);
+        //checkSubQuestion(question.subQuestions[0]);
+        checkSubQuestion(question.subQuestions[1]);
     }
 
     function checkSubQuestion(question: IPolling.QuestionData) {
         expect(question.id.length > 0).toBe(true);
         expect(question.type).toBe('free');
+        expect(question.visualType).toBe('visual-type');
         expect(question.title).toBe('sub-title');
         expect(question.description).toBe('sub-description');
     }
@@ -238,35 +462,39 @@ describe.skip('integration tests using server api', () => {
         question: IPolling.QuestionData,
         poll: IPolling.PollData
     ) {
-        expect(question.id.length > 0).toBe(true);
-        expect(question.pollId).toBe(poll.id);
-        expect(question.type).toBe('scale');
+        checkGenericQuestion(question, poll, 'scale');
         expect(question.minValue).toBe(0.001);
         expect(question.maxValue).toBe(0.004);
         expect(question.step).toBe(0.001);
-        expect(question.title).toBe('questionTitle');
-        expect(question.description).toBe('questionDescription');
     }
 
     function checkNumberQuestion(
         question: IPolling.QuestionData,
         poll: IPolling.PollData
     ) {
-        expect(question.id.length > 0).toBe(true);
-        expect(question.pollId).toBe(poll.id);
-        expect(question.type).toBe('number');
+        checkGenericQuestion(question, poll, 'number');
         expect(question.step).toBe(0.001);
-        expect(question.title).toBe('questionTitle');
-        expect(question.description).toBe('questionDescription');
     }
 
     function checkBooleanQuestion(
         question: IPolling.QuestionData,
         poll: IPolling.PollData
     ) {
+        checkGenericQuestion(question, poll, 'boolean');
+    }
+
+    function checkGenericQuestion(
+        question: IPolling.QuestionData,
+        poll: IPolling.PollData,
+        type: string,
+        visualType?: string
+    ) {
         expect(question.id.length > 0).toBe(true);
         expect(question.pollId).toBe(poll.id);
-        expect(question.type).toBe('boolean');
+        expect(question.type).toBe(type);
+        expect(question.visualType).toBe(
+            typeof visualType === 'string' ? visualType : 'default'
+        );
         expect(question.title).toBe('questionTitle');
         expect(question.description).toBe('questionDescription');
     }

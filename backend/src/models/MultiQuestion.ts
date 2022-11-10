@@ -6,6 +6,8 @@ import * as IQuestion from './IQuestion';
 import * as IMultiQuestion from './IMultiQuestion';
 import { PrismaClient } from '@prisma/client';
 import Answer from './Answer';
+import BadRequestError from '../utils/badRequestError';
+import QuestionFactory from './QuestionFactory';
 
 /**
  * A Question that can have sub-questions.
@@ -15,6 +17,26 @@ export default class MultiQuestion extends Question {
     _subQuestions: { [id: string]: Question } = {};
     _minAnswers = 1;
     _maxAnswers = 1;
+    _factory: QuestionFactory;
+
+    /**  */
+
+    factory(): QuestionFactory {
+        return this._factory;
+    }
+
+    /** Sets value of factory. */
+
+    setFactory(factory: QuestionFactory): void {
+        pre(
+            'factory is of type QuestionFactory',
+            factory instanceof QuestionFactory
+        );
+
+        this._factory = factory;
+
+        post('_factory is factory', this._factory === factory);
+    }
 
     /**
      * Maximum amount of sub-answers the question can
@@ -101,17 +123,21 @@ export default class MultiQuestion extends Question {
 
     /**
      * Makes sub-Questions from given database data
-     * and adds them as sub-questions.
+     * and adds them as sub-questions. Assumes that the MultiQuestion's
+     * own info has been set beforehand.
      */
 
     _setSubQuestionsFromDatabaseData(
         subQuestions: Array<IQuestion.DatabaseData>
     ): void {
         for (let i = 0; i < subQuestions.length; i++) {
-            const subQuestionData = subQuestions[i];
-            const subQuestion = new Question();
+            const subQuestion = this._factory.createFromType(
+                subQuestions[i].typeName,
+                subQuestions[i]
+            );
 
-            subQuestion.setFromDatabaseData(subQuestionData);
+            subQuestion.setParentAnswerCount(this.answerCount());
+            subQuestion.setFromDatabaseData(subQuestions[i]);
 
             this.subQuestions()[subQuestion.id()] = subQuestion;
         }
@@ -256,14 +282,18 @@ export default class MultiQuestion extends Question {
      * and adds it as a sub-question.
      */
     _setSubQuestionFromRequest(
+        id: number,
         subQuestionData: IMultiQuestion.QuestionRequest
     ): void {
-        const subQuestion = new Question();
+        const subQuestion = this._factory.createFromType(
+            subQuestionData.type,
+            subQuestionData
+        );
 
         subQuestion.setDatabase(this.database());
         subQuestion.setFromRequest(subQuestionData);
 
-        this.subQuestions()[subQuestion.id()] = subQuestion;
+        this.subQuestions()[id.toString()] = subQuestion;
     }
 
     /**
@@ -303,8 +333,9 @@ export default class MultiQuestion extends Question {
         return subQuestion;
     }
 
-    constructor(database?: PrismaClient) {
+    constructor(database: PrismaClient) {
         super(database);
+        this._factory = new QuestionFactory(database);
     }
 
     /**
@@ -412,7 +443,7 @@ export default class MultiQuestion extends Question {
         if (this.answerDataIsAcceptable(answerData)) {
             await this._answerWithAcceptableData(answerData, answerer);
         } else {
-            throw new Error('Invalid answer data.');
+            throw new BadRequestError('Invalid answer data.');
         }
     }
 
@@ -543,8 +574,42 @@ export default class MultiQuestion extends Question {
     ): void {
         pre('subQuestions is of type Array', Array.isArray(subQuestions));
 
+        let id = 0;
+
         for (let i = 0; i < subQuestions.length; i++) {
-            this._setSubQuestionFromRequest(subQuestions[i]);
+            this._setSubQuestionFromRequest(id, subQuestions[i]);
+            id++;
         }
+    }
+
+    /**
+     * Answer result statistics of sub-questions.
+     */
+
+    subQuestionResultDataObjs(): Array<IQuestion.ResultData> {
+        const dataObjs = [];
+
+        for (const id in this.subQuestions()) {
+            const subQuestion = this.subQuestions()[id];
+
+            dataObjs.push(subQuestion.resultDataObj());
+        }
+
+        return dataObjs;
+    }
+
+    /**
+     * Data object containing the answer result statistics
+     * of the multi-question. Contains result statistics
+     * for sub-questions as well.
+     */
+
+    resultDataObj(): IMultiQuestion.ResultData {
+        const result = super.resultDataObj();
+
+        result.subQuestions = this.subQuestionResultDataObjs();
+        result.answerValueStatistics = [];
+
+        return result as IMultiQuestion.ResultData;
     }
 }

@@ -182,7 +182,8 @@ function PollCreation(props: any) {
 
         createPoll(pollName, questions)
             .then((response) => {
-                // console.log(response);
+                console.log(response.publicId);
+                props.setPollId(response.publicId); // TO BE REMOVED WHEN ADMIN POLLS IMPLEMENTED
                 props.showNotification({
                     severity: 'success',
                     message: 'Poll Created successfully'
@@ -212,7 +213,7 @@ function PollCreation(props: any) {
                 <Typography variant="h4"> Create poll </Typography>
                 <ArrowRightAlt />
             </div>
-            <div className="poll-name">
+            <div className="creation-poll-name">
                 <TextField
                     autoComplete="off"
                     id="pollName"

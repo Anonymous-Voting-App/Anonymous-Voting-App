@@ -1,0 +1,60 @@
+@import '../styles/colors';
+
+@mixin for-phone-only {
+    @media (max-width: 599px) {
+        @content;
+    }
+}
+
+@mixin for-tablet-portrait-up {
+    @media (min-width: 600px) {
+        @content;
+    }
+}
+
+@mixin for-tablet-landscape-up {
+    @media (min-width: 900px) {
+        @content;
+    }
+}
+
+.MuiSvgIcon-root.check-icon {
+    font-size: 1rem !important;
+    position: relative;
+    top: 3px;
+    @include for-phone-only {
+        font-size: 0.75rem !important;
+    }
+}
+
+.pickone-multi-type {
+    display: flex;
+    flex-wrap: wrap;
+    min-width: 45rem !important;
+    justify-content: center;
+    margin-bottom: 1rem;
+    @include for-phone-only {
+        min-width: 3rem !important;
+        flex-direction: column;
+    }
+
+    @include for-tablet-portrait-up {
+        min-width: 6rem !important;
+    }
+
+    @include for-tablet-landscape-up {
+        min-width: 20rem !important;
+    }
+}
+
+.option,
+.value {
+    flex-basis: 50%;
+}
+
+.icon-container {
+    margin-right: 0.375rem;
+}
+.option-percent {
+    margin-right: 0.5rem;
+}

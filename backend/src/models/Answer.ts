@@ -441,4 +441,64 @@ export default class Answer {
             );
         }
     }
+
+    /**
+     * Whether the answer is a leaf answer, i.e it does not
+     * have sub-answers.
+     */
+
+    isLeafAnswer(): boolean {
+        return Object.keys(this.subAnswers()).length === 0;
+    }
+
+    /**
+     * How many of the answer's tree of shallow
+     * immediate sub-answers are leaf nodes.
+     * Excludes the root answer itself.
+     */
+
+    leafSubAnswerCount(): number {
+        let result = 0;
+
+        for (const id in this.subAnswers()) {
+            const subAnswer = this.subAnswers()[id];
+
+            if (subAnswer.isLeafAnswer()) {
+                result += 1;
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * How many of the answer's tree of answers are leaf nodes
+     * excluding the root answer itself. Thus, if the
+     * answer itself is a leaf node, then the count will still
+     * be 0.
+     */
+
+    subAnswerCount(): number {
+        let result = this.leafSubAnswerCount();
+
+        for (const id in this.subAnswers()) {
+            const subAnswer = this.subAnswers()[id];
+
+            result += subAnswer.subAnswerCount();
+        }
+
+        return result;
+    }
+
+    /**
+     * How many of the answer's tree of answers are leaf nodes.
+     */
+
+    count(): number {
+        if (this.isLeafAnswer()) {
+            return 1;
+        } else {
+            return this.subAnswerCount();
+        }
+    }
 }

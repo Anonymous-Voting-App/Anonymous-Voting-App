@@ -26,15 +26,15 @@
 
     .MuiSvgIcon-root {
         transform: rotate(90deg);
-        font-size: 3rem;
+        font-size: 3rem !important;
 
         @include for-phone-only {
-            font-size: 2.5rem;
+            font-size: 2rem !important;
         }
     }
 }
 
-.poll-name {
+.creation-poll-name {
     margin-top: 3rem;
     .MuiInputBase-input {
         text-align: center;
@@ -75,7 +75,8 @@
     }
 }
 
-.submit-poll-btn {
+.submit-poll-btn,
+.submit-poll-btn:hover {
     border-radius: 20px;
     width: 16.25rem;
     color: $background-color;

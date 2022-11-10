@@ -13,7 +13,7 @@ describe('MultiQuestion', () => {
 
     describe('answerDataIsAcceptable', () => {
         test('Answer data correct', () => {
-            const question = new MultiQuestion();
+            const question = new MultiQuestion(prismaMock);
             const subQuestion = new Question();
 
             subQuestion.setId('sub-id');
@@ -65,7 +65,7 @@ describe('MultiQuestion', () => {
 
             const user = makeAnswerer();
 
-            const question = new MultiQuestion();
+            const question = new MultiQuestion(prismaMock);
             const subQuestion = new Question();
 
             question.setId('q1');
@@ -105,7 +105,7 @@ describe('MultiQuestion', () => {
         });
 
         test('Question not found', async () => {
-            const question = new MultiQuestion();
+            const question = new MultiQuestion(prismaMock);
             const subQuestion = new Question();
 
             subQuestion.setId('sub-id');
@@ -137,7 +137,11 @@ describe('MultiQuestion', () => {
 
     describe('setFromDatabaseData', () => {
         test('Set multi question from database data', () => {
-            const question = new MultiQuestion();
+            const question = new MultiQuestion(prismaMock);
+
+            Question.prototype.answerCount = jest.fn(() => 2);
+            Question.prototype.setAnswerCount = jest.fn();
+            Question.prototype.setAnswerPercentage = jest.fn();
 
             question.setFromDatabaseData({
                 id: 'id',
@@ -147,6 +151,7 @@ describe('MultiQuestion', () => {
                 parentId: null,
                 type: 'type',
                 typeName: 'multi',
+                visualType: 'default',
                 minValue: 1,
                 maxValue: 1,
                 votes: [],
@@ -158,6 +163,7 @@ describe('MultiQuestion', () => {
                         pollId: 'pollId',
                         parentId: 'id',
                         type: 'type',
+                        visualType: 'default',
                         typeName: 'free',
                         votes: []
                     }
@@ -176,12 +182,26 @@ describe('MultiQuestion', () => {
             expect(subQuestion.id()).toBe('sub-id');
             expect(subQuestion.title()).toBe('title');
             expect(subQuestion.type()).toBe('free');
+
+            expect(Question.prototype.setAnswerCount).toHaveBeenNthCalledWith(
+                1,
+                2
+            );
+            expect(Question.prototype.setAnswerCount).toHaveBeenNthCalledWith(
+                2,
+                2
+            );
+            expect(
+                Question.prototype.setAnswerPercentage
+            ).toHaveBeenNthCalledWith(1, 1);
+            expect(Question.prototype.setAnswerCount).toHaveBeenCalledTimes(2);
+            expect(Question.prototype.setAnswerPercentage).toHaveBeenCalled();
         });
     });
 
     describe('newDatabaseObject', () => {
         test('Create new multi question database object', () => {
-            const question = new MultiQuestion();
+            const question = new MultiQuestion(prismaMock);
 
             question.setId('id');
             question.setType('type');
@@ -199,7 +219,6 @@ describe('MultiQuestion', () => {
             question.subQuestions()[subQuestion.id()] = subQuestion;
 
             expect(question.newDatabaseObject()).toEqual({
-                typeId: '7b76d1c6-8f40-4509-8317-ce444892b1ee',
                 pollId: 'pollId',
                 maxValue: 1,
                 minValue: 1,

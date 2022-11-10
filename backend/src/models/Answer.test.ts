@@ -151,6 +151,66 @@ describe('Answer', () => {
         });
     });
 
+    describe('isLeafAnswer', () => {
+        test('Leaf answer is recognized', () => {
+            const answer = new Answer();
+
+            expect(answer.isLeafAnswer()).toBe(true);
+        });
+
+        test('Non-leaf-answer is recognized', () => {
+            const answer = new Answer();
+
+            answer.subAnswers()['1'] = new Answer();
+
+            expect(answer.isLeafAnswer()).toBe(false);
+        });
+    });
+
+    describe('leafSubAnswerCount', () => {
+        test('One leaf sub-answer and one non-leaf', () => {
+            const answer = new Answer();
+
+            answer.subAnswers()['1'] = new Answer();
+            answer.subAnswers()['1'].subAnswers()['1-1'] = new Answer();
+
+            answer.subAnswers()['2'] = new Answer();
+
+            expect(answer.leafSubAnswerCount()).toBe(1);
+        });
+
+        test('No leaf sub-answers', () => {
+            const answer = new Answer();
+
+            answer.subAnswers()['1'] = new Answer();
+            answer.subAnswers()['1'].subAnswers()['1-1'] = new Answer();
+
+            expect(answer.leafSubAnswerCount()).toBe(0);
+        });
+    });
+
+    describe('subAnswerCount', () => {
+        test('One leaf sub-answer and one non-leaf', () => {
+            const answer = new Answer();
+
+            answer.subAnswers()['1'] = new Answer();
+            answer.subAnswers()['1'].subAnswers()['1-1'] = new Answer();
+
+            answer.subAnswers()['2'] = new Answer();
+
+            expect(answer.subAnswerCount()).toBe(2);
+        });
+
+        test('One non-leaf sub-answer', () => {
+            const answer = new Answer();
+
+            answer.subAnswers()['1'] = new Answer();
+            answer.subAnswers()['1'].subAnswers()['1-1'] = new Answer();
+
+            expect(answer.subAnswerCount()).toBe(1);
+        });
+    });
+
     const makeAnswerer = () => {
         const answerer = new User();
 

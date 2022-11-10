@@ -106,6 +106,7 @@ export default class UserManager {
      * If such user does not exist in database,
      * returns undefined.
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async getUser(userOptions: IUserManager.UserOptions): Promise<User | null> {
         const user = new User();
 

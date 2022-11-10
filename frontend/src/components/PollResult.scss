@@ -1,0 +1,25 @@
+@import '../styles/colors';
+
+@mixin for-phone-only {
+    @media (max-width: 599px) {
+        @content;
+    }
+}
+
+.MuiContainer-root {
+    margin-top: 100px;
+    display: flex !important;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.poll-name {
+    padding-top: 80px;
+    font-weight: 600 !important;
+    font-size: 40px !important;
+    @include for-phone-only {
+        font-size: 30px !important;
+        line-height: 0.8;
+    }
+}

@@ -1,5 +1,7 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-1.1.x"]
+  engineType    = "binary"
 }
 
 datasource db {
@@ -8,17 +10,18 @@ datasource db {
 }
 
 model Poll {
-  id         String     @id @default(uuid()) @db.Uuid
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
-  name       String
-  creatorId  String     @db.Uuid
-  adminLink  String
-  pollLink   String
-  resultLink String
-  isActive   Boolean    @default(true)
-  creator    User       @relation("PollUser", fields: [creatorId], references: [id])
-  questions  Question[] @relation("PollQuestions")
+  id          String     @id @default(uuid()) @db.Uuid
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  name        String
+  creatorId   String     @db.Uuid
+  adminLink   String
+  pollLink    String
+  resultLink  String
+  isActive    Boolean    @default(true)
+  answerCount Int        @default(0)
+  creator     User       @relation("PollUser", fields: [creatorId], references: [id])
+  questions   Question[] @relation("PollQuestions")
 }
 
 model Question {
@@ -26,7 +29,6 @@ model Question {
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
   pollId       String     @db.Uuid
-  typeId       String     @db.Uuid
   maxValue     Float?
   minValue     Float?
   parentId     String?    @db.Uuid
@@ -34,20 +36,12 @@ model Question {
   typeName     String     @default("free")
   description  String     @default("")
   title        String     @default("")
+  visualType   String     @default("default")
   parent       Question?  @relation("SubQuestions", fields: [parentId], references: [id])
   poll         Poll       @relation("PollQuestions", fields: [pollId], references: [id])
-  type         Type       @relation("QuestionType", fields: [typeId], references: [id])
   options      Option[]   @relation("QuestionOptions")
   subQuestions Question[] @relation("SubQuestions")
   votes        Vote[]     @relation("QuestionVotes")
-}
-
-model Type {
-  id        String     @id @default(uuid()) @db.Uuid
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  type      String
-  questions Question[] @relation("QuestionType")
 }
 
 model Option {

@@ -94,6 +94,7 @@ export default class VotingService {
         const user = await this.userManager().getUser(userData);
 
         if (!(user instanceof User)) {
+            // Make this return 401
             throw new Error('User not found.');
         }
 
@@ -217,6 +218,30 @@ export default class VotingService {
             await poll.loadFromDatabase();
 
             return { answers: poll.answersDataObjs() };
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns results for poll with given public id.
+     * The results contain question answer counts and
+     * percentages.
+     * If no such poll exists, returns null.
+     */
+    async getPollResults(
+        publicId: string
+    ): Promise<IPolling.ResultData | null> {
+        pre('publicId is of type string', typeof publicId === 'string');
+
+        const poll = new Poll(this.database(), this.questionFactory());
+
+        poll.setPublicId(publicId);
+
+        if (await poll.existsInDatabase()) {
+            await poll.loadFromDatabase();
+
+            return poll.resultDataObj();
         }
 
         return null;
