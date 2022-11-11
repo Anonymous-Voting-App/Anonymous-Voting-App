@@ -64,15 +64,15 @@ describe.skip('integration tests using server api', () => {
                             { 
                                 \\"title\\": \\"sub-title\\", 
                                 \\"description\\": \\"sub-description\\", 
-                                \\"type\\": \\"boolean\\",
+                                \\"type\\": \\"free\\",
                                 \\"visualType\\": \\"visual-type\\"
                             },
                             { 
                                 \\"title\\": \\"sub-title\\", 
                                 \\"description\\": \\"sub-description\\", 
-                                \\"type\\": \\"free\\",
+                                \\"type\\": \\"boolean\\",
                                 \\"visualType\\": \\"visual-type\\"
-                            } 
+                            }
                         ] 
                     }, 
                     { 
@@ -87,7 +87,7 @@ describe.skip('integration tests using server api', () => {
                         \\"title\\": \\"questionTitle\\", 
                         \\"description\\": \\"questionDescription\\", 
                         \\"type\\": \\"number\\", 
-                        \\"step\\": 0.001
+                        \\"step\\": 2
                     },
                     { 
                         \\"title\\": \\"questionTitle\\", 
@@ -102,9 +102,7 @@ describe.skip('integration tests using server api', () => {
                 } 
             }" http://localhost:8080/api/poll`;
 
-            command = command.replace(/\n/g, '');
-            command = command.replace(/\s+/g, ' ');
-            command = command.trim();
+            command = formatMultiLineCommandForConsole(command);
 
             exec(command, async (err, stdout) => {
                 if (err) {
@@ -129,52 +127,59 @@ describe.skip('integration tests using server api', () => {
 
     describe('answer poll', () => {
         test('answer poll successfully', (resolve) => {
-            const questionId = (
-                createdPoll.questions[0] as IPolling.MultiQuestionData
-            ).subQuestions[0].id;
+            const multiQuestion = createdPoll
+                .questions[0] as IPolling.MultiQuestionData;
+            const scaleQuestion = createdPoll.questions[1];
+            const numberQuestion = createdPoll.questions[2];
+            const booleanQuestion = createdPoll.questions[3];
 
-            sendAnswerToBooleanSubQuestion(questionId, resolve);
+            let command = `curl -i -X POST -H "Content-Type: application/json" -d "{
+                                    \\"publicId\\": \\"${createdPoll.publicId}\\", 
+                                    \\"answers\\": [
+                                        {
+                                            \\"questionId\\": \\"${multiQuestion.id}\\",
+                                            \\"data\\": {
+                                                \\"subQuestionIds\\": [
+                                                    \\"${multiQuestion.subQuestions[0].id}\\",
+                                                    \\"${multiQuestion.subQuestions[1].id}\\"
+                                                ],
+                                                \\"answer\\": [ 
+                                                    { 
+                                                        \\"answer\\": \\"free-text-answer\\" 
+                                                    },
+                                                    { 
+                                                        \\"answer\\": true
+                                                    }
+                                                ] 
+                                            }
+                                        },
+                                        {
+                                            \\"questionId\\": \\"${scaleQuestion.id}\\",
+                                            \\"data\\": {
+                                                \\"answer\\": 0.002
+                                            }
+                                        },
+                                        {
+                                            \\"questionId\\": \\"${numberQuestion.id}\\",
+                                            \\"data\\": {
+                                                \\"answer\\": 2
+                                            }
+                                        },
+                                        {
+                                            \\"questionId\\": \\"${booleanQuestion.id}\\",
+                                            \\"data\\": {
+                                                \\"answer\\": true
+                                            }
+                                        }
+                                    ]
+                                }" http://localhost:8080/api/poll/${createdPoll.publicId}/answers`;
+
+            command = formatMultiLineCommandForConsole(command);
+
+            console.log(command);
+
+            exec(command, handleAnswerResponse.bind(null, resolve));
         });
-        test('answer poll successfully', (resolve) => {
-            const questionId = (
-                createdPoll.questions[0] as IPolling.MultiQuestionData
-            ).subQuestions[0].id;
-
-            sendAnswerToBooleanSubQuestion(questionId, resolve);
-        });
-        /* test('answer poll successfully', (resolve) => {
-            const questionId = (
-                createdPoll.questions[0] as IPolling.MultiQuestionData
-            ).subQuestions[0].id;
-
-            sendAnswerToFreeQuestion(questionId, 'true', resolve);
-        }); */
-        /* test('send another answer to first sub-question for next tests', (resolve) => {
-            const questionId = (
-                createdPoll.questions[0] as IPolling.MultiQuestionData
-            ).subQuestions[0].id;
-
-            sendAnswerToFreeQuestion(questionId, 'test2', resolve);
-        });
-        test('send another answer to first sub-question for next tests', (resolve) => {
-            const questionId = (
-                createdPoll.questions[0] as IPolling.MultiQuestionData
-            ).subQuestions[0].id;
-
-            sendAnswerToFreeQuestion(questionId, 'test2', resolve);
-        }); */
-        /* test('send another answer to another sub-question for next tests', (resolve) => {
-            const questionId = (
-                createdPoll.questions[0] as IPolling.MultiQuestionData
-            ).subQuestions[1].id;
-
-            sendAnswerToFreeQuestion(questionId, 'test2', resolve);
-        });
-        test('send another answer to another question for next tests', (resolve) => {
-            const questionId = createdPoll.questions[1].id;
-
-            sendAnswerToScaleQuestion(questionId, resolve);
-        }); */
     });
 
     describe('get public poll', () => {
@@ -190,7 +195,7 @@ describe.skip('integration tests using server api', () => {
 
                     console.log(resultJson);
 
-                    //checkPublicPoll(JSON.parse(resultJson));
+                    checkPublicPoll(JSON.parse(resultJson));
 
                     resolve();
                 }
@@ -209,7 +214,7 @@ describe.skip('integration tests using server api', () => {
 
                     const resultJson = extractJson(stdout);
 
-                    //checkAnswers(JSON.parse(resultJson));
+                    checkAnswers(JSON.parse(resultJson));
 
                     resolve();
                 }
@@ -230,42 +235,13 @@ describe.skip('integration tests using server api', () => {
 
                     console.log(resultJson);
 
-                    //checkResults(JSON.parse(resultJson));
+                    checkResults(JSON.parse(resultJson));
 
                     resolve();
                 }
             );
         });
     });
-
-    function sendAnswerToFreeQuestion(
-        id: string,
-        value: string,
-        resolve: jest.DoneCallback
-    ) {
-        const command = `curl -i -X POST -H "Content-Type: application/json" -d "{\\"publicId\\": \\"${createdPoll.publicId}\\", \\"questionId\\": \\"${createdPoll.questions[0].id}\\", \\"answer\\": { \\"subQuestionIds\\": [\\"${id}\\"], \\"answer\\": [ { \\"answer\\": \\"${value}\\" } ] } }" http://localhost:8080/api/poll/${createdPoll.publicId}/answers`;
-
-        console.log(command);
-
-        exec(command, handleAnswerResponse.bind(null, resolve));
-    }
-
-    function sendAnswerToBooleanSubQuestion(
-        id: string,
-        resolve: jest.DoneCallback
-    ) {
-        const command = `curl -i -X POST -H "Content-Type: application/json" -d "{\\"publicId\\": \\"${createdPoll.publicId}\\", \\"questionId\\": \\"${createdPoll.questions[0].id}\\", \\"answer\\": { \\"subQuestionIds\\": [\\"${id}\\"], \\"answer\\": [ { \\"answer\\": true } ] } }" http://localhost:8080/api/poll/${createdPoll.publicId}/answers`;
-
-        console.log(command);
-
-        exec(command, handleAnswerResponse.bind(null, resolve));
-    }
-
-    function sendAnswerToScaleQuestion(id: string, resolve: jest.DoneCallback) {
-        const command = `curl -i -X POST -H "Content-Type: application/json" -d "{\\"publicId\\": \\"${createdPoll.publicId}\\", \\"questionId\\": \\"${id}\\", \\"answer\\": { \\"answer\\": 0.002 } }" http://localhost:8080/api/poll/${createdPoll.publicId}/answers`;
-
-        exec(command, handleAnswerResponse.bind(null, resolve));
-    }
 
     function handleAnswerResponse(
         resolve: jest.DoneCallback,
@@ -286,7 +262,7 @@ describe.skip('integration tests using server api', () => {
     }
 
     function checkResults(results: IPolling.ResultData) {
-        expect(results.answerCount).toBe(5);
+        expect(results.answerCount).toBe(1);
         expect(results.questions.length).toBe(4);
         expect(Object.keys(results.questions)).toEqual(
             Object.keys(createdPoll.questions)
@@ -297,7 +273,7 @@ describe.skip('integration tests using server api', () => {
     function checkQuestionResults(questions: Array<IQuestion.ResultData>) {
         checkMultiQuestionResults(questions[0] as IMultiQuestion.ResultData);
         checkScaleQuestionResult(questions[1]);
-        checkAnswerlessQuestionResult(questions[2] /*, 'number' */);
+        checkNumberQuestionResult(questions[2]);
         checkBooleanQuestionResult(questions[3]);
     }
 
@@ -305,15 +281,36 @@ describe.skip('integration tests using server api', () => {
         checkGenericQuestionResult(question);
 
         expect(question.answerCount).toBe(1);
-        expect(question.answerPercentage).toBe(0.2);
+        expect(question.answerPercentage).toBe(1);
+        expect(question.answerValueStatistics).toEqual([
+            {
+                value: '0.002',
+                count: 1,
+                percentage: 1
+            }
+        ]);
+    }
+
+    function checkNumberQuestionResult(question: IQuestion.ResultData) {
+        checkGenericQuestionResult(question);
+
+        expect(question.answerCount).toBe(1);
+        expect(question.answerPercentage).toBe(1);
+        expect(question.answerValueStatistics).toEqual([
+            {
+                value: '2',
+                count: 1,
+                percentage: 1
+            }
+        ]);
     }
 
     function checkMultiQuestionResults(
         multiQuestion: IMultiQuestion.ResultData
     ) {
         checkGenericQuestionResult(multiQuestion);
-        expect(multiQuestion.answerCount).toBe(4);
-        expect(multiQuestion.answerPercentage).toBe(0.8);
+        expect(multiQuestion.answerCount).toBe(1);
+        expect(multiQuestion.answerPercentage).toBe(1);
         expect(multiQuestion.type).toBe('multi');
         expect(multiQuestion.subQuestions.length).toBe(2);
         checkFirstSubQuestionResults(multiQuestion.subQuestions[0]);
@@ -322,47 +319,36 @@ describe.skip('integration tests using server api', () => {
 
     function checkFirstSubQuestionResults(question: IQuestion.ResultData) {
         checkGenericSubQuestionResult(question);
-        expect(question.answerCount).toBe(3);
-        expect(question.answerPercentage).toBe(0.75);
+        expect(question.answerCount).toBe(1);
+        expect(question.answerPercentage).toBe(1);
         expect(question.type).toBe('free');
         expect(question.visualType).toBe('visual-type');
 
-        const valueStatisticTrue = {
-            value: 'true',
+        const valueStatistic1 = {
+            value: 'free-text-answer',
             count: 1,
-            percentage: 0.3333333333333333
+            percentage: 1
         };
 
-        const valueStatisticTest2 = {
-            value: 'test2',
-            count: 2,
-            percentage: 0.6666666666666666
-        };
-
-        if (question.answerValueStatistics[0].value === 'true') {
-            expect(question.answerValueStatistics).toEqual([
-                valueStatisticTrue,
-                valueStatisticTest2
-            ]);
-        } else {
-            expect(question.answerValueStatistics).toEqual([
-                valueStatisticTest2,
-                valueStatisticTrue
-            ]);
-        }
+        expect(question.answerValueStatistics).toEqual([valueStatistic1]);
     }
 
     function checkSecondSubQuestionResults(question: IQuestion.ResultData) {
         checkGenericSubQuestionResult(question);
         expect(question.answerCount).toBe(1);
-        expect(question.answerPercentage).toBe(0.25);
-        expect(question.type).toBe('free');
+        expect(question.answerPercentage).toBe(1);
+        expect(question.type).toBe('boolean');
         expect(question.visualType).toBe('visual-type');
         expect(question.answerValueStatistics).toEqual([
             {
-                value: 'test2',
+                value: 'true',
                 count: 1,
                 percentage: 1
+            },
+            {
+                value: 'false',
+                count: 0,
+                percentage: 0
             }
         ]);
     }
@@ -384,14 +370,27 @@ describe.skip('integration tests using server api', () => {
     function checkBooleanQuestionResult(question: IQuestion.ResultData) {
         checkGenericQuestionResult(question);
 
-        expect(question.answerCount).toBe(5);
+        expect(question.answerCount).toBe(1);
         expect(question.answerPercentage).toBe(1);
+        expect(question.answerValueStatistics).toEqual([
+            {
+                value: 'true',
+                count: 1,
+                percentage: 1
+            },
+            {
+                value: 'false',
+                count: 0,
+                percentage: 0
+            }
+        ]);
     }
 
     function checkAnswerlessQuestionResult(
-        question: IQuestion.ResultData
-        /* type: string */
+        question: IQuestion.ResultData,
+        type: string
     ) {
+        expect(question.type).toBe(type);
         checkGenericQuestionResult(question);
         expect(question.answerCount).toBe(0);
         expect(question.answerPercentage).toBe(0);
@@ -446,13 +445,12 @@ describe.skip('integration tests using server api', () => {
         expect(question.minAnswers).toBe(1);
         expect(question.maxAnswers).toBe(4);
 
-        //checkSubQuestion(question.subQuestions[0]);
+        checkSubQuestion(question.subQuestions[0]);
         checkSubQuestion(question.subQuestions[1]);
     }
 
     function checkSubQuestion(question: IPolling.QuestionData) {
         expect(question.id.length > 0).toBe(true);
-        expect(question.type).toBe('free');
         expect(question.visualType).toBe('visual-type');
         expect(question.title).toBe('sub-title');
         expect(question.description).toBe('sub-description');
@@ -473,7 +471,7 @@ describe.skip('integration tests using server api', () => {
         poll: IPolling.PollData
     ) {
         checkGenericQuestion(question, poll, 'number');
-        expect(question.step).toBe(0.001);
+        expect(question.step).toBe(2);
     }
 
     function checkBooleanQuestion(
@@ -501,5 +499,13 @@ describe.skip('integration tests using server api', () => {
 
     function extractJson(stdout: string): string {
         return '{' + stdout.split('\n{')[1];
+    }
+
+    function formatMultiLineCommandForConsole(command: string) {
+        command = command.replace(/\n/g, '');
+        command = command.replace(/\s+/g, ' ');
+        command = command.trim();
+
+        return command;
     }
 });

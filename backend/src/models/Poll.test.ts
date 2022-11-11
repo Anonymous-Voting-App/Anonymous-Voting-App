@@ -46,10 +46,14 @@ describe('Poll', () => {
             const user = makeAnswerer();
 
             await poll.answer(
-                'question-id',
-                {
-                    answer: 'answer'
-                },
+                [
+                    {
+                        questionId: 'question-id',
+                        data: {
+                            answer: 'answer'
+                        }
+                    }
+                ],
                 user
             );
 
