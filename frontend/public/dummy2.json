@@ -71,9 +71,16 @@
             "type": "free",
             "visualType": "free",
             "pollId": "c72fb0ba-d940-4da8-891c-934e6f73475f",
-            "answerCount": 0,
+            "answerCount": 6,
             "answerPercentage": 1,
-            "answerValueStatistics": []
+            "answerValueStatistics": [
+                "this is feedbcak 1",
+                "this is feedbcak 2",
+                "this is feedbcak 3",
+                "this is feedbcak 4",
+                "this is feedbcak 5",
+                "this is feedbcak 6"
+            ]
         },
         {
             "id": "a7967b89-2a18-4c39-b9e4-aca50867a31a",

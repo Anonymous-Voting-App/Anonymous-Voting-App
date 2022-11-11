@@ -92,4 +92,14 @@
             margin-bottom: 1.25rem;
         }
     }
+
+    .searchButton {
+        width: 260px;
+        height: 40px;
+        border-radius: 20px !important;
+        text-transform: none !important;
+        border: 1px solid $main-color !important;
+        background-color: $main-color !important;
+        color: $background-color !important;
+    }
 }

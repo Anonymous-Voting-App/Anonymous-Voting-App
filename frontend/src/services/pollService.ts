@@ -89,6 +89,7 @@ export const fetchPollResult = async (pollId: string) => {
     // ee651f25-a6f7-4602-b517-2031396a0b26 - thumbs up/down
     pollId = '1576d894-2571-4281-933d-431d246bb460';
     const newResponse = await fetch(
+        // `${window.location.origin}/dummy2.json`,
         `${getBackendUrl()}/api/poll/${pollId}/results`,
         {
             headers: {

@@ -9,6 +9,7 @@ const ResultOption = (props: any) => {
     console.log(props.optionData);
     const { optionData, highestCount, totalCount, type } = props;
     const showIcon = highestCount === optionData.count ? true : false;
+
     return (
         <div className="option-wrapper">
             {type === 'radioBtn' || type === 'checkBox' || type === 'yesNo' ? (
@@ -75,7 +76,11 @@ const ResultOption = (props: any) => {
                     </div>
                 </div>
             ) : null}
-            {type === 'free' ? <div className="free-type"></div> : null}
+            {type === 'free' ? (
+                <div className="free-type">
+                    <div>{optionData.title}</div>
+                </div>
+            ) : null}
         </div>
     );
 };

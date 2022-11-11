@@ -1,4 +1,4 @@
-import { Paper, Typography } from '@mui/material';
+import { Button, Paper, Typography } from '@mui/material';
 // import React, { useState } from 'react';
 import './ResultCard.scss';
 import { ResultOptionObj } from '../utils/types';
@@ -9,7 +9,9 @@ const ResultCard = (props: any) => {
     //     props.ques.options
     // );
     const options: ResultOptionObj[] = props.ques.options;
-
+    const handleExport = () => {
+        console.log('clicked');
+    };
     const setQuesType = (type: string) => {
         switch (type) {
             case 'checkBox':
@@ -54,6 +56,15 @@ const ResultCard = (props: any) => {
                     </div>
                 ))}
             </div>
+            {quesType === 'Free text' ? (
+                <Button
+                    className="searchButton"
+                    variant="outlined"
+                    onClick={handleExport}
+                >
+                    Export Data
+                </Button>
+            ) : null}
         </Paper>
     );
 };
