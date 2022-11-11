@@ -67,7 +67,7 @@ jobs:
               with:
                   working-directory: frontend
                   install: false
-                  start: npm start
+                  start: npx serve build
                   wait-on: 'http://localhost:3000'
                   wait-on-timeout: 120
                   browser: ${{ matrix.browser }}
@@ -100,7 +100,7 @@ jobs:
               with:
                   working-directory: frontend
                   install: false
-                  start: npm start
+                  start: npx serve build
                   wait-on: 'http://localhost:3000'
                   wait-on-timeout: 120
                   browser: ${{ matrix.browser }}
@@ -133,7 +133,7 @@ jobs:
               with:
                   working-directory: frontend
                   install: false
-                  start: npm start
+                  start: npx serve build
                   wait-on: 'http://localhost:3000'
                   wait-on-timeout: 120
                   browser: ${{ matrix.browser }}
