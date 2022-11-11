@@ -18,7 +18,7 @@ const ResultCard = (props: any) => {
                 return 'Pick one';
             case 'star':
                 return 'Star rating';
-            case 'textfield':
+            case 'free':
                 return 'Free text';
             case 'yesNo':
                 return 'Yes/No';

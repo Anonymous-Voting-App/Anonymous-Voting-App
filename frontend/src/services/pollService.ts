@@ -85,6 +85,9 @@ export const createPoll = async (title: string, questions: any) => {
 export const fetchPollResult = async (pollId: string) => {
     // pollId = '1576d894-2571-4281-933d-431d246bb460';
     // a6fb06b2-7146-42c0-820b-346a9d1e0539
+    // 63189e12-7a23-4630-8984-5cc2a2629d24 - rating type ques only
+    // ee651f25-a6f7-4602-b517-2031396a0b26 - thumbs up/down
+    pollId = '1576d894-2571-4281-933d-431d246bb460';
     const newResponse = await fetch(
         `${getBackendUrl()}/api/poll/${pollId}/results`,
         {
@@ -216,7 +219,9 @@ const formatRatingOptions = (options: [any]) => {
         };
     });
     console.log(ratingTypeOptions);
-    return ratingTypeOptions.length > 0 ? ratingTypeOptions : newArray;
+    return ratingTypeOptions.length > 0
+        ? ratingTypeOptions.reverse()
+        : newArray;
 };
 
 const formatBooleanOptions = (options: [any]) => {
@@ -225,8 +230,9 @@ const formatBooleanOptions = (options: [any]) => {
         { title: false, count: 0, percentage: 0 }
     ];
     const booleanTypeOptions = options.map((option) => {
+        console.log(option);
         return {
-            title: option.value ? 'Yes' : 'No',
+            title: option.value === 'true' ? 'Yes' : 'No',
             count: option.count,
             percentage:
                 (option.percentage * 100)
@@ -237,6 +243,6 @@ const formatBooleanOptions = (options: [any]) => {
                     : (option.percentage * 100).toFixed(1)
         };
     });
-
+    console.log(booleanTypeOptions);
     return booleanTypeOptions.length > 0 ? booleanTypeOptions : newArray;
 };
