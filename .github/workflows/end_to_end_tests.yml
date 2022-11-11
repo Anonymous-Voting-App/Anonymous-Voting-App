@@ -1,0 +1,86 @@
+name: Cypress E2E
+
+on:
+    pull_request:
+        branches:
+            - main
+    workflow_dispatch:
+
+env:
+    # User specified
+    REACT_APP_BACKEND_URL: https://staging.lb.knowit-anonymous-voting-app.aws.cybercom.dev
+
+    # Secrets
+    CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+
+    # Automatic
+    GITHUB_PUSH_BEFORE_SHA: ${{ github.event.before }}
+    GITHUB_PUSH_BASE_SHA: ${{ github.event.base }}
+    GITHUB_PULL_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+    GITHUB_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+    install:
+        name: Install
+        runs-on: ubuntu-latest
+        container: cypress/browsers:node16.18.0-chrome107-ff106-edge
+
+        defaults:
+            run:
+                working-directory: frontend
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+
+            - name: Cypress install
+              uses: cypress-io/github-action@v4
+              with:
+                  # Disable running of tests within install job
+                  runTests: false
+                  build: npm run build
+
+            - name: Save build folder
+              uses: actions/upload-artifact@v3
+              with:
+                  name: build
+                  if-no-files-found: error
+                  path: build
+
+    cypress-run:
+        name: Run cypress
+        needs: install
+        runs-on: ubuntu-latest
+        container: cypress/browsers:node16.18.0-chrome107-ff106-edge
+        strategy:
+            fail-fast: false
+            matrix:
+                browser: [chrome, firefox]
+
+        defaults:
+            run:
+                working-directory: frontend
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+
+            - name: Download the build folders
+              uses: actions/download-artifact@v3
+              with:
+                  name: build
+                  path: build
+
+            - name: Cypress run
+              uses: cypress-io/github-action@v4
+              with:
+                  install: false
+                  start: npm start
+                  wait-on: 'http://localhost:3000'
+                  wait-on-timeout: 120
+                  browser: ${{ matrix.browser }}
+                  record: true
+                  parallel: true
+                  group: 'UI'
+                  spec: cypress/e2e/*
