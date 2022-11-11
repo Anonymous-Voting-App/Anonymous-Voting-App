@@ -24,7 +24,6 @@ jobs:
     install:
         name: Install
         runs-on: ubuntu-latest
-        container: cypress/browsers:node16.18.0-chrome107-ff106-edge
 
         steps:
             - name: Checkout
@@ -33,9 +32,8 @@ jobs:
             - name: Cypress install
               uses: cypress-io/github-action@v4
               with:
-                  # Disable running of tests within install job
+                  working-directory: frontend
                   runTests: false
-                  project: ./frontend
                   build: npm run build
 
             - name: Save build folder
@@ -45,15 +43,14 @@ jobs:
                   if-no-files-found: error
                   path: ./frontend/build
 
-    cypress-run:
-        name: Run cypress
+    cypress-run-ubuntu:
+        name: Run cypress on Ubuntu 22.04
         needs: install
-        runs-on: ubuntu-latest
-        container: cypress/browsers:node16.18.0-chrome107-ff106-edge
+        runs-on: ubuntu-22.04
         strategy:
             fail-fast: false
             matrix:
-                browser: [chrome, firefox]
+                browser: [chrome, edge]
 
         steps:
             - name: Checkout
@@ -68,6 +65,73 @@ jobs:
             - name: Cypress run
               uses: cypress-io/github-action@v4
               with:
+                  working-directory: frontend
+                  install: false
+                  start: npm start
+                  wait-on: 'http://localhost:3000'
+                  wait-on-timeout: 120
+                  browser: ${{ matrix.browser }}
+                  record: true
+                  parallel: true
+                  group: 'UI'
+                  spec: cypress/e2e/*
+
+    cypress-run-windows:
+        name: Run cypress on Windows Server 2022
+        needs: install
+        runs-on: windows-2022
+        strategy:
+            fail-fast: false
+            matrix:
+                browser: [chrome, firefox, edge]
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+
+            - name: Download the build folders
+              uses: actions/download-artifact@v3
+              with:
+                  name: build
+                  path: ./frontend/build
+
+            - name: Cypress run
+              uses: cypress-io/github-action@v4
+              with:
+                  working-directory: frontend
+                  install: false
+                  start: npm start
+                  wait-on: 'http://localhost:3000'
+                  wait-on-timeout: 120
+                  browser: ${{ matrix.browser }}
+                  record: true
+                  parallel: true
+                  group: 'UI'
+                  spec: cypress/e2e/*
+
+    cypress-run-macos:
+        name: Run cypress on MacOS 12
+        needs: install
+        runs-on: macos-12
+        strategy:
+            fail-fast: false
+            matrix:
+                browser: [chrome, firefox, edge]
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+
+            - name: Download the build folders
+              uses: actions/download-artifact@v3
+              with:
+                  name: build
+                  path: ./frontend/build
+
+            - name: Cypress run
+              uses: cypress-io/github-action@v4
+              with:
+                  working-directory: frontend
                   install: false
                   start: npm start
                   wait-on: 'http://localhost:3000'
