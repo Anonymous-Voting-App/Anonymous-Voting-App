@@ -5,6 +5,11 @@ export interface AnswerData {
     [extra: string]: unknown;
 }
 
+export interface Answer {
+    questionId: string;
+    data: AnswerData;
+}
+
 export interface NewOptionData {
     option: string;
     questionId: string;

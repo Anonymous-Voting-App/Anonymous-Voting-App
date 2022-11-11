@@ -18,7 +18,6 @@ function App() {
         '4c5365d6-a32f-4c86-b088-85cb0c4f64ea'
     );
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const handleNotification = (status: {
         severity: string;
         message: string;

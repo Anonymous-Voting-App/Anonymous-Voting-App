@@ -12,8 +12,7 @@ const app = express();
 const port = 8080;
 
 const corsOptions: CorsOptions = {
-    // origin: process.env.FRONTEND_URL || 'http://localhost:3000'
-    origin: '*'
+    origin: process.env.CORS_ALLOW_ORIGIN || 'http://localhost:3000'
 };
 
 app.use(

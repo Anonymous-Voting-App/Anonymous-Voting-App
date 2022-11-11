@@ -27,14 +27,16 @@
         "lint": "eslint .",
         "test": "react-scripts test",
         "test:ci": "CI=true npm test -- --watchAll=false --coverage",
-        "eject": "react-scripts eject"
+        "eject": "react-scripts eject",
+        "cypress": "cypress open"
     },
     "proxy": "http://localhost:8080",
     "eslintConfig": {
         "extends": [
             "react-app",
             "react-app/jest",
-            "prettier"
+            "prettier",
+            "plugin:cypress/recommended"
         ]
     },
     "browserslist": {
@@ -50,7 +52,9 @@
         ]
     },
     "devDependencies": {
+        "cypress": "^11.0.1",
         "eslint-config-prettier": "^8.5.0",
+        "eslint-plugin-cypress": "^2.12.1",
         "react-router-dom": "^6.4.2",
         "sass": "^1.55.0"
     }

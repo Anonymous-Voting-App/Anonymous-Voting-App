@@ -1,10 +1,8 @@
+import * as IQuestion from '../models/IQuestion';
+
 export interface AnswerData {
     publicId: string;
-    questionId: string;
-    answer: {
-        answer: number | string | object | boolean;
-        [extra: string]: unknown;
-    };
+    answers: Array<IQuestion.Answer>;
     answerer: {
         ip: string;
         cookie: string;

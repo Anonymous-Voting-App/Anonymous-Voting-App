@@ -4,6 +4,7 @@ on:
     push:
         branches:
             - dev
+    workflow_dispatch:
 
 env:
     # User specified
@@ -14,6 +15,7 @@ env:
     ECS_TASK: ava-staging-backend-task
     CONTAINER_NAME: ava-staging-backend-container
     FRONTEND_BUCKET: ava-staging-s3-frontend
+    BACKEND_URL: 'https://staging.lb.knowit-anonymous-voting-app.aws.cybercom.dev'
 
     # Secrets
     DATABASE_URL: ${{ secrets.STAGING_DB_URL }}
@@ -114,8 +116,10 @@ jobs:
                   node-version: lts/*
                   cache: npm
             - run: npm ci
+            - name: Create .env-file
+              run: |
+                  echo "REACT_APP_BACKEND_URL=$BACKEND_URL" >> .env
             - run: npm run build:ci
-
             - name: Configure AWS credentials
               uses: aws-actions/configure-aws-credentials@v1
               with:

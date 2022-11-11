@@ -1,4 +1,5 @@
 import { PollQuesObj } from '../utils/types';
+import getBackendUrl from '../utils/getBackendUrl';
 
 // function to modify question type before calling api
 const updatePollBody = (questions: PollQuesObj[]) => {
@@ -62,8 +63,7 @@ export const createPoll = async (title: string, questions: any) => {
         questions: updatedQuestions
     };
     console.log(pollContent);
-    // await fetch(`${window.location.origin}/api/poll`, {
-    const response = await fetch(`${window.location.origin}/api/poll`, {
+    const response = await fetch(`${getBackendUrl()}/api/poll`, {
         method: 'POST',
         body: JSON.stringify(pollContent),
         headers: {
@@ -86,7 +86,7 @@ export const fetchPollResult = async (pollId: string) => {
     // pollId = '1576d894-2571-4281-933d-431d246bb460';
     // a6fb06b2-7146-42c0-820b-346a9d1e0539
     const newResponse = await fetch(
-        `${window.location.origin}/api/poll/${pollId}/results`,
+        `${getBackendUrl()}/api/poll/${pollId}/results`,
         {
             headers: {
                 'Content-Type': 'application/json',
@@ -99,7 +99,7 @@ export const fetchPollResult = async (pollId: string) => {
     }
     const dataList = await newResponse.json();
     const formattedData = formatData(dataList);
-    console.log(formattedData, 'data');
+
     return formattedData;
 };
 
