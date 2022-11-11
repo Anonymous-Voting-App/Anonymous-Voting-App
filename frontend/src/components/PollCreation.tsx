@@ -11,14 +11,15 @@ import { ArrowRightAlt, AddCircleOutline } from '@mui/icons-material';
 import './PollCreation.scss';
 import Question from './Question';
 import { createPoll } from '../services/pollService';
+import { PollQuesObj } from '../utils/types';
 
 function PollCreation(props: any) {
     const [showQuesContainer, setShowQuesContainer] = useState(false);
-    const [questions, setQuestions] = useState([
+    const [questions, setQuestions] = useState<PollQuesObj[]>([
         {
             title: '',
             description: '',
-            type: '',
+            visualType: '',
             minAnswers: 1,
             maxAnswers: 1,
             subQuestions: [{ title: '', description: '', type: '' }]
@@ -34,16 +35,12 @@ function PollCreation(props: any) {
             questions.findIndex(
                 (question) =>
                     question.title === '' ||
-                    question.type === '' ||
-                    question.subQuestions.length < 2 ||
-                    (question.subQuestions.findIndex(
-                        (option) => option.title === ''
-                    ) === -1
-                        ? false
-                        : true)
+                    question.visualType === '' ||
+                    handleSubQuestionCheck(question)
             ) === -1
                 ? false
                 : true;
+        // console.log(isEmpty)
         setEmptyFlag(isEmpty);
     }, [questions]);
 
@@ -54,18 +51,32 @@ function PollCreation(props: any) {
             questions.findIndex(
                 (question) =>
                     question.title === '' ||
-                    question.type === '' ||
-                    question.subQuestions.length < 2 ||
-                    (question.subQuestions.findIndex(
-                        (option) => option.title === ''
-                    ) === -1
-                        ? false
-                        : true)
+                    question.visualType === '' ||
+                    handleSubQuestionCheck(question) // check returns false if not empty and true if empty
             ) === -1
                 ? false
                 : true;
         return isEmpty;
     };
+
+    const handleSubQuestionCheck = (question: PollQuesObj) => {
+        if (
+            question.visualType === 'radioBtn' ||
+            question.visualType === 'checkBox'
+        ) {
+            // returns true if empty false if not empty
+            return (
+                question.subQuestions.length < 2 ||
+                (question.subQuestions.findIndex(
+                    (option) => option.title === ''
+                ) === -1
+                    ? false
+                    : true)
+            );
+        }
+        return false;
+    };
+
     /**
      * Function to add empty object to array when add question btn is clicked
      */
@@ -82,7 +93,7 @@ function PollCreation(props: any) {
                 {
                     title: '',
                     description: '',
-                    type: '',
+                    visualType: '',
                     minAnswers: 1,
                     maxAnswers: 1,
                     subQuestions: [{ title: '', description: '', type: '' }]
@@ -102,10 +113,10 @@ function PollCreation(props: any) {
                 return {
                     title: value,
                     description: value,
-                    type: question.type,
+                    visualType: question.visualType,
                     minAnswers: 1,
                     maxAnswers:
-                        question.type === 'radioBtn'
+                        question.visualType === 'radioBtn'
                             ? 1
                             : question.subQuestions.length,
                     subQuestions: question.subQuestions
@@ -113,6 +124,7 @@ function PollCreation(props: any) {
             }
             return question;
         });
+        console.log(newQuestions, 'QUESTIONLIST');
         setQuestions(newQuestions);
     };
 
@@ -137,11 +149,13 @@ function PollCreation(props: any) {
                 return {
                     title: question.title,
                     description: question.title,
-                    type: question.type,
+                    visualType: question.visualType,
                     subQuestions: newOptions,
                     minAnswers: 1,
                     maxAnswers:
-                        question.type === 'radioBtn' ? 1 : newOptions.length
+                        question.visualType === 'radioBtn'
+                            ? 1
+                            : newOptions.length
                 };
             }
             return question;
@@ -161,11 +175,11 @@ function PollCreation(props: any) {
                 return {
                     title: question.title,
                     description: question.description,
-                    type: value,
+                    visualType: value,
                     subQuestions: question.subQuestions,
                     minAnswers: 1,
                     maxAnswers:
-                        question.type === 'radioBtn'
+                        question.visualType === 'radioBtn'
                             ? 1
                             : question.subQuestions.length
                 };
@@ -184,6 +198,7 @@ function PollCreation(props: any) {
         createPoll(pollName, questions)
             .then((response) => {
                 console.log(response.publicId);
+                // 1576d894-2571-4281-933d-431d246bb460
                 props.setPollId(response.publicId); // TO BE REMOVED WHEN ADMIN POLLS IMPLEMENTED
                 props.showNotification({
                     severity: 'success',

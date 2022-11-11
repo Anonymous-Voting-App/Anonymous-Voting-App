@@ -16,7 +16,7 @@ import {
 } from '@mui/icons-material';
 import InputAdornment from '@mui/material/InputAdornment';
 import './Question.scss';
-// import { QUESTION_TYPES } from './constants';
+import { QUESTION_TYPES } from './constants';
 
 function Question(props: any) {
     // console.log(props);
@@ -42,8 +42,13 @@ function Question(props: any) {
      * @param value
      */
     const onTypeChange = (value: string) => {
+        console.log(value);
         props.typeChangehandler(value, props.ind);
-        setShowOptionBtn(true);
+        if (value === 'radioBtn' || value === 'checkBox') {
+            setShowOptionBtn(true);
+        } else {
+            setShowOptionBtn(false);
+        }
     };
 
     /**
@@ -105,17 +110,18 @@ function Question(props: any) {
                         IconComponent={KeyboardArrowDown}
                         labelId="select-ques-type"
                         id="select-ques-type"
-                        value={props.ques.type}
+                        value={props.ques.visualType}
                         onChange={(event) => onTypeChange(event.target.value)}
                     >
-                        {/* <MenuItem value={''}>
-                            <em>None</em>
-                        </MenuItem> */}
-                        {/* {QUESTION_TYPES.map(item => {
-                            return <MenuItem value={item.value}>{item.type}</MenuItem>;
-                        })} */}
-                        <MenuItem value={'radioBtn'}>Pick one</MenuItem>
-                        <MenuItem value={'checkBox'}>Multi - choice</MenuItem>
+                        {QUESTION_TYPES.map((item) => {
+                            return (
+                                <MenuItem key={item.value} value={item.value}>
+                                    {item.type}
+                                </MenuItem>
+                            );
+                        })}
+                        {/* <MenuItem value={'radioBtn'}>Pick one</MenuItem>
+                        <MenuItem value={'checkBox'}>Multi - choice</MenuItem> */}
                     </Select>
                 </FormControl>
                 <TextField

@@ -1,0 +1,115 @@
+{
+    "name": "pollname",
+    "publicId": "1576d894-2571-4281-933d-431d246bb460",
+    "type": "",
+    "answerCount": 0,
+    "questions": [
+        {
+            "id": "30e3f8ef-b157-481d-9128-c7d847f5eb59",
+            "title": "q1",
+            "description": "q1",
+            "type": "multi",
+            "visualType": "radioBtn",
+            "pollId": "c72fb0ba-d940-4da8-891c-934e6f73475f",
+            "answerCount": 0,
+            "answerPercentage": 1,
+            "answerValueStatistics": [],
+            "subQuestions": [
+                {
+                    "id": "d2be00fe-7bc5-4139-9e0c-382aa4100c00",
+                    "title": "as",
+                    "description": "as",
+                    "type": "boolean",
+                    "visualType": "default",
+                    "pollId": "c72fb0ba-d940-4da8-891c-934e6f73475f",
+                    "answerCount": 0,
+                    "answerPercentage": 1,
+                    "answerValueStatistics": [
+                        { "value": "true", "count": 0, "percentage": 1 },
+                        { "value": "false", "count": 0, "percentage": 1 }
+                    ],
+                    "trueAnswerCount": 0,
+                    "falseAnswerCount": 0,
+                    "trueAnswerPercentage": 1,
+                    "falseAnswerPercentage": 1
+                },
+                {
+                    "id": "b7ad4eb4-6866-4d2f-ab34-23c5ff7b3b7c",
+                    "title": "b",
+                    "description": "b",
+                    "type": "boolean",
+                    "visualType": "default",
+                    "pollId": "c72fb0ba-d940-4da8-891c-934e6f73475f",
+                    "answerCount": 0,
+                    "answerPercentage": 1,
+                    "answerValueStatistics": [
+                        { "value": "true", "count": 0, "percentage": 1 },
+                        { "value": "false", "count": 0, "percentage": 1 }
+                    ],
+                    "trueAnswerCount": 0,
+                    "falseAnswerCount": 0,
+                    "trueAnswerPercentage": 1,
+                    "falseAnswerPercentage": 1
+                }
+            ]
+        },
+        {
+            "id": "75230070-a2d3-4d3a-938f-af5bc3640fb2",
+            "title": "ques 2",
+            "description": "ques 2",
+            "type": "scale",
+            "visualType": "star",
+            "pollId": "c72fb0ba-d940-4da8-891c-934e6f73475f",
+            "answerCount": 0,
+            "answerPercentage": 1,
+            "answerValueStatistics": []
+        },
+        {
+            "id": "6de04a53-c015-41dc-a43f-06111b76c6eb",
+            "title": "ques 3",
+            "description": "ques 3",
+            "type": "free",
+            "visualType": "free",
+            "pollId": "c72fb0ba-d940-4da8-891c-934e6f73475f",
+            "answerCount": 0,
+            "answerPercentage": 1,
+            "answerValueStatistics": []
+        },
+        {
+            "id": "a7967b89-2a18-4c39-b9e4-aca50867a31a",
+            "title": "ques 4",
+            "description": "ques 4",
+            "type": "boolean",
+            "visualType": "yesNo",
+            "pollId": "c72fb0ba-d940-4da8-891c-934e6f73475f",
+            "answerCount": 0,
+            "answerPercentage": 1,
+            "answerValueStatistics": [
+                { "value": "true", "count": 0, "percentage": 1 },
+                { "value": "false", "count": 0, "percentage": 1 }
+            ],
+            "trueAnswerCount": 0,
+            "falseAnswerCount": 0,
+            "trueAnswerPercentage": 1,
+            "falseAnswerPercentage": 1
+        },
+        {
+            "id": "b73c46bc-08f4-41d6-98b3-47840447365d",
+            "title": "ques 5",
+            "description": "ques 5",
+            "type": "boolean",
+            "visualType": "upDown",
+            "pollId": "c72fb0ba-d940-4da8-891c-934e6f73475f",
+            "answerCount": 0,
+            "answerPercentage": 1,
+            "answerValueStatistics": [
+                { "value": "true", "count": 0, "percentage": 1 },
+                { "value": "false", "count": 0, "percentage": 1 }
+            ],
+            "trueAnswerCount": 0,
+            "falseAnswerCount": 0,
+            "trueAnswerPercentage": 1,
+            "falseAnswerPercentage": 1
+        }
+    ]
+}

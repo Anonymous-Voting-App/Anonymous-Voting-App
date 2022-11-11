@@ -1,14 +1,47 @@
-import { PollObj } from '../utils/types';
+import { PollQuesObj } from '../utils/types';
 
 // function to modify question type before calling api
-const updatePollBody = (questions: PollObj[]) => {
-    const updatedQuestions = questions.map((element) => {
-        console.log(element.type);
-        if (element.type === 'radioBtn' || element.type === 'checkBox')
-            return { ...element, visualType: element.type, type: 'multi' };
-        else return element;
-    });
-    // console.log(updatedQuestions);
+const updatePollBody = (questions: PollQuesObj[]) => {
+    const updatedQuestions = questions.map(
+        ({ subQuestions, minAnswers, maxAnswers, ...element }) => {
+            console.log(element.visualType);
+
+            switch (element.visualType) {
+                case 'radioBtn':
+                case 'checkBox':
+                    return {
+                        type: 'multi',
+                        subQuestions: subQuestions,
+                        minAnswers: minAnswers,
+                        maxAnswers: maxAnswers,
+                        ...element
+                    };
+                case 'star':
+                    return {
+                        type: 'scale',
+                        step: 1,
+                        minValue: 1,
+                        maxValue: 5,
+                        ...element
+                    };
+                case 'yesNo':
+                case 'upDown':
+                    return {
+                        type: 'boolean',
+                        ...element
+                    };
+                case 'free':
+                    return {
+                        type: 'free',
+                        ...element
+                    };
+            }
+            // if (element.type === 'radioBtn' || element.type === 'checkBox')
+            //     return { ...element, visualType: element.type, type: 'multi' };
+            // else return element;
+        }
+    );
+    console.log(updatedQuestions);
     return updatedQuestions;
 };
 
@@ -28,6 +61,7 @@ export const createPoll = async (title: string, questions: any) => {
         },
         questions: updatedQuestions
     };
+    console.log(pollContent);
     // await fetch(`${window.location.origin}/api/poll`, {
     const response = await fetch(`${window.location.origin}/api/poll`, {
         method: 'POST',
@@ -49,8 +83,8 @@ export const createPoll = async (title: string, questions: any) => {
  * @returns
  */
 export const fetchPollResult = async (pollId: string) => {
-    console.log(pollId, 'poll results');
-
+    // pollId = '1576d894-2571-4281-933d-431d246bb460';
+    // a6fb06b2-7146-42c0-820b-346a9d1e0539
     const newResponse = await fetch(
         `${window.location.origin}/api/poll/${pollId}/results`,
         {
@@ -96,6 +130,12 @@ const setQuesArray = (item: any) => {
                     : [];
             options = formatRatingOptions(ratingOptions);
             break;
+        case 'free':
+            options =
+                item.answerValueStatistics.length > 0
+                    ? formatFreeTextOptions(item.answerValueStatistics)
+                    : formatFreeTextOptions(['No feedback']);
+            break;
         case 'yesNo':
         case 'upDown':
             const booleanOptions =
@@ -116,6 +156,12 @@ const setQuesArray = (item: any) => {
     };
 };
 
+const formatFreeTextOptions = (options: [any]) => {
+    const formattedTextOptions = options.map((option) => {
+        return { title: option, count: 0, percenatge: 0 };
+    });
+    return formattedTextOptions;
+};
 const formatMultiTypeOptions = (options: [any]) => {
     console.log(options);
     const formattedOptions = options.map((option) => {

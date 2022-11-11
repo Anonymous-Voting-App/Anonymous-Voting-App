@@ -1,0 +1,46 @@
+{
+    "name": "pollname",
+    "type": "string",
+    "owner": { "accountId": "3fa85f64-5717-4562-b3fc-2c963f66afa6" },
+    "questions": [
+        {
+            "title": "multiple choice question",
+            "description": "multiple choice question",
+            "type": "multi",
+            "subQuestions": [
+                { "title": "a", "description": "a", "type": "boolean" },
+                { "title": "b", "description": "b", "type": "boolean" }
+            ],
+            "minAnswers": 1,
+            "maxAnswers": 2,
+            "visualType": "checkBox"
+        },
+        {
+            "title": "boolean -YESNO type question",
+            "description": "boolean type question",
+            "type": "boolean",
+            "visualType": "yesNo"
+        },
+        {
+            "title": "boolean - THUMBSUPDOWN type question",
+            "description": "boolean type question",
+            "type": "boolean",
+            "visualType": "upDown"
+        },
+        {
+            "title": "scale / rating type question",
+            "description": "scale / rating type question",
+            "type": "scale",
+            "step": 1,
+            "minValue": 1,
+            "maxValue": 5,
+            "visualType": "star"
+        },
+        {
+            "title": "free text type question",
+            "description": "free text type question",
+            "type": "free",
+            "visualType": "free"
+        }
+    ]
+}
