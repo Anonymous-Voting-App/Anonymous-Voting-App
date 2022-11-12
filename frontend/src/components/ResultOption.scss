@@ -55,8 +55,9 @@
 
 .upDown-type {
     display: flex;
+    margin-bottom: 1rem;
     .upDown-icon {
-        margin-right: 2rem;
+        margin-right: 6rem;
         .MuiSvgIcon-root {
             font-size: 1.5rem !important;
         }
@@ -64,7 +65,7 @@
 
     .value {
         display: flex;
-        min-width: 6rem;
+        // min-width: 6rem;
         .MuiTypography-root {
             display: flex !important;
             align-items: center !important;
@@ -78,7 +79,7 @@
 }
 
 .MuiRating-root {
-    margin-right: 2rem;
+    margin-right: 5rem;
 }
 
 .MuiRating-icon {

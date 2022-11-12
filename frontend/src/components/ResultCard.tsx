@@ -1,17 +1,25 @@
 import { Button, Paper, Typography } from '@mui/material';
-// import React, { useState } from 'react';
 import './ResultCard.scss';
 import { ResultOptionObj } from '../utils/types';
 import ResultOption from './ResultOption';
+import * as FileSaver from 'file-saver';
+import * as XLSX from 'sheetjs-style';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 const ResultCard = (props: any) => {
-    // const [options, setOptions] = useState<ResultOptionObj[]>(
-    //     props.ques.options
-    // );
     const options: ResultOptionObj[] = props.ques.options;
+    const fileType =
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+    const fileExtension = '.xlsx';
     const handleExport = () => {
-        console.log('clicked');
+        const fileName = 'Data';
+        const ws = XLSX.utils.json_to_sheet(options);
+        const wb = { Sheets: { data: ws }, SheetNames: ['data'] };
+        const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+        const data = new Blob([excelBuffer], { type: fileType });
+        FileSaver.saveAs(data, fileName + fileExtension);
     };
+
     const setQuesType = (type: string) => {
         switch (type) {
             case 'checkBox':
@@ -51,19 +59,31 @@ const ResultCard = (props: any) => {
                             totalCount={props.ques.totalCount}
                             highestCount={highestCount.count}
                             type={props.ques.type}
-                            optionData={option}
+                            optionData={
+                                quesType === 'Free text' && index > 1
+                                    ? ''
+                                    : option
+                            }
                         ></ResultOption>
                     </div>
                 ))}
             </div>
             {quesType === 'Free text' ? (
-                <Button
-                    className="searchButton"
-                    variant="outlined"
-                    onClick={handleExport}
-                >
-                    Export Data
-                </Button>
+                <div className="free-text-export">
+                    <div>
+                        <MoreVertIcon></MoreVertIcon>
+                    </div>
+                    {/* <div className='separator'>.</div>
+                <div className='separator'>.</div>
+                <div >.</div> */}
+                    <Button
+                        className="searchButton"
+                        variant="outlined"
+                        onClick={handleExport}
+                    >
+                        Export Data
+                    </Button>
+                </div>
             ) : null}
         </Paper>
     );

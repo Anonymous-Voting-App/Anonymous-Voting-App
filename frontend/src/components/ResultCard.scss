@@ -93,13 +93,22 @@
         }
     }
 
-    .searchButton {
-        width: 260px;
-        height: 40px;
-        border-radius: 20px !important;
-        text-transform: none !important;
-        border: 1px solid $main-color !important;
-        background-color: $main-color !important;
-        color: $background-color !important;
+    .separator {
+        line-height: 1;
+    }
+    .free-text-export {
+        .MuiSvgIcon-root {
+            font-size: 1.5rem !important;
+        }
+        .searchButton {
+            margin-top: 1rem;
+            width: 260px;
+            height: 40px;
+            border-radius: 20px !important;
+            text-transform: none !important;
+            border: 1px solid $main-color !important;
+            background-color: $main-color !important;
+            color: $background-color !important;
+        }
     }
 }
