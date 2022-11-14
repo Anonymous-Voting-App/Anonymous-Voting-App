@@ -1,5 +1,3 @@
-import { validate } from 'uuid';
-
 export interface CreateUser {
     email?: string;
     passwordHash?: string;
