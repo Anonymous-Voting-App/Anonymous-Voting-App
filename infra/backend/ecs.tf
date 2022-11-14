@@ -46,6 +46,10 @@ resource "aws_ecs_task_definition" "app" {
         {
           "name" : "DATABASE_URL",
           "valueFrom" : "${aws_secretsmanager_secret.database_secret.arn}"
+        },
+        {
+          "name" : "JWT_SECRET",
+          "valueFrom" : "${aws_secretsmanager_secret.jwt_secret.arn}"
         }
       ],
       "environment" : [

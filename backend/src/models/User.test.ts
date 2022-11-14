@@ -42,7 +42,11 @@ describe('User', () => {
                 name: 'dummy-name',
                 email: 'dummy@email.com',
                 emailVerified: false,
-                password: 'dummy-password'
+                password: 'dummy-password',
+                firstname: 'dummy',
+                lastname: 'user',
+                username: 'iamdummyuser',
+                isAdmin: false
             });
 
             const user = new User();

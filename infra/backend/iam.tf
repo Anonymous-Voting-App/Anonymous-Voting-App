@@ -44,6 +44,27 @@ resource "aws_iam_policy" "allow_get_db_secret" {
   })
 }
 
+resource "aws_iam_policy" "allow_get_jwt_secret" {
+  name        = "${var.name}-${local.environment}-allow-get-jwt-secret"
+  path        = "/"
+  description = "Allows getting JWT_SECRET from Secrets Manager"
+  depends_on  = [aws_secretsmanager_secret.jwt_secret]
+  tags        = local.tags
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "secretsmanager:GetSecretValue",
+        ]
+        Effect   = "Allow"
+        Resource = "${aws_secretsmanager_secret.jwt_secret.arn}"
+      },
+    ]
+  })
+}
+
 resource "aws_iam_policy" "allow_ecs_deployment" {
   name        = "${var.name}-${local.environment}-allow-ecs-deployment"
   path        = "/"
@@ -117,7 +138,12 @@ resource "aws_iam_role_policy_attachment" "attach_allow_logging" {
   policy_arn = aws_iam_policy.allow_logging.arn
 }
 
-resource "aws_iam_role_policy_attachment" "attach_allow_get_secret" {
+resource "aws_iam_role_policy_attachment" "attach_allow_get_db_secret" {
   role       = aws_iam_role.ecs_task_execution_role.name
   policy_arn = aws_iam_policy.allow_get_db_secret.arn
+}
+
+resource "aws_iam_role_policy_attachment" "attach_allow_get_jwt_secret" {
+  role       = aws_iam_role.ecs_task_execution_role.name
+  policy_arn = aws_iam_policy.allow_get_jwt_secret
 }
