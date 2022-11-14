@@ -1,13 +1,10 @@
-import { validate } from 'uuid';
-
-export interface CreateUser {
-    email?: string;
-    passwordHash?: string;
+export interface UserOptions {
+    ip?: string;
+    cookie?: string;
+    accountId?: string;
 }
 
-export interface userData {
-    email: string;
-    userName: string;
-    firstName: string;
-    lastName: string;
+export interface CreateUserOptions {
+    ip?: string;
+    cookie?: string;
 }
