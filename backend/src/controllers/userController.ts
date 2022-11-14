@@ -72,7 +72,7 @@ export const createAccount = async (req: Request, res: Response) => {
         }
 
         if (code === 200) {
-            return responses.created(req, res);
+            return responses.custom(req, res, 201, 'Created');
         }
 
         if (code === 500) {
