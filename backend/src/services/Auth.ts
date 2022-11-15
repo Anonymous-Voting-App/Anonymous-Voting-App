@@ -1,15 +1,16 @@
 import { sign, verify } from 'jsonwebtoken';
 import { Request } from 'express';
 import logger from '../utils/logger';
+import { UserData } from './IAccountManager';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
-if (JWT_SECRET === undefined || typeof JWT_SECRET !== 'string') {
+if (!JWT_SECRET) {
     throw new Error('JWT secret must be given');
 }
 
-export const signToken = (username: string) => {
-    return sign({ user: username }, JWT_SECRET, { expiresIn: '48h' });
+export const signToken = (data: UserData) => {
+    return sign(data, JWT_SECRET, { expiresIn: '48h', subject: data.id });
 };
 
 export const verifyToken = (req: Request) => {

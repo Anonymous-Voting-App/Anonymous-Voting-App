@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import * as AccountManager from '../services/AccountManager';
 import * as responses from '../utils/responses';
 import * as Auth from '../services/Auth';
+import logger from '../utils/logger';
 
 export const createAccount = async (req: Request, res: Response) => {
     try {
@@ -62,6 +63,7 @@ export const createAccount = async (req: Request, res: Response) => {
             firstname,
             lastname
         );
+
         if (code === 400) {
             return responses.custom(
                 req,
@@ -78,8 +80,11 @@ export const createAccount = async (req: Request, res: Response) => {
         if (code === 500) {
             return responses.custom(req, res, 500, 'Internal server error');
         }
+
+        logger.error(`Error while creating account`);
         return responses.custom(req, res, 500, 'Unknown error');
-    } catch {
+    } catch (e: unknown) {
+        logger.error(`Error while creating account: ${e}`);
         return responses.custom(req, res, 500, 'Unknown error');
     }
 };
@@ -108,10 +113,11 @@ export const login = async (req: Request, res: Response) => {
         }
 
         return res.json({
-            token: Auth.signToken(username),
+            token: Auth.signToken(data),
             user: data
         });
-    } catch {
+    } catch (e: unknown) {
+        logger.error(`Error while creating account: ${e}`);
         return responses.custom(req, res, 500, 'Unknown error');
     }
 };

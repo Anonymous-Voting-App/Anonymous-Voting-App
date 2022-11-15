@@ -74,6 +74,7 @@ export const verify = async (
 
         if (validpassword) {
             const data: IAccountManager.UserData = {
+                id: existingUser.id,
                 firstName: existingUser.firstname,
                 lastName: existingUser.lastname,
                 email: existingUser.email,

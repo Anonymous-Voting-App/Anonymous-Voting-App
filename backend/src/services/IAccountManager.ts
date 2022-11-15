@@ -4,6 +4,7 @@ export interface CreateUser {
 }
 
 export interface UserData {
+    id: string;
     email: string;
     userName: string;
     firstName: string;
