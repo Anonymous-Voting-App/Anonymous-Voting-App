@@ -4,9 +4,9 @@
     width: 100%;
     height: 80px;
     top: 0px;
-    background: $main-color !important;
-    position: 'relative' !important;
-    box-shadow: none !important;
+    background: $main-color;
+    position: 'relative';
+    box-shadow: none;
     background-color: $main-color;
 }
 
@@ -56,15 +56,19 @@
     cursor: pointer;
 }
 
+.login:hover {
+    text-decoration: underline;
+}
+
 .profile {
     position: absolute !important;
 
     background: #f1f0ed;
 
-    height: 40px !important;
-    width: 40px !important;
-    right: 40px !important;
-    top: 20px !important;
+    height: 40px;
+    width: 40px;
+    right: 40px;
+    top: 20px;
 
     font-size: large;
     cursor: pointer;

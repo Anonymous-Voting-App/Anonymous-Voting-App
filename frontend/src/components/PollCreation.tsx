@@ -1,5 +1,4 @@
 import {
-    Container,
     Typography,
     TextField,
     Button,
@@ -209,12 +208,12 @@ function PollCreation(props: any) {
     };
 
     return (
-        <Container className="main-wrapper">
-            <div className="page-heading">
+        <div className="main-wrap">
+            <div className="page-header">
                 <Typography variant="h4"> Create poll </Typography>
                 <ArrowRightAlt />
             </div>
-            <div className="poll-name">
+            <div className="creation-poll-name">
                 <TextField
                     autoComplete="off"
                     id="pollName"
@@ -284,7 +283,7 @@ function PollCreation(props: any) {
                 {' '}
                 Cancel{' '}
             </Button>
-        </Container>
+        </div>
     );
 }
 

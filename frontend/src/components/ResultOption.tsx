@@ -13,7 +13,9 @@ const ResultOption = (props: any) => {
                     <div className="option">
                         <Typography>
                             <span className="icon-container">
-                                {showIcon ? <CheckIcon></CheckIcon> : null}
+                                {showIcon ? (
+                                    <CheckIcon className="check-icon"></CheckIcon>
+                                ) : null}
                             </span>
                             <span className="option-title">
                                 {optionData.title}

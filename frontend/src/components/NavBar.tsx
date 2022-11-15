@@ -8,9 +8,16 @@ import AVALogo from './ava.svg';
 import Sidebar from './Sidebar';
 import IconButton from '@mui/material/IconButton';
 import './NavBar.scss';
+import { useNavigate } from 'react-router-dom';
 
 const NavBar = () => {
     const [sidebarOpen, setSidebarOpen] = useState(true);
+
+    const navigate = useNavigate();
+
+    const handleClick = () => {
+        navigate('/login');
+    };
 
     return (
         <>
@@ -33,7 +40,9 @@ const NavBar = () => {
                     alt="Anonymous voting app logo"
                 />
 
-                <Typography className="login">Login</Typography>
+                <Typography className="login" onClick={handleClick}>
+                    Login
+                </Typography>
 
                 <PersonIcon className="profile"></PersonIcon>
             </AppBar>

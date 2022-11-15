@@ -8,13 +8,13 @@
 
 .question-wrapper {
     margin-top: 4.5rem;
-    display: flex !important;
-    flex-direction: column !important;
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    border-radius: 20px !important;
+    border-radius: 20px;
     border: 1px solid $black;
     padding: 1.25rem;
-    background-color: $background-color !important;
+    background-color: $background-color;
 }
 
 .type-dropdown {
@@ -83,15 +83,16 @@
     }
 }
 
-.add-option-btn {
+.add-option-btn,
+.add-option-btn:hover {
     margin-top: none;
-    border-radius: 20px !important;
-    width: 14.5rem !important;
+    border-radius: 20px;
+    width: 14.5rem;
     margin-top: 0;
-    color: $main-color !important;
-    background-color: $clay !important;
-    text-transform: none !important;
-    border: 2px solid $main-color !important;
+    color: $main-color;
+    background-color: $clay;
+    text-transform: none;
+    border: 2px solid $main-color;
 
     @include for-phone-only {
         font-size: 2.5rem;
