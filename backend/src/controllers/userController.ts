@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import * as AccountManager from '../services/AccountManager';
 import * as responses from '../utils/responses';
-import * as auth from '../services/auth';
+import * as Auth from '../services/Auth';
 
 export const createAccount = async (req: Request, res: Response) => {
     try {
@@ -108,18 +108,10 @@ export const login = async (req: Request, res: Response) => {
         }
 
         return res.json({
-            token: auth.signToken(username),
+            token: Auth.signToken(username),
             user: data
         });
     } catch {
         return responses.custom(req, res, 500, 'Unknown error');
     }
-};
-
-export const test = async (req: Request, res: Response) => {
-    const isLoggedIn = auth.verifyToken(req);
-    if (isLoggedIn) {
-        return responses.ok(req, res, {});
-    }
-    return responses.forbidden(req, res);
 };
