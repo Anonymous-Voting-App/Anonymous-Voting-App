@@ -3,7 +3,7 @@ import { Request } from 'express';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
-if (!JWT_SECRET) {
+if (JWT_SECRET === undefined || typeof JWT_SECRET !== 'string') {
     throw new Error('JWT secret must be given');
 }
 
