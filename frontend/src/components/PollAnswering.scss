@@ -15,13 +15,14 @@
 }
 
 .questionType {
+    margin-top: -7px;
     padding-top: 80px;
-    font-weight: 600 !important;
+    font-weight: 600;
 }
 
 .questionTitle {
     padding-top: 80px;
-    font-size: 40px !important;
+    font-size: 40px;
 }
 
 .answerContainer {
@@ -39,26 +40,28 @@
 }
 
 .button {
-    margin-top: 52px !important;
-    border-radius: 20px !important;
+    margin-top: 52px;
+    border-radius: 20px;
     width: 16.25rem;
-    color: $main-color !important;
-    font-weight: bold !important;
-    text-transform: none !important;
-    background-color: $melon !important;
-    border: 2px solid $main-color !important;
+    color: $main-color;
+    font-weight: bold;
+    text-transform: none;
+    background-color: $melon;
+    border: 2px solid $main-color;
     gap: 10px;
     @include for-phone-only {
         font-size: 2.5rem;
     }
 }
 
-.previousQuestionButton {
+.previousQuestionButton,
+.previousQuestionButton:hover {
     @extend .button;
-    background-color: $melon !important;
+    background-color: $melon;
 }
 
-.nextQuestionButton {
+.nextQuestionButton,
+.nextQuestionButton:hover {
     @extend .button;
-    background-color: $mint !important;
+    background-color: $mint;
 }
