@@ -110,11 +110,7 @@ export default class VotingService {
         answerData: IVotingService.AnswerData,
         user: User
     ): Promise<void> {
-        await poll.answer(
-            answerData.questionId,
-            answerData.answer,
-            user as User
-        );
+        await poll.answer(answerData.answers, user as User);
     }
 
     constructor(database: PrismaClient, questionFactory: QuestionFactory) {
@@ -285,8 +281,8 @@ export default class VotingService {
         );
 
         pre(
-            'answerData.answer is of type object',
-            typeof answerData.answer === 'object'
+            'answerData.answers is of type Array',
+            Array.isArray(answerData.answers)
         );
 
         const user = await this._tryGettingUser(answerData.answerer);

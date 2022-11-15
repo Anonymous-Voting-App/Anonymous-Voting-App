@@ -59,9 +59,11 @@ const callService = async (
         // Bad request
         if (e instanceof AssertionError) {
             Logger.warn(`Bad Request: ${e.message}`);
+            Logger.warn(e.stack);
             return responses.badRequest(req, res);
         } else if (e instanceof BadRequestError) {
             Logger.warn(`Bad Request: ${e.message}`);
+            Logger.warn(e.stack);
             return responses.badRequest(req, res);
         }
 

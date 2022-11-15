@@ -319,9 +319,8 @@ export default class Question {
     ): void {
         let answerCount = this.answerCount();
         for (let i = 0; i < answersData.length; i++) {
-            answerCount += this._setAnswerFromDatabaseData(
-                answersData[i]
-            ).count();
+            this._setAnswerFromDatabaseData(answersData[i]);
+            answerCount += 1;
         }
         this._setOwnAnswerCounts(answerCount);
     }

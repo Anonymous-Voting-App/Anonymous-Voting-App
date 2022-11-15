@@ -137,7 +137,7 @@
             },
             "post": {
                 "tags": ["Poll public"],
-                "description": "Answers a sub-question of a poll's question. The questionId should be the id of the question to answer. The question type should be specified. Different question types are: \"free\" (free-form text question), \"multi\" (question containing sub-questions), \"number\" (number question), \"scale\" (number question with a specified range of allowed values).\n",
+                "description": "Answers all the poll's questions at once. All questions directly under the poll are mandatory and need to be answered. On the other hand, a sub-question of a multi-question follows the restrictions of the multi-question and thus may contain optional questions.",
                 "parameters": [
                     {
                         "in": "path",
@@ -171,9 +171,42 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/AddAnswer"
+                                "$ref": "#/components/schemas/PollAnswerRequest"
                             }
                         }
+                    }
+                }
+            }
+        },
+        "/api/poll/{publicId}/results": {
+            "get": {
+                "tags": ["Poll public"],
+                "description": "Returns answer result statistics about the poll. For each question result, .answerPercentage tells the ratio of the question's .answerCount to its parent's .answerCount. The parent of a sub-question is the multi-question containing it. On the other hand, the parent of a non-sub-question is the poll itself. .answerValueStatistics contains information about the answer counts for different answer values under a question. The .percentage of these statistic objects is the ratio of the statistic object's .count to the question's .answerCount.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "publicId",
+                        "description": "publicId of the poll to get results of.",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Information about the poll's answer results.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PollResults"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Poll not found"
                     }
                 }
             }
@@ -268,7 +301,8 @@
         "schemas": {
             "QuestionType": {
                 "type": "string",
-                "description": "One of: \"free\" (free-form text question), \"multi\" (question containing sub-questions), \"number\" (number question), \"scale\" (number question with a specified range of allowed values)."
+                "description": "One of: \"free\" (free-form text question), \"multi\" (question containing sub-questions), \"number\" (number question), \"scale\" (number question with a specified range of allowed values).",
+                "example": "free"
             },
             "AddPoll": {
                 "properties": {
@@ -424,6 +458,35 @@
                     }
                 }
             },
+            "PollResults": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Name of the poll"
+                    },
+                    "publicId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "questions": {
+                        "type": "array",
+                        "items": {
+                            "oneOf": [
+                                {
+                                    "$ref": "#/components/schemas/MultiQuestionResult"
+                                },
+                                {
+                                    "$ref": "#/components/schemas/QuestionResult"
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
             "AddAnswer": {
                 "properties": {
                     "questionId": {
@@ -431,27 +494,55 @@
                         "format": "uuid"
                     },
                     "type": {
-                        "$ref": "#/components/schemas/QuestionType"
+                        "type": "string",
+                        "example": "multi"
                     },
                     "answer": {
                         "oneOf": [
                             {
                                 "type": "object",
                                 "properties": {
-                                    "subQuestionId": {
-                                        "type": "string",
-                                        "format": "uuid"
+                                    "subQuestionIds": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        }
                                     },
                                     "answer": {
-                                        "type": "string"
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "answer": {
+                                                    "type": "string",
+                                                    "example": "test-text-value"
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             },
                             {
-                                "type": "string",
-                                "example": "test-text-value"
+                                "type": "object",
+                                "properties": {
+                                    "answer": {
+                                        "type": "string",
+                                        "example": "test-text-value"
+                                    }
+                                }
                             }
                         ]
+                    }
+                }
+            },
+            "PollAnswerRequest": {
+                "properties": {
+                    "answers": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/AddAnswer"
+                        }
                     }
                 }
             },
@@ -535,6 +626,97 @@
                         "example": 5
                     },
                     "step": {
+                        "type": "number",
+                        "example": 1
+                    }
+                }
+            },
+            "QuestionResult": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "title": {
+                        "type": "string",
+                        "example": "Title of the sub-question"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Description of the sub-question"
+                    },
+                    "pollId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "type": {
+                        "$ref": "#/components/schemas/QuestionType"
+                    },
+                    "answerCount": {
+                        "type": "number",
+                        "example": 1
+                    },
+                    "answerPercentage": {
+                        "type": "number",
+                        "example": 1
+                    },
+                    "answerValueStatistics": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/AnswerValueStatistic"
+                        }
+                    }
+                }
+            },
+            "MultiQuestionResult": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "title": {
+                        "type": "string",
+                        "example": "Title of the sub-question"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Description of the sub-question"
+                    },
+                    "pollId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "type": {
+                        "type": "string",
+                        "example": "multi"
+                    },
+                    "answerCount": {
+                        "type": "number",
+                        "example": 1
+                    },
+                    "answerPercentage": {
+                        "type": "number",
+                        "example": 1
+                    },
+                    "subQuestions": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/QuestionResult"
+                        }
+                    }
+                }
+            },
+            "AnswerValueStatistic": {
+                "properties": {
+                    "value": {
+                        "type": "string",
+                        "example": "true"
+                    },
+                    "count": {
+                        "type": "number",
+                        "example": 1
+                    },
+                    "percentage": {
                         "type": "number",
                         "example": 1
                     }

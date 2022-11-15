@@ -2,8 +2,10 @@
 
 Anonymous Voting App -project
 
+[![Production CI](https://github.com/Anonymous-Voting-App/Anonymous-Voting-App/actions/workflows/production_ci.yml/badge.svg)](https://github.com/Anonymous-Voting-App/Anonymous-Voting-App/actions/workflows/production_ci.yml)
 [![Staging CI](https://github.com/Anonymous-Voting-App/Anonymous-Voting-App/actions/workflows/staging_ci.yml/badge.svg)](https://github.com/Anonymous-Voting-App/Anonymous-Voting-App/actions/workflows/staging_ci.yml)
 [![codecov](https://codecov.io/gh/Anonymous-Voting-App/Anonymous-Voting-App/branch/dev/graph/badge.svg?token=JIZMP0Z6ZX)](https://codecov.io/gh/Anonymous-Voting-App/Anonymous-Voting-App)
+[![Cypress](https://img.shields.io/endpoint?url=https://dashboard.cypress.io/badge/simple/davogf/dev&style=flat&logo=cypress)](https://dashboard.cypress.io/projects/davogf/runs)
 
 ## Project structure
 

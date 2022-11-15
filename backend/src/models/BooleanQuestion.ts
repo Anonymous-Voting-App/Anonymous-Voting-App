@@ -50,14 +50,14 @@ export default class BooleanQuestion extends Question {
 
     /**
      * Whether given answer data object is acceptable to the question.
-     * The answer property of the object must be a boolean to be accepted.
+     * The answer property of the object must be true in order to be accepted.
+     * BooleanQuestions are never answered with false. The lack
+     * of an answer is taken to mean the question was
+     * answered false.
      */
 
     answerDataIsAcceptable(answerData: AnswerData): boolean {
-        return (
-            typeof answerData === 'object' &&
-            typeof answerData.answer === 'boolean'
-        );
+        return typeof answerData === 'object' && answerData.answer === true;
     }
 
     /**
