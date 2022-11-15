@@ -1,5 +1,6 @@
 import { sign, verify } from 'jsonwebtoken';
 import { Request } from 'express';
+import logger from '../utils/logger';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -12,8 +13,6 @@ export const signToken = (username: string) => {
 };
 
 export const verifyToken = (req: Request) => {
-    //let tokenHeaderKey = process.env.TOKEN_HEADER_KEY;
-    //let jwtSecretKey = process.env.JWT_SECRET_KEY;
     try {
         let token = req.headers.authorization;
 
@@ -32,8 +31,9 @@ export const verifyToken = (req: Request) => {
             // Access Denied
             return false;
         }
-    } catch (error) {
+    } catch (e: unknown) {
         // Access Denied
+        logger.error(`Error while verifying token: ${e}`);
         return false;
     }
 };

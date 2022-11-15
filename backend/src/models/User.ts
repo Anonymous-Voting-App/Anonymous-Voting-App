@@ -18,27 +18,6 @@ export default class User {
     _loadedFromDatabase = false;
     _database!: PrismaClient;
     _id = '';
-    _createdInDatabase = false;
-
-    /** Whether new user entry in database has been created from this instance. */
-    createdInDatabase(): boolean {
-        return this._createdInDatabase;
-    }
-
-    /** Sets value of createdInDatabase. */
-    setCreatedInDatabase(createdInDatabase: boolean): void {
-        pre(
-            'argument createdInDatabase is of type boolean',
-            typeof createdInDatabase === 'boolean'
-        );
-
-        this._createdInDatabase = createdInDatabase;
-
-        post(
-            '_createdInDatabase is createdInDatabase',
-            this._createdInDatabase === createdInDatabase
-        );
-    }
 
     /** Database id of user. */
     id(): string {
@@ -159,32 +138,6 @@ export default class User {
         }
 
         return result;
-    }
-
-    /**
-     * Makes new object in Prisma database from the values
-     * of the properties of this instance.
-     */
-    async createNewInDatabase(): Promise<void> {
-        const data = await this._database.user.create({
-            data: this.newDatabaseObject()
-        });
-
-        this.setFromDatabaseData(data);
-
-        this._createdInDatabase = true;
-    }
-
-    /**
-     * A new Prisma-compatible object used for when creating a
-     * database entry for the user.
-     */
-    newDatabaseObject(): IUser.NewUserDatabaseObject {
-        return {
-            name: 'dummy-name',
-            email: 'dummy-email',
-            password: 'dummy-password'
-        };
     }
 
     /**

@@ -1,6 +1,7 @@
 import prisma from '../utils/prismaHandler';
 import bcrypt from 'bcryptjs';
 import * as IAccountManager from './IAccountManager';
+import logger from '../utils/logger';
 
 /**
  * A service for accessing and editing the anonymous
@@ -37,16 +38,15 @@ export const CreateUser = async (
                     password: await bcrypt.hash(password, 10),
                     username: username,
                     firstname: firstName,
-                    lastname: lastName,
-                    name: ''
+                    lastname: lastName
                 }
             });
             return 200;
         } else {
             return 400;
         }
-    } catch (e) {
-        console.log(e);
+    } catch (e: unknown) {
+        logger.error(`Error while creating user: ${e}`);
         return 500;
     }
 };
@@ -54,7 +54,7 @@ export const CreateUser = async (
 export const verify = async (
     username: string,
     password: string
-): Promise<any> => {
+): Promise<IAccountManager.UserData | null> => {
     try {
         const existingUser = await _prisma.user.findFirst({
             where: {
@@ -65,25 +65,27 @@ export const verify = async (
         // returning an user if also password is correct. Don't give info if email existed.
         if (existingUser === null) {
             return null;
-        } else {
-            const validpassword = await bcrypt.compare(
-                password,
-                existingUser.password
-            );
-            console.log(password);
-            console.log(existingUser.password);
-            if (validpassword) {
-                const data: IAccountManager.userData = {
-                    firstName: existingUser.firstname,
-                    lastName: existingUser.lastname,
-                    email: existingUser.email,
-                    userName: existingUser.username
-                };
-                return data;
-            }
-            return null;
         }
-    } catch (e: any) {
+
+        const validpassword = await bcrypt.compare(
+            password,
+            existingUser.password
+        );
+
+        if (validpassword) {
+            const data: IAccountManager.UserData = {
+                firstName: existingUser.firstname,
+                lastName: existingUser.lastname,
+                email: existingUser.email,
+                userName: existingUser.username
+            };
+
+            return data;
+        }
+
+        return null;
+    } catch (e: unknown) {
+        logger.error(`Error while verifying JWT: ${e}`);
         return null;
     }
 };
@@ -101,7 +103,8 @@ export const isAdmin = async (username: string): Promise<boolean> => {
         } else {
             return existingUser.isAdmin;
         }
-    } catch (e: any) {
+    } catch (e: unknown) {
+        logger.error(`Error while checking for admin: ${e}`);
         return false;
     }
 };
