@@ -6,7 +6,7 @@ import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 
 const ResultOption = (props: any) => {
-    console.log(props.optionData);
+    // console.log(props.optionData);
     const { optionData, highestCount, totalCount, type } = props;
     const showIcon = highestCount === optionData.count ? true : false;
 

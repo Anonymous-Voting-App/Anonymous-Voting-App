@@ -166,6 +166,7 @@ const formatFreeTextOptions = (options: [any]) => {
     });
     return formattedTextOptions;
 };
+
 const formatMultiTypeOptions = (options: [any]) => {
     console.log(options);
     const formattedOptions = options.map((option) => {
@@ -210,7 +211,6 @@ const formatRatingOptions = (options: [any]) => {
                 : respOptions.find((item) => item.value === arr.title);
         return obj;
     });
-    console.log(ratingTypeOptions);
     // for fixing title - value keys
     ratingTypeOptions = ratingTypeOptions.map((option) => {
         return {

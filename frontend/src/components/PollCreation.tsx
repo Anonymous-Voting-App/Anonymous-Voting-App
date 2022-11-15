@@ -124,7 +124,7 @@ function PollCreation(props: any) {
             }
             return question;
         });
-        console.log(newQuestions, 'QUESTIONLIST');
+        // console.log(newQuestions, 'QUESTIONLIST');
         setQuestions(newQuestions);
     };
 

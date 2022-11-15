@@ -1,4 +1,4 @@
-import { Button, Paper, Typography } from '@mui/material';
+import { Button, Link, Paper, Typography } from '@mui/material';
 import './ResultCard.scss';
 import { ResultOptionObj } from '../utils/types';
 import ResultOption from './ResultOption';
@@ -8,6 +8,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 const ResultCard = (props: any) => {
     const options: ResultOptionObj[] = props.ques.options;
+    // console.log(options)
     const fileType =
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
     const fileExtension = '.xlsx';
@@ -70,19 +71,17 @@ const ResultCard = (props: any) => {
             </div>
             {quesType === 'Free text' ? (
                 <div className="free-text-export">
-                    <div>
-                        <MoreVertIcon></MoreVertIcon>
-                    </div>
-                    {/* <div className='separator'>.</div>
-                <div className='separator'>.</div>
-                <div >.</div> */}
-                    <Button
-                        className="searchButton"
-                        variant="outlined"
-                        onClick={handleExport}
-                    >
-                        Export Data
-                    </Button>
+                    {options.length === 1 &&
+                    options[0].title === 'No feedback' ? null : (
+                        <>
+                            <div>
+                                <MoreVertIcon></MoreVertIcon>
+                            </div>
+                            <div className="export-link">
+                                <Link onClick={handleExport}>Export Data</Link>
+                            </div>
+                        </>
+                    )}
                 </div>
             ) : null}
         </Paper>

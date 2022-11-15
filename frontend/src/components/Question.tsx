@@ -12,7 +12,8 @@ import {
     KeyboardArrowDown,
     AddCircleOutline,
     RemoveCircleOutline,
-    HighlightOff
+    HighlightOff,
+    Close
 } from '@mui/icons-material';
 import InputAdornment from '@mui/material/InputAdornment';
 import './Question.scss';
@@ -26,6 +27,14 @@ function Question(props: any) {
         { title: '', description: '', type: '' }
     ]);
     useEffect(() => {
+        if (
+            props.ques.visualType === 'radioBtn' ||
+            props.ques.visualType === 'checkBox'
+        ) {
+            setShowOptionBtn(true);
+        } else {
+            setShowOptionBtn(false);
+        }
         setQuesOptions(props.ques.subQuestions);
     }, [props.ques.subQuestions]);
 
@@ -99,6 +108,9 @@ function Question(props: any) {
     return (
         <>
             <Paper className="question-wrapper" elevation={3}>
+                <div className="close-icon">
+                    <Close onClick={() => removeQuestion()} />
+                </div>
                 <FormControl
                     className="type-dropdown"
                     sx={{ m: 1, minWidth: 120 }}
