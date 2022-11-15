@@ -145,5 +145,5 @@ resource "aws_iam_role_policy_attachment" "attach_allow_get_db_secret" {
 
 resource "aws_iam_role_policy_attachment" "attach_allow_get_jwt_secret" {
   role       = aws_iam_role.ecs_task_execution_role.name
-  policy_arn = aws_iam_policy.allow_get_jwt_secret
+  policy_arn = aws_iam_policy.allow_get_jwt_secret.arn
 }
