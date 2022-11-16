@@ -6,37 +6,42 @@ const updatePollBody = (questions: PollQuesObj[]) => {
     const updatedQuestions = questions.map(
         ({ subQuestions, minAnswers, maxAnswers, ...element }) => {
             console.log(element.visualType);
-
+            let quesObj;
             switch (element.visualType) {
                 case 'radioBtn':
                 case 'checkBox':
-                    return {
+                    quesObj = {
                         type: 'multi',
                         subQuestions: subQuestions,
                         minAnswers: minAnswers,
                         maxAnswers: maxAnswers,
                         ...element
                     };
+                    break;
                 case 'star':
-                    return {
+                    quesObj = {
                         type: 'scale',
                         step: 1,
                         minValue: 1,
                         maxValue: 5,
                         ...element
                     };
+                    break;
                 case 'yesNo':
                 case 'upDown':
-                    return {
+                    quesObj = {
                         type: 'boolean',
                         ...element
                     };
+                    break;
                 case 'free':
-                    return {
+                    quesObj = {
                         type: 'free',
                         ...element
                     };
+                    break;
             }
+            return quesObj;
             // if (element.type === 'radioBtn' || element.type === 'checkBox')
             //     return { ...element, visualType: element.type, type: 'multi' };
             // else return element;

@@ -41,7 +41,7 @@ function Question(props: any) {
             setShowOptionBtn(false);
         }
         setQuesOptions(props.ques.subQuestions);
-    }, [props.ques.subQuestions]);
+    }, [props.ques.subQuestions, props.ques.visualType]);
 
     /**
      * Function to pass entered question text to pollcreation page(parent)
@@ -90,6 +90,9 @@ function Question(props: any) {
         });
         setQuesOptions(newOptions);
         props.optionInputHandler(newOptions, props.ind);
+        setShrink({ ...shrink, option: true });
+        setNotched({ ...notched, option: true });
+        setMove({ ...move, option: 'option-label' });
     };
 
     /**
@@ -98,10 +101,11 @@ function Question(props: any) {
      * @param value - option text
      */
     const onOptionInput = (index: number, value: string, type: string) => {
-        setShrink({ ...shrink, option: true });
-        setNotched({ ...notched, option: true });
-        setMove({ ...move, option: 'option-label' });
-
+        if (value) {
+            setShrink({ ...shrink, option: true });
+            setNotched({ ...notched, option: true });
+            setMove({ ...move, option: 'option-label' });
+        }
         const newOptions = quesOptions.map((quesOption, optionIndex) => {
             if (optionIndex === index) {
                 return { title: value, description: value, type: 'boolean' };
@@ -116,6 +120,9 @@ function Question(props: any) {
         props.questionRemovalHandler(props.ind);
         // console.log(props, 'props after ques removal');
         setQuesOptions(props.ques.subQuestions);
+        setShrink({ ...shrink, option: true });
+        setNotched({ ...notched, option: true });
+        setMove({ ...move, option: 'option-label' });
     };
 
     return (

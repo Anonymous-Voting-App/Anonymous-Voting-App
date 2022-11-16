@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import PollCreation from '../PollCreation';
-import UserEvent from '@testing-library/user-event';
+// import UserEvent from '@testing-library/user-event';
 
 test('Renders page heading', () => {
     render(<PollCreation />);

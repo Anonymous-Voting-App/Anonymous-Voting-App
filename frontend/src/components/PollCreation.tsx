@@ -38,7 +38,6 @@ function PollCreation(props: any) {
             ) === -1
                 ? false
                 : true;
-        console.log(isEmpty);
         setEmptyFlag(isEmpty);
     }, [questions]);
 

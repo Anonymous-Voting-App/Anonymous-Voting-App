@@ -1,4 +1,4 @@
-import { Button, Link, Paper, Typography } from '@mui/material';
+import { Link, Paper, Typography } from '@mui/material';
 import './ResultCard.scss';
 import { ResultOptionObj } from '../utils/types';
 import ResultOption from './ResultOption';
