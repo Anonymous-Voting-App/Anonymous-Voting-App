@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import {
-    TextField,
     Button,
     FormControl,
     InputLabel,
     Select,
     MenuItem,
-    Paper
+    Paper,
+    OutlinedInput
 } from '@mui/material';
 import {
     KeyboardArrowDown,
@@ -20,7 +20,12 @@ import './Question.scss';
 import { QUESTION_TYPES } from './constants';
 
 function Question(props: any) {
-    // console.log(props);
+    const [shrink, setShrink] = useState({ ques: false, option: false });
+    const [notched, setNotched] = useState({ ques: false, option: false });
+    const [move, setMove] = useState({
+        ques: 'move-ques-label',
+        option: 'move-option-label'
+    }); //'move-label'
     const [showOptionBtn, setShowOptionBtn] = useState(false);
     const [quesOptions, setQuesOptions] = useState([
         { title: '', description: '', type: '' },
@@ -42,7 +47,11 @@ function Question(props: any) {
      * Function to pass entered question text to pollcreation page(parent)
      * @param value
      */
-    const onQuestionInput = (value: string) => {
+    const onQuestionInput = (value: string, type: string) => {
+        setShrink({ ...shrink, ques: true });
+        setNotched({ ...notched, ques: true });
+        setMove({ ...move, ques: 'ques-label' });
+
         props.questionInputHandler(value, props.ind);
     };
 
@@ -88,7 +97,11 @@ function Question(props: any) {
      * @param index - index of question for which options are added
      * @param value - option text
      */
-    const onOptionInput = (index: number, value: string) => {
+    const onOptionInput = (index: number, value: string, type: string) => {
+        setShrink({ ...shrink, option: true });
+        setNotched({ ...notched, option: true });
+        setMove({ ...move, option: 'option-label' });
+
         const newOptions = quesOptions.map((quesOption, optionIndex) => {
             if (optionIndex === index) {
                 return { title: value, description: value, type: 'boolean' };
@@ -107,7 +120,7 @@ function Question(props: any) {
 
     return (
         <>
-            <Paper className="question-wrapper" elevation={3}>
+            <Paper className="question-wrapper main-wrap" elevation={3}>
                 <div className="close-icon">
                     <Close onClick={() => removeQuestion()} />
                 </div>
@@ -136,17 +149,26 @@ function Question(props: any) {
                         <MenuItem value={'checkBox'}>Multi - choice</MenuItem> */}
                     </Select>
                 </FormControl>
-                <TextField
-                    autoComplete="off"
-                    className="question-field"
-                    onChange={(event) => onQuestionInput(event.target.value)}
-                    type="text"
-                    value={props.ques.title}
-                    variant="outlined"
-                    inputProps={{ 'data-testid': 'question-field' }}
-                    multiline
-                    InputProps={{
-                        startAdornment: (
+                <FormControl className="question-field">
+                    <InputLabel
+                        id="question-label"
+                        shrink={shrink.ques}
+                        className={move.ques}
+                    >
+                        Enter question
+                    </InputLabel>
+                    <OutlinedInput
+                        notched={notched.ques}
+                        label="Enter question"
+                        autoComplete="off"
+                        onChange={(event) =>
+                            onQuestionInput(event.target.value, 'ques')
+                        }
+                        type="text"
+                        value={props.ques.title}
+                        inputProps={{ 'data-testid': 'question-field' }}
+                        multiline
+                        startAdornment={
                             <InputAdornment position="start">
                                 <span
                                     className="adornment-span"
@@ -155,19 +177,31 @@ function Question(props: any) {
                                     <HighlightOff />
                                 </span>
                             </InputAdornment>
-                        )
-                    }}
-                />
+                        }
+                    />
+                </FormControl>
                 {showOptionBtn ? (
                     <>
                         {quesOptions.map((quesOption, index) => (
-                            <TextField
-                                inputProps={{
-                                    'data-testid': `option-field-${index}`
-                                }}
+                            <FormControl
+                                key={`form-${index}`}
                                 className="option-field"
-                                InputProps={{
-                                    startAdornment: (
+                            >
+                                <InputLabel
+                                    key={`option-${index}`}
+                                    id="option-label"
+                                    shrink={shrink.option}
+                                    className={move.option}
+                                >
+                                    Enter option
+                                </InputLabel>
+                                <OutlinedInput
+                                    inputProps={{
+                                        'data-testid': `option-field-${index}`
+                                    }}
+                                    notched={notched.option}
+                                    label="Enter option"
+                                    startAdornment={
                                         <InputAdornment position="start">
                                             <span
                                                 className="adornment-span"
@@ -179,17 +213,20 @@ function Question(props: any) {
                                                 <RemoveCircleOutline />
                                             </span>
                                         </InputAdornment>
-                                    )
-                                }}
-                                autoComplete="off"
-                                variant="outlined"
-                                onChange={(event) =>
-                                    onOptionInput(index, event.target.value)
-                                }
-                                key={index}
-                                type="text"
-                                value={quesOption.title}
-                            />
+                                    }
+                                    autoComplete="off"
+                                    onChange={(event) =>
+                                        onOptionInput(
+                                            index,
+                                            event.target.value,
+                                            'option'
+                                        )
+                                    }
+                                    key={index}
+                                    type="text"
+                                    value={quesOption.title}
+                                />
+                            </FormControl>
                         ))}
                         <Button
                             className="add-option-btn"

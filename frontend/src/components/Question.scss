@@ -19,126 +19,146 @@
 }
 
 .question-wrapper {
-    margin-top: 4.5rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    border-radius: 20px;
-    border: 1px solid $black;
-    padding: 1.25rem;
-    background-color: $background-color;
-}
-
-.type-dropdown {
-    .MuiFormLabel-root {
-        left: 4.25rem;
+    .main-wrap {
+        margin-top: 4.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        border-radius: 20px;
+        border: 1px solid $black;
+        padding: 1.25rem;
+        background-color: $background-color;
     }
 
-    .MuiOutlinedInput-notchedOutline {
-        border: none;
+    .type-dropdown {
+        margin-top: 0;
+        margin-bottom: 1.25rem;
+        .MuiFormLabel-root {
+            left: 4.25rem;
+        }
+
+        .MuiOutlinedInput-notchedOutline {
+            border: none;
+        }
+
+        .MuiInputLabel-shrink {
+            display: none;
+        }
+
+        .MuiInputBase-root {
+            background-color: $melon;
+            border-radius: 1.25rem;
+            min-width: 16.25rem;
+            border: 1px solid $main-color;
+
+            .MuiSvgIcon-root {
+                left: 1.875rem;
+            }
+        }
     }
 
-    .MuiInputLabel-shrink {
-        display: none;
+    .question-field,
+    .option-field {
+        .MuiInputBase-root {
+            width: 16.25rem;
+            border-radius: 1.25rem;
+            min-height: 2.5rem;
+            margin-bottom: 1.25rem;
+            .MuiOutlinedInput-notchedOutline {
+                border: 1px solid $main-color;
+            }
+        }
+        // .MuiOutlinedInput-notchedOutline {
+        //     border: none;
+        // }
+        .label.Mui-focused {
+            color: $main-color;
+        }
+        .MuiInputLabel-shrink {
+            position: absolute;
+        }
+        .ques-label,
+        .option-label {
+            color: $main-color;
+            font-size: medium;
+            // .MuiOutlinedInput-notchedOutline {
+            //     border: none;
+            // }
+        }
+        .move-ques-label,
+        .move-option-label {
+            margin-left: 4rem;
+            color: $placeholder-text-color;
+            font-size: 1rem;
+        }
+        .adornment-span {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
     }
 
-    .MuiInputBase-root {
-        background-color: $melon;
-        border-radius: 1.25rem;
-        min-width: 16.25rem;
-        border: 1px solid $main-color;
+    .close-icon {
+        display: flex;
+        justify-content: right;
+        width: 100%;
 
         .MuiSvgIcon-root {
-            left: 1.875rem;
+            position: relative;
+            cursor: pointer;
+            right: -5rem;
+            width: 1.2rem;
+            height: 1.2rem;
+
+            @include for-phone-only {
+                right: -2rem;
+            }
+
+            @include for-tablet-landscape-up {
+                right: -5rem;
+            }
+
+            @include for-tablet-portrait-up {
+                right: -3rem;
+            }
         }
     }
-}
 
-.question-field {
-    .MuiInputBase-root {
-        min-width: 16.25rem;
-        border-radius: 1.25rem;
-        min-height: 2.5rem;
-        border: 1px solid $main-color;
-        margin-top: 1.25rem;
-        margin-bottom: 1.25rem;
+    .option-field {
+        .MuiInputBase-root {
+            width: 14.5rem;
+            height: 2.5rem;
+            margin-bottom: 0.9rem;
+        }
+        .MuiInputLabel-root {
+            position: absolute;
+            top: -6px;
+        }
+
+        .MuiInputLabel-shrink {
+            position: absolute;
+            top: 0px;
+        }
     }
 
-    .MuiOutlinedInput-notchedOutline {
-        border: none;
-    }
-
-    .adornment-span {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        cursor: pointer;
-    }
-}
-
-.close-icon {
-    display: flex;
-    justify-content: right;
-    width: 100%;
-
-    .MuiSvgIcon-root {
-        position: relative;
-        cursor: pointer;
-        right: -5rem;
-        width: 1.2rem;
-        height: 1.2rem;
+    .add-option-btn,
+    .add-option-btn:hover {
+        margin-top: none;
+        border-radius: 20px;
+        width: 14.5rem;
+        margin-top: 0;
+        color: $main-color;
+        background-color: $clay;
+        text-transform: none;
+        border: 2px solid $main-color;
 
         @include for-phone-only {
-            right: -2rem;
+            font-size: 2.5rem;
         }
 
-        @include for-tablet-landscape-up {
-            right: -5rem;
+        .MuiSvgIcon-root {
+            margin-right: 0.625rem;
         }
-
-        @include for-tablet-portrait-up {
-            right: -3rem;
-        }
-    }
-}
-
-.option-field {
-    .MuiInputBase-root {
-        width: 14.5rem;
-        border-radius: 1.25rem;
-        height: 2.5rem;
-        border: 1px solid $main-color;
-        margin-bottom: 0.625rem;
-    }
-
-    .MuiOutlinedInput-notchedOutline {
-        border: none;
-    }
-
-    .adornment-span {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        cursor: pointer;
-    }
-}
-
-.add-option-btn,
-.add-option-btn:hover {
-    margin-top: none;
-    border-radius: 20px;
-    width: 14.5rem;
-    margin-top: 0;
-    color: $main-color;
-    background-color: $clay;
-    text-transform: none;
-    border: 2px solid $main-color;
-
-    @include for-phone-only {
-        font-size: 2.5rem;
-    }
-
-    .MuiSvgIcon-root {
-        margin-right: 0.625rem;
     }
 }
