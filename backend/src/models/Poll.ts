@@ -6,9 +6,6 @@ import * as IPolling from './IPolling';
 import * as IPoll from './IPoll';
 import * as IQuestion from './IQuestion';
 import * as IUser from './IUser';
-/* import * as IAnswer from './IAnswer'; */
-/* import MultiQuestionCollection from './MultiQuestionCollection'; */
-/* import MultiQuestion from './MultiQuestion'; */
 import { PrismaClient } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 import QuestionFactory from './QuestionFactory';
