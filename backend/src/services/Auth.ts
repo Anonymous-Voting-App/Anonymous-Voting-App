@@ -13,28 +13,27 @@ export const signToken = (data: UserData) => {
     return sign(data, JWT_SECRET, { expiresIn: '48h', subject: data.id });
 };
 
-export const verifyToken = (req: Request) => {
+export const verifyToken = (req: Request): UserData | null => {
     try {
-        let token = req.headers.authorization;
+        const token = req.headers.authorization;
 
         if (token === null || token === undefined) {
-            return false;
+            return null;
         }
 
-        const value = token.split(' ');
-        const bearer = value[1];
-        token = bearer;
+        const values = token.split(' ');
+        const bearer = values[1];
 
-        const verified = verify(token, JWT_SECRET);
+        const verified = verify(bearer, JWT_SECRET);
         if (verified) {
-            return true;
+            return verified as UserData;
         } else {
             // Access Denied
-            return false;
+            return null;
         }
     } catch (e: unknown) {
         // Access Denied
         logger.error(`Error while verifying token: ${e}`);
-        return false;
+        return null;
     }
 };

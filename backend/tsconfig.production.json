@@ -8,5 +8,6 @@
         "strict": true,
         "resolveJsonModule": true
     },
-    "exclude": ["**/*.test.ts", "**/prisma_singleton.ts"]
+    "exclude": ["**/*.test.ts", "**/prisma_singleton.ts"],
+    "files": ["./src/types/express/index.d.ts"]
 }
