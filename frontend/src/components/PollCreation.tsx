@@ -28,7 +28,7 @@ function PollCreation(props: any) {
     const [pollName, setPollName] = useState('');
     const [showCount, setShowCount] = useState(false);
     const [emptyFlag, setEmptyFlag] = useState(true);
-
+    const [addBtnDisable, setAddBtnDisable] = useState(false);
     useEffect(() => {
         const isEmpty =
             questions.findIndex(
@@ -39,7 +39,7 @@ function PollCreation(props: any) {
             ) === -1
                 ? false
                 : true;
-        // console.log(isEmpty)
+        console.log(isEmpty);
         setEmptyFlag(isEmpty);
     }, [questions]);
 
@@ -80,6 +80,12 @@ function PollCreation(props: any) {
      * Function to add empty object to array when add question btn is clicked
      */
     const addQuestion = () => {
+        if (questions.length === 1) {
+            console.log('sdsd');
+            setAddBtnDisable(true);
+        } else {
+            setAddBtnDisable(false);
+        }
         setShowQuesContainer(true);
         // console.log(questions,'after questions added')
         //    condition check to handle empty question type,
@@ -132,6 +138,12 @@ function PollCreation(props: any) {
             return i !== index;
         });
         setQuestions(updatedQuestions);
+        if (questions.length === 1) {
+            console.log('sdsd');
+            setAddBtnDisable(true);
+        } else {
+            setAddBtnDisable(false);
+        }
     };
 
     /**
@@ -256,15 +268,34 @@ function PollCreation(props: any) {
                     </div>
                 ) : null}
 
-                <Button
-                    className="add-ques-btn"
-                    onClick={addQuestion}
-                    sx={{ mt: '4.5rem', width: 200 }}
-                    variant="outlined"
-                >
-                    <AddCircleOutline />
-                    Add a question
-                </Button>
+                {questions.length === 1 ? (
+                    <Button
+                        disabled={
+                            questions[0].visualType === 'radioBtn' ||
+                            questions[0].visualType === 'checkBox'
+                                ? emptyFlag || pollName === ''
+                                : pollName === '' || addBtnDisable
+                        }
+                        className="add-ques-btn"
+                        onClick={addQuestion}
+                        sx={{ mt: '4.5rem', width: 200 }}
+                        variant="outlined"
+                    >
+                        <AddCircleOutline />
+                        Add a question
+                    </Button>
+                ) : (
+                    <Button
+                        className="add-ques-btn"
+                        onClick={addQuestion}
+                        sx={{ mt: '4.5rem', width: 200 }}
+                        variant="outlined"
+                        disabled={emptyFlag === true || pollName === ''}
+                    >
+                        <AddCircleOutline />
+                        Add a question
+                    </Button>
+                )}
             </div>
             <FormControlLabel
                 className="vote-count-toggle-btn"
