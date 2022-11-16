@@ -78,7 +78,12 @@ const ResultCard = (props: any) => {
                                 <MoreVertIcon></MoreVertIcon>
                             </div>
                             <div className="export-link">
-                                <Link onClick={handleExport}>Export Data</Link>
+                                <Link
+                                    className="pinkLink"
+                                    onClick={handleExport}
+                                >
+                                    Export Data
+                                </Link>
                             </div>
                         </>
                     )}
