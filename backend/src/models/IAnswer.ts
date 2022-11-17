@@ -6,6 +6,7 @@ export interface DatabaseData {
     voterId: string;
     voter?: IFingerprint.DatabaseData;
     parentId: string | null;
+    pollId: string;
     subVotes?: Array<DatabaseData>;
     value: string;
 }
@@ -15,6 +16,7 @@ export interface NewAnswerData {
     value: string;
     voterId: string;
     parentId: string | null;
+    pollId: string;
     subVotes?: Array<NewAnswerData>;
 }
 

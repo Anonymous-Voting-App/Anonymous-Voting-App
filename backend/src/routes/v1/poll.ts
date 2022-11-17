@@ -27,7 +27,7 @@ router.get('/:publicId/answers', getPollAnswers);
 /**
  * Get results of a poll
  */
-router.get('/:publicId/results', requireUser(), getPollResults);
+router.get('/:publicId/results', getPollResults);
 
 /**
  * Answer poll

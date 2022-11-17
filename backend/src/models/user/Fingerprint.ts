@@ -133,6 +133,24 @@ export default class Fingerprint {
         }
     }
 
+    /**
+     * 
+     */
+    
+    _setFromCreatedDbData( data: IFingerprint.DatabaseData | undefined ): void {
+        
+        if ( typeof data === "object" ) {
+            
+            this.setFromDatabaseData( data );
+            
+        } else {
+            
+            throw new Error( "Error: Could not create fingerprint in database." );
+            
+        }
+        
+    }
+
     constructor(database: PrismaClient) {
         this._database = database;
     }
@@ -211,11 +229,39 @@ export default class Fingerprint {
     }
 
     /**
+     * 
+     */
+    
+     newDatabaseObject(  ): IFingerprint.NewDbObject {
+        
+        let obj = {  };
+
+        for ( let i = 0; i < this._identifiers.length; i++ ) {
+            
+            var identifier = this._identifiers[i];
+            
+            identifier.addToNewDatabaseObject( obj );
+            
+        }
+
+        return obj;
+        
+    }
+
+    /**
      *
      */
 
     async createNewInDatabase(): Promise<void> {
         
+        var data = await this._database.fingerprint.create( {
+            
+            data: this.newDatabaseObject(  )
+            
+        } );
+
+        this._setFromCreatedDbData( data );
+
     }
 
     /**
@@ -235,8 +281,8 @@ export default class Fingerprint {
      */
 
     async loadFromDatabase(): Promise<void> {
-        /* const data = await this.database(  ).userIdentity.findFirst( 
-            this.findSelfInDatabaseQuery(  )
+        const data = await this.database(  ).fingerprint.findFirst( 
+            this.findSelfInDatabaseQuery(  ) as any
         );
 
         if ( data !== null ) {
@@ -244,7 +290,7 @@ export default class Fingerprint {
             this.setFromDatabaseData( data );
             this.setWasFoundInDatabase( true );
             
-        } */
+        }
     }
 
     /**
@@ -261,5 +307,19 @@ export default class Fingerprint {
         }
 
         return obj;
+    }
+
+    /**
+     * 
+     */
+    
+    async ensureExistsInDatabase(  ): Promise<void> {
+        
+        if ( !this.wasFoundInDatabase(  ) ) {
+            
+            await this.createNewInDatabase(  );
+            
+        }
+        
     }
 }

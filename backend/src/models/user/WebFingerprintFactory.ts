@@ -67,11 +67,23 @@ export default class WebFingerprintFactory {
         post('_database is database', this._database === database);
     }
 
+    _stripIPV6Prefix( ip: string ) {
+        
+        if ( ip.includes( "::ffff:" ) ) {
+            
+            return ip.replace( "::ffff:", "" );
+            
+        }
+
+        return ip;
+        
+    }
+
     _ipFromRequest(req: Request) {
         const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
 
         if (typeof ip === 'string') {
-            return Array.isArray(ip) ? ip[0] : ip;
+            return this._stripIPV6Prefix( Array.isArray(ip) ? ip[0] : ip );
         } else {
             // Temporary
             throw new Error('Error: Internal server error');

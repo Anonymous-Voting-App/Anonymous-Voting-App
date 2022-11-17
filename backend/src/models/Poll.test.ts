@@ -25,8 +25,19 @@ describe('Poll', () => {
                 questionId: 'question-id',
                 parentId: null,
                 value: 'answer',
-                voterId: '1'
+                voterId: '1',
+                pollId: "p1",
             });
+            prismaMock.fingerprint.create.mockResolvedValue( {
+                
+                id: '',
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                ip: "ip",
+                idCookie: "idCookie",
+                fingerprintJsId: "fingerprintJsId"
+                
+            } );
 
             const poll = new Poll(prismaMock, new QuestionFactory(prismaMock));
             poll.setId('pollId');
@@ -45,6 +56,12 @@ describe('Poll', () => {
             poll.questions()[question.id()] = question;
 
             const user = makeAnswerer();
+
+            poll.hasBeenAnsweredBy = async (  ) => {
+                
+                return false;
+                
+            };
 
             await poll.answer(
                 [
@@ -67,10 +84,12 @@ describe('Poll', () => {
             );
             expect(poll.answerCount()).toBe(1);
             expect(prismaMock.poll.update).toHaveBeenCalled();
+
         });
         test('Double answering is blocked', async () => {
             const poll = new Poll(prismaMock, new QuestionFactory(prismaMock));
             poll.setId('1');
+            poll.setPublicId( "p1" );
 
             const question = new Question();
             question.setId('question-id');
@@ -78,10 +97,11 @@ describe('Poll', () => {
 
             const user = makeAnswerer();
 
-            Fingerprint.prototype.loadFromDatabase = jest.fn();
+            Fingerprint.prototype.loadFromDatabase = jest.fn().mockResolvedValueOnce( null );
             Fingerprint.prototype.wasFoundInDatabase = jest
                 .fn()
-                .mockResolvedValue(true);
+                .mockReturnValueOnce(true);
+            prismaMock.vote.count.mockResolvedValueOnce( 1 );
 
             try {
                 await poll.answer(
@@ -98,9 +118,10 @@ describe('Poll', () => {
 
                 expect(true).toBe(false);
             } catch (e) {
+                console.log( e );
                 if (e instanceof Error) {
                     expect(e.message).toBe(
-                        'User does not have right to answer poll 1.'
+                        'User does not have right to answer poll p1.'
                     );
                 } else {
                     expect(true).toBe(false);
@@ -129,6 +150,7 @@ describe('Poll', () => {
                             questionId: '1',
                             value: 'value',
                             voterId: '1',
+                            pollId: "p1",
                             parentId: null,
                             voter: {
                                 ip: '',
@@ -371,7 +393,8 @@ describe('Poll', () => {
                         questionId: '1',
                         value: 'value',
                         parentId: '1',
-                        voterId: '1'
+                        voterId: '1',
+                        pollId: "p1",
                     }
                 ],
                 options: []

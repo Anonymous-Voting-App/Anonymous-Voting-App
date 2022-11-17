@@ -9,7 +9,8 @@ import QuestionFactory from '../models/QuestionFactory';
 import { AssertionError } from 'assert';
 import BadRequestError from '../utils/badRequestError';
 import WebFingerprintFactory from '../models/user/WebFingerprintFactory';
-import Fingerprint from '../models/user/IdentifyingFeature';
+import Fingerprint from '../models/user/Fingerprint';
+import ForbiddenError from '../utils/forbiddenError';
 
 const internalServerError = (
     method: string,
@@ -20,23 +21,52 @@ const internalServerError = (
     return responses.internalServerError(req, res);
 };
 
-function makeIdentityFactory() {
-    const identityFactory = new WebFingerprintFactory(prisma);
+function makeFingerprintFactory() {
+    const fingerprintFactory = new WebFingerprintFactory(prisma);
 
-    identityFactory.setUseIp(true);
-    identityFactory.setUseCookie(true);
+    fingerprintFactory.setUseIp(true);
+    fingerprintFactory.setUseCookie(true);
 
-    return identityFactory;
+    return fingerprintFactory;
 }
 
 function makeFingerprint(req: Request) {
-    const identityFactory = makeIdentityFactory();
+    const fingerprintFactory = makeFingerprintFactory();
 
-    const userIdentity = identityFactory.createFromExpressRequest(req);
+    const fingerprint = fingerprintFactory.createFromExpressRequest(req);
 
-    userIdentity.setSamenessCheck('oneOf');
+    fingerprint.setSamenessCheck('oneOf');
 
-    return userIdentity;
+    return fingerprint;
+}
+
+function handleServiceError( 
+    req: Request,
+    res: Response,
+    e: unknown ) {
+    
+    // Bad request
+    if (e instanceof AssertionError) {
+        Logger.warn(`Bad Request: ${e.message}`);
+        Logger.warn(e.stack);
+        return responses.badRequest(req, res);
+    } else if (e instanceof BadRequestError) {
+        Logger.warn(`Bad Request: ${e.message}`);
+        Logger.warn(e.stack);
+        return responses.badRequest(req, res);
+    } else if ( e instanceof ForbiddenError ) {
+        Logger.warn(`Forbidden: ${e.message}`);
+        Logger.warn(e.stack);
+        return responses.forbidden(req, res, e);
+    }
+
+    if (e instanceof Error) {
+        Logger.error(e.message);
+        Logger.error(e.stack);
+    }
+
+    return responses.internalServerError(req, res);
+    
 }
 
 const callService = async (
@@ -45,7 +75,7 @@ const callService = async (
     res: Response
 ): Promise<Response> => {
     const service = new VotingService(prisma, new QuestionFactory(prisma));
-    const userIdentity = makeFingerprint(req);
+    const fingerprint = makeFingerprint(req);
 
     try {
         if (typeof service[method] !== 'function') {
@@ -54,12 +84,12 @@ const callService = async (
 
         type serviceFunction = (
             body: string | IPolling.PollRequest | IVotingService.AnswerData,
-            userIdentity: Fingerprint
+            fingerprint: Fingerprint
         ) => IPolling.PollData | IPolling.AnswerData | null;
 
         const poll = await (service[method] as unknown as serviceFunction)(
             req.body,
-            userIdentity
+            fingerprint
         );
 
         // Poll not found
@@ -80,23 +110,7 @@ const callService = async (
 
         return internalServerError(method, req, res);
     } catch (e: unknown) {
-        // Bad request
-        if (e instanceof AssertionError) {
-            Logger.warn(`Bad Request: ${e.message}`);
-            Logger.warn(e.stack);
-            return responses.badRequest(req, res);
-        } else if (e instanceof BadRequestError) {
-            Logger.warn(`Bad Request: ${e.message}`);
-            Logger.warn(e.stack);
-            return responses.badRequest(req, res);
-        }
-
-        if (e instanceof Error) {
-            Logger.error(e.message);
-            Logger.error(e.stack);
-        }
-
-        return responses.internalServerError(req, res);
+        return handleServiceError( req, res, e );
     }
 };
 

@@ -31,6 +31,7 @@ describe('Question', () => {
                 questionId: 'test-question-id',
                 parentId: null,
                 voterId: '1',
+                pollId: "test-poll-id",
                 value: 'test-value'
             });
 
@@ -55,6 +56,7 @@ describe('Question', () => {
             expect(prismaMock.vote.create).toBeCalledWith({
                 data: {
                     questionId: 'test-question-id',
+                    pollId: "test-poll-id",
                     value: 'test-value',
                     voterId: '1',
                     parentId: null
@@ -82,7 +84,8 @@ describe('Question', () => {
                         parentId: '',
                         questionId: 'test-id',
                         value: 'test',
-                        voterId: 'voter1'
+                        voterId: 'voter1',
+                        pollId: "p1",
                     }
                 ]
             });

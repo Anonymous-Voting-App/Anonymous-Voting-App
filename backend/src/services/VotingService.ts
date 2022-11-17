@@ -295,6 +295,9 @@ export default class VotingService {
             return null;
         }
 
-        return { success: true };
+        return { 
+            success: true,
+            fingerprint: userIdentity.privateDataObj(  )
+        };
     }
 }

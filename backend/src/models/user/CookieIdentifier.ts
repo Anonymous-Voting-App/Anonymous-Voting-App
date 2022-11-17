@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { FindInDbQuery, PrivateData } from './IIdentifyingFeature';
-import { DatabaseData } from './IFingerprint';
+import { DatabaseData, NewDbObject } from './IFingerprint';
 import IdentifyingFeature from './IdentifyingFeature';
 import { pre, post } from '../../utils/designByContract';
 import crypto from 'crypto';
@@ -10,9 +10,6 @@ import crypto from 'crypto';
  */
 
 export default class CookieIdentifier extends IdentifyingFeature {
-    privateDataObj(): PrivateData {
-        throw new Error('Method not implemented.');
-    }
 
     _cookie = '';
 
@@ -60,5 +57,13 @@ export default class CookieIdentifier extends IdentifyingFeature {
 
     generate(): void {
         this.setCookie(crypto.randomUUID());
+    }
+
+    addToNewDatabaseObject(obj: NewDbObject): void {
+        obj.idCookie = this.cookie(  );
+    }
+
+    privateDataObj(): PrivateData {
+        return { idCookie: this.cookie(  ) };
     }
 }

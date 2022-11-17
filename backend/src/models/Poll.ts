@@ -12,6 +12,7 @@ import QuestionFactory from './QuestionFactory';
 import AnswerCollection from './AnswerCollection';
 import QuestionCollection from './QuestionCollection';
 import Fingerprint from './user/Fingerprint';
+import ForbiddenError from '../utils/forbiddenError';
 
 /**
  * A voting poll that can have questions and an owner.
@@ -493,8 +494,8 @@ export default class Poll {
         answers: Array<IQuestion.Answer>,
         answerer: Fingerprint
     ): Promise<void> {
+        await answerer.ensureExistsInDatabase();
         await this._answerQuestionsWithRights(answers, answerer);
-        await answerer.createNewInDatabase();
         await this.incrementAnswerCount();
     }
 
@@ -506,8 +507,8 @@ export default class Poll {
         return await this.database().vote.count({
             where: {
                 AND: [
-                    { voterId: answerer.id() } /* ,
-                    { pollId: this.id(  ) } */
+                    { voterId: answerer.id() } ,
+                    { pollId: this.id(  ) }
                 ]
             }
         });
@@ -752,9 +753,8 @@ export default class Poll {
         if (!(await this.hasBeenAnsweredBy(answerer))) {
             await this._answerPollWithRights(answers, answerer);
         } else {
-            // Make this return 403! - Joonas Hiltunen 04.11.2022
-            throw new Error(
-                `User does not have right to answer poll ${this.id()}.`
+            throw new ForbiddenError(
+                `User does not have right to answer poll ${this.publicId()}.`
             );
         }
     }
@@ -766,7 +766,7 @@ export default class Poll {
         await answerer.loadFromDatabase();
 
         if (answerer.wasFoundInDatabase()) {
-            return (await this._countUserAnswersInDb(answerer)) !== 0;
+            return ( (await this._countUserAnswersInDb(answerer)) !== 0 );
         } else {
             return false;
         }

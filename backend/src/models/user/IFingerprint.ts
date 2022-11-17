@@ -8,7 +8,6 @@ export interface DatabaseData {
 export type AllIdentifiersQueryArray = [
     { ip: string }?,
     { idCookie: string }?,
-    { loginCookie: string }?,
     { id: string }?,
     { fingerprintJsId: string }?
 ];
@@ -31,4 +30,12 @@ export interface PrivateData {
     ip?: string;
     idCookie?: string;
     fingerprintJsId?: string;
+}
+
+export interface NewDbObject {
+    
+    ip?: string;
+    idCookie?: string;
+    fingerprintJsId?: string;
+    
 }

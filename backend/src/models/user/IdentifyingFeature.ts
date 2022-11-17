@@ -38,4 +38,6 @@ export default abstract class IdentifyingFeature {
     abstract findSelfInDatabaseQuery(): IIdentifyingFeature.FindInDbQuery;
 
     abstract privateDataObj(): IIdentifyingFeature.PrivateData;
+
+    abstract addToNewDatabaseObject( obj: IFingerprint.NewDbObject ): void;
 }

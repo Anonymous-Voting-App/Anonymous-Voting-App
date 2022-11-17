@@ -9,9 +9,6 @@ import { PrismaClient } from '@prisma/client';
  */
 
 export default class IPIdentifier extends IdentifyingFeature {
-    privateDataObj(): PrivateData {
-        throw new Error('Method not implemented.');
-    }
 
     _ip = '';
 
@@ -74,4 +71,13 @@ export default class IPIdentifier extends IdentifyingFeature {
             }
         };
     }
+
+    addToNewDatabaseObject(obj: IFingerprint.NewDbObject): void {
+        obj.ip = this.ip(  );
+    }
+
+    privateDataObj(): PrivateData {
+        return { ip: this.ip(  ) };
+    }
+    
 }
