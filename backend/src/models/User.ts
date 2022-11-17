@@ -18,6 +18,27 @@ export default class User {
     _loadedFromDatabase = false;
     _database!: PrismaClient;
     _id = '';
+    _createdInDatabase = false;
+
+    /** Whether new user entry in database has been created from this instance. */
+    createdInDatabase(): boolean {
+        return this._createdInDatabase;
+    }
+
+    /** Sets value of createdInDatabase. */
+    setCreatedInDatabase(createdInDatabase: boolean): void {
+        pre(
+            'argument createdInDatabase is of type boolean',
+            typeof createdInDatabase === 'boolean'
+        );
+
+        this._createdInDatabase = createdInDatabase;
+
+        post(
+            '_createdInDatabase is createdInDatabase',
+            this._createdInDatabase === createdInDatabase
+        );
+    }
 
     /** Database id of user. */
     id(): string {
