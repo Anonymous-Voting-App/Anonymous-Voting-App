@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { verifyToken } from '../services/Auth';
 import { isAdmin } from '../services/AccountManager';
 import * as responses from '../utils/responses';
+import prisma from '../utils/prismaHandler';
 
 /**
  * Checks token and adds user to req.User if token contained it
@@ -45,7 +46,7 @@ export const requireUser = () => {
             return responses.forbidden(req, res);
         }
 
-        req.UserIsAdmin = await isAdmin(user.userName);
+        req.UserIsAdmin = await isAdmin(user.userName, prisma);
         return next();
     };
 
@@ -69,7 +70,7 @@ export const requireAdmin = () => {
             return responses.forbidden(req, res);
         }
 
-        const userIsAdmin = await isAdmin(user.userName);
+        const userIsAdmin = await isAdmin(user.userName, prisma);
         req.UserIsAdmin = userIsAdmin;
 
         if (!userIsAdmin) {

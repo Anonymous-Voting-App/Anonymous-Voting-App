@@ -1,30 +1,25 @@
-import prisma from '../utils/prismaHandler';
+import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import * as IAccountManager from './IAccountManager';
 import logger from '../utils/logger';
 
-/**
- * A service for accessing and editing the anonymous
- * voting app's users in the database.
- */
-const _prisma = prisma;
-
-export const CreateUser = async (
+export const createUser = async (
     email: string,
     password: string,
     username: string,
     firstName: string,
-    lastName: string
+    lastName: string,
+    prisma: PrismaClient
 ): Promise<number> => {
     try {
         // check that there is no user existing with that email
-        const existingUser = await _prisma.user.findFirst({
+        const existingUser = await prisma.user.findFirst({
             where: {
                 email: email
             }
         });
 
-        const existingUserName = await _prisma.user.findFirst({
+        const existingUserName = await prisma.user.findFirst({
             where: {
                 username: username
             }
@@ -32,7 +27,7 @@ export const CreateUser = async (
 
         if (existingUser === null && existingUserName === null) {
             // create a new user
-            await _prisma.user.create({
+            await prisma.user.create({
                 data: {
                     email: email,
                     password: await bcrypt.hash(password, 10),
@@ -41,22 +36,24 @@ export const CreateUser = async (
                     lastname: lastName
                 }
             });
+
             return 200;
-        } else {
-            return 400;
         }
+
+        return 400;
     } catch (e: unknown) {
-        logger.error(`Error while creating user: ${e}`);
+        logger.error(e);
         return 500;
     }
 };
 
-export const verify = async (
+export const verifyUser = async (
     username: string,
-    password: string
+    password: string,
+    prisma: PrismaClient
 ): Promise<IAccountManager.UserData | null> => {
     try {
-        const existingUser = await _prisma.user.findFirst({
+        const existingUser = await prisma.user.findFirst({
             where: {
                 username: username
             }
@@ -86,14 +83,17 @@ export const verify = async (
 
         return null;
     } catch (e: unknown) {
-        logger.error(`Error while verifying JWT: ${e}`);
+        logger.error(e);
         return null;
     }
 };
 
-export const isAdmin = async (username: string): Promise<boolean> => {
+export const isAdmin = async (
+    username: string,
+    prisma: PrismaClient
+): Promise<boolean> => {
     try {
-        const existingUser = await _prisma.user.findFirst({
+        const existingUser = await prisma.user.findFirst({
             where: {
                 username: username
             }
@@ -105,7 +105,7 @@ export const isAdmin = async (username: string): Promise<boolean> => {
             return existingUser.isAdmin;
         }
     } catch (e: unknown) {
-        logger.error(`Error while checking for admin: ${e}`);
+        logger.error(e);
         return false;
     }
 };

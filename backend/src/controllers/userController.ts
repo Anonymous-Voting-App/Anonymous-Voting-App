@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import prisma from '../utils/prismaHandler';
 import * as AccountManager from '../services/AccountManager';
 import * as responses from '../utils/responses';
 import * as Auth from '../services/Auth';
@@ -56,12 +57,13 @@ export const createAccount = async (req: Request, res: Response) => {
         }
 
         // account creation
-        const code = await AccountManager.CreateUser(
+        const code = await AccountManager.createUser(
             email,
             password,
             username,
             firstname,
-            lastname
+            lastname,
+            prisma
         );
 
         if (code === 400) {
@@ -102,7 +104,12 @@ export const login = async (req: Request, res: Response) => {
             return responses.custom(req, res, 400, 'Username can not be empty');
         }
 
-        const data = await AccountManager.verify(username, password);
+        const data = await AccountManager.verifyUser(
+            username,
+            password,
+            prisma
+        );
+
         if (data === null) {
             return responses.custom(
                 req,

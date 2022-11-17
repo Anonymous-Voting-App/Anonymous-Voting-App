@@ -6,7 +6,8 @@
         "outDir": "./build",
         "esModuleInterop": true,
         "strict": true,
-        "resolveJsonModule": true
+        "resolveJsonModule": true,
+        "removeComments": true
     },
     "exclude": ["**/*.test.ts", "**/prisma_singleton.ts"],
     "files": ["./src/types/express/index.d.ts"]
