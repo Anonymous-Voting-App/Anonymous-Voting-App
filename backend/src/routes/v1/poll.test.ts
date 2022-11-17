@@ -386,16 +386,6 @@ describe.skip('integration tests using server api', () => {
         ]);
     }
 
-    function checkAnswerlessQuestionResult(
-        question: IQuestion.ResultData,
-        type: string
-    ) {
-        expect(question.type).toBe(type);
-        checkGenericQuestionResult(question);
-        expect(question.answerCount).toBe(0);
-        expect(question.answerPercentage).toBe(0);
-    }
-
     function checkAnswers(answers: IPolling.AnswersData) {
         expect(answers.answers.length).toBe(4);
 

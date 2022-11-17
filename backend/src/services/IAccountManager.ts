@@ -3,7 +3,8 @@ export interface CreateUser {
     passwordHash?: string;
 }
 
-export interface userData {
+export interface UserData {
+    id: string;
     email: string;
     userName: string;
     firstName: string;

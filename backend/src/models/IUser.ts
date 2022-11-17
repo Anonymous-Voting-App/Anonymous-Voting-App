@@ -10,9 +10,3 @@ export interface DatabaseData {
     cookie?: string;
     accountId?: string;
 }
-
-export interface NewUserDatabaseObject {
-    name: string;
-    email: string;
-    password: string;
-}
