@@ -185,32 +185,6 @@ export default class User {
     }
 
     /**
-     * Makes new object in Prisma database from the values
-     * of the properties of this instance.
-     */
-    async createNewInDatabase(): Promise<void> {
-        const data = await this._database.user.create({
-            data: this.newDatabaseObject()
-        });
-
-        this.setFromDatabaseData(data);
-
-        this._createdInDatabase = true;
-    }
-
-    /**
-     * A new Prisma-compatible object used for when creating a
-     * database entry for the user.
-     */
-    newDatabaseObject(): IUser.NewUserDatabaseObject {
-        return {
-            name: 'dummy-name',
-            email: 'dummy-email',
-            password: 'dummy-password'
-        };
-    }
-
-    /**
      * Loads the user's info from the database.
      * If user is not in database, then does nothing.
      * If the user was found in the database, then

@@ -1,67 +1,28 @@
 import { Request, Response } from 'express';
+import prisma from '../utils/prismaHandler';
 import * as AccountManager from '../services/AccountManager';
 import * as responses from '../utils/responses';
-import * as auth from '../services/auth';
+import * as Auth from '../services/Auth';
+import logger from '../utils/logger';
 
 export const createAccount = async (req: Request, res: Response) => {
     try {
-        const password = req.body.password;
-        const email = req.body.email;
-        const username = req.body.username;
-        const firstname = req.body.firstname;
-        const lastname = req.body.lastname;
-
-        if (password == null) {
-            return responses.custom(req, res, 400, 'Password can not be empty');
-        }
-        if (email == null) {
-            return responses.custom(req, res, 400, 'Email can not be empty');
-        }
-        if (username == null) {
-            return responses.custom(req, res, 400, 'Username can not be empty');
-        }
-        if (firstname == null) {
-            return responses.custom(
-                req,
-                res,
-                400,
-                'First name can not be empty'
-            );
-        }
-        if (lastname == null) {
-            return responses.custom(
-                req,
-                res,
-                400,
-                'Last name can not be empty'
-            );
-        }
-
-        // password checks
-        if (password.length < 6) {
-            return responses.custom(
-                req,
-                res,
-                400,
-                'Password must be at least 6 characters'
-            );
-        }
-
-        // email checks
-        const regexEmailValidation =
-            /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
-        if (!email.match(regexEmailValidation)) {
-            return responses.custom(req, res, 400, 'Email must be valid');
-        }
+        const password = req.body.password as string;
+        const email = req.body.email as string;
+        const username = req.body.username as string;
+        const firstname = req.body.firstname as string;
+        const lastname = req.body.lastname as string;
 
         // account creation
-        const code = await AccountManager.CreateUser(
+        const code = await AccountManager.createUser(
             email,
             password,
             username,
             firstname,
-            lastname
+            lastname,
+            prisma
         );
+
         if (code === 400) {
             return responses.custom(
                 req,
@@ -76,28 +37,29 @@ export const createAccount = async (req: Request, res: Response) => {
         }
 
         if (code === 500) {
-            return responses.custom(req, res, 500, 'Internal server error');
+            return responses.internalServerError(req, res);
         }
-        return responses.custom(req, res, 500, 'Unknown error');
-    } catch {
-        return responses.custom(req, res, 500, 'Unknown error');
+
+        logger.error(`Error while creating account`);
+        return responses.internalServerError(req, res);
+    } catch (e: unknown) {
+        logger.error(e);
+        return responses.internalServerError(req, res);
     }
 };
 
 export const login = async (req: Request, res: Response) => {
     try {
-        const password = req.body.password;
-        // const email = req.body.email;
-        const username = req.body.username;
+        const password = req.body.password as string;
+        // const email = req.body.email as string;
+        const username = req.body.username as string;
 
-        if (password == null) {
-            return responses.custom(req, res, 400, 'Password can not be empty');
-        }
-        if (username == null) {
-            return responses.custom(req, res, 400, 'Username can not be empty');
-        }
+        const data = await AccountManager.verifyUser(
+            username,
+            password,
+            prisma
+        );
 
-        const data = await AccountManager.verify(username, password);
         if (data === null) {
             return responses.custom(
                 req,
@@ -107,19 +69,12 @@ export const login = async (req: Request, res: Response) => {
             );
         }
 
-        return res.json({
-            token: auth.signToken(username),
+        return responses.custom(req, res, 200, {
+            token: Auth.signToken(data),
             user: data
         });
-    } catch {
-        return responses.custom(req, res, 500, 'Unknown error');
+    } catch (e: unknown) {
+        logger.error(e);
+        return responses.internalServerError(req, res);
     }
-};
-
-export const test = async (req: Request, res: Response) => {
-    const isLoggedIn = auth.verifyToken(req);
-    if (isLoggedIn) {
-        return responses.ok(req, res, {});
-    }
-    return responses.forbidden(req, res);
 };
