@@ -1,6 +1,7 @@
-import { pre, post } from '../utils/designByContract';
-import * as IUser from './IUser';
+import { pre, post } from '../../utils/designByContract';
+import * as IUser from './/IUser';
 import { PrismaClient } from '@prisma/client';
+import Fingerprint from './IdentifyingFeature';
 
 /**
  * A user of the anonymous voting app.
@@ -19,6 +20,28 @@ export default class User {
     _database!: PrismaClient;
     _id = '';
     _createdInDatabase = false;
+    _fingerprint!: Fingerprint;
+
+    /**  */
+
+    fingerprint(): Fingerprint {
+        return this._fingerprint;
+    }
+
+    /** Sets value of fingerprint. */
+
+    setFingerprint(fingerprint: Fingerprint): User {
+        pre(
+            'argument fingerprint is of type Fingerprint',
+            fingerprint instanceof Fingerprint
+        );
+
+        this._fingerprint = fingerprint;
+
+        post('_fingerprint is fingerprint', this._fingerprint === fingerprint);
+
+        return this;
+    }
 
     /** Whether new user entry in database has been created from this instance. */
     createdInDatabase(): boolean {

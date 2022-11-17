@@ -1,5 +1,5 @@
 import { pre, post } from '../utils/designByContract';
-import User from '../models/User';
+import User from '../models/user/User';
 import Poll from '../models/Poll';
 import * as IPolling from '../models/IPolling';
 import * as IVotingService from './IVotingService';
@@ -8,6 +8,7 @@ import UserManager from './/UserManager';
 import { PrismaClient } from '@prisma/client';
 import QuestionFactory from '../models/QuestionFactory';
 import BadRequestError from '../utils/badRequestError';
+import Fingerprint from '../models/user/Fingerprint';
 
 /**
  * Service of the anonymous voting app
@@ -108,9 +109,9 @@ export default class VotingService {
     async _answerExistingPoll(
         poll: Poll,
         answerData: IVotingService.AnswerData,
-        user: User
+        userIdentity: Fingerprint
     ): Promise<void> {
-        await poll.answer(answerData.answers, user as User);
+        await poll.answer(answerData.answers, userIdentity);
     }
 
     constructor(database: PrismaClient, questionFactory: QuestionFactory) {
@@ -271,7 +272,8 @@ export default class VotingService {
      * If not, returns null.
      */
     async answerPoll(
-        answerData: IVotingService.AnswerData
+        answerData: IVotingService.AnswerData,
+        userIdentity: Fingerprint
     ): Promise<IVotingService.SuccessObject | null> {
         pre('answerData is of type object', typeof answerData === 'object');
 
@@ -285,12 +287,10 @@ export default class VotingService {
             Array.isArray(answerData.answers)
         );
 
-        const user = await this._tryGettingUser(answerData.answerer);
-
         const poll = await this._loadPollWithPublicId(answerData.publicId);
 
         if (poll.loadedFromDatabase()) {
-            await this._answerExistingPoll(poll, answerData, user);
+            await this._answerExistingPoll(poll, answerData, userIdentity);
         } else {
             return null;
         }

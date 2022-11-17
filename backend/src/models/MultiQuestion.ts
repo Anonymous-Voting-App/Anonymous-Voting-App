@@ -1,6 +1,6 @@
 import { pre, post } from '../utils/designByContract';
 import Question from './Question';
-import User from './User';
+import User from './user/User';
 import * as IPolling from './IPolling';
 import * as IQuestion from './IQuestion';
 import * as IMultiQuestion from './IMultiQuestion';
@@ -8,6 +8,7 @@ import { PrismaClient } from '@prisma/client';
 import Answer from './Answer';
 import BadRequestError from '../utils/badRequestError';
 import QuestionFactory from './QuestionFactory';
+import Fingerprint from './user/Fingerprint';
 
 /**
  * A Question that can have sub-questions.
@@ -149,7 +150,7 @@ export default class MultiQuestion extends Question {
     async _answerSubQuestion(
         subQuestion: Question,
         answerData: IQuestion.AnswerData,
-        answerer: User,
+        answerer: Fingerprint,
         ownAnswerId: string
     ): Promise<void> {
         await subQuestion.answer(answerData, answerer, ownAnswerId);
@@ -163,7 +164,7 @@ export default class MultiQuestion extends Question {
     async _answerSubQuestions(
         subQuestions: Array<Question>,
         answerData: IMultiQuestion.AnswerData,
-        answerer: User,
+        answerer: Fingerprint,
         ownAnswerId: string
     ): Promise<void> {
         for (let i = 0; i < subQuestions.length; i++) {
@@ -201,7 +202,7 @@ export default class MultiQuestion extends Question {
 
     async _answerOwnQuestion(
         answerData: IMultiQuestion.AnswerData,
-        answerer: User
+        answerer: Fingerprint
     ): Promise<Answer> {
         answerData = Object.assign({}, answerData);
 
@@ -214,7 +215,7 @@ export default class MultiQuestion extends Question {
      */
     async _answerWithAcceptableData(
         answerData: IMultiQuestion.AnswerData,
-        answerer: User
+        answerer: Fingerprint
     ): Promise<void> {
         const subQuestions = this._gatherSubQuestions(
             answerData.subQuestionIds
@@ -431,10 +432,10 @@ export default class MultiQuestion extends Question {
      */
     async answer(
         answerData: IMultiQuestion.AnswerData,
-        answerer: User
+        answerer: Fingerprint
     ): Promise<void> {
         pre('answerData is of type object', typeof answerData === 'object');
-        pre('answerer is of type User', answerer instanceof User);
+        pre('answerer is of type Fingerprint', answerer instanceof Fingerprint);
         pre(
             'sub-questions with given ids exist',
             this.hasSubQuestionIds(answerData.subQuestionIds)

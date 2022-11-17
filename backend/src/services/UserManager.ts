@@ -1,4 +1,4 @@
-import User from '../models/User';
+import User from '../models/user/User';
 import { pre, post } from '../utils/designByContract';
 import { PrismaClient } from '@prisma/client';
 import * as IUserManager from './IUserManager';
@@ -41,36 +41,6 @@ export default class UserManager {
         pre('database is of type object', typeof database === 'object');
 
         this._database = database;
-    }
-
-    /**
-     * Creates new user with given options
-     * in database. Returns new user
-     * if it was created.
-     */
-    async createUser(
-        userOptions: IUserManager.CreateUserOptions
-    ): Promise<User | null> {
-        pre('userOptions is of type object', typeof userOptions === 'object');
-        const user = new User();
-
-        user.setDatabase(this.database());
-
-        if (typeof userOptions.ip === 'string') {
-            user.setIp(userOptions.ip);
-        }
-
-        if (typeof userOptions.cookie === 'string') {
-            user.setCookie(userOptions.cookie);
-        }
-
-        await user.createNewInDatabase();
-
-        if (user.createdInDatabase()) {
-            return user;
-        }
-
-        return null;
     }
 
     /**

@@ -1,7 +1,7 @@
 import { prismaMock } from '../utils/prisma_singleton';
 import Poll from './Poll';
 import Question from './Question';
-import User from './User';
+import User from './user/User';
 import * as IPoll from './IPoll';
 import QuestionFactory from './QuestionFactory';
 import {
@@ -10,6 +10,7 @@ import {
     Option as PrismaOption,
     Vote as PrismaVote
 } from '@prisma/client';
+import Fingerprint from './user/Fingerprint';
 
 describe('Poll', () => {
     beforeEach(() => {
@@ -67,6 +68,45 @@ describe('Poll', () => {
             expect(poll.answerCount()).toBe(1);
             expect(prismaMock.poll.update).toHaveBeenCalled();
         });
+        test('Double answering is blocked', async () => {
+            const poll = new Poll(prismaMock, new QuestionFactory(prismaMock));
+            poll.setId('1');
+
+            const question = new Question();
+            question.setId('question-id');
+            poll.questions()[question.id()] = question;
+
+            const user = makeAnswerer();
+
+            Fingerprint.prototype.loadFromDatabase = jest.fn();
+            Fingerprint.prototype.wasFoundInDatabase = jest
+                .fn()
+                .mockResolvedValue(true);
+
+            try {
+                await poll.answer(
+                    [
+                        {
+                            questionId: 'question-id',
+                            data: {
+                                answer: 'answer'
+                            }
+                        }
+                    ],
+                    user
+                );
+
+                expect(true).toBe(false);
+            } catch (e) {
+                if (e instanceof Error) {
+                    expect(e.message).toBe(
+                        'User does not have right to answer poll 1.'
+                    );
+                } else {
+                    expect(true).toBe(false);
+                }
+            }
+        });
     });
 
     describe('setAnswersFromDatabaseData', () => {
@@ -92,8 +132,8 @@ describe('Poll', () => {
                             parentId: null,
                             voter: {
                                 ip: '',
-                                cookie: '',
-                                accountId: '',
+                                idCookie: '',
+                                fingerprintJsId: '',
                                 id: '1'
                             }
                         }
@@ -340,13 +380,9 @@ describe('Poll', () => {
     };
 
     const makeAnswerer = () => {
-        const answerer = new User();
+        const answerer = new Fingerprint(prismaMock);
 
         answerer.setId('1');
-        answerer.setIp('test-ip');
-        answerer.setAccountId('test-account-id');
-        answerer.setCookie('test-cookie');
-        answerer.setDatabase(prismaMock);
 
         return answerer;
     };

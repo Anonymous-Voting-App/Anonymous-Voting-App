@@ -1,5 +1,5 @@
 import { AssertionError } from 'assert';
-import { prismaMock } from '../utils/prisma_singleton';
+import { prismaMock } from '../../utils/prisma_singleton';
 import User from './User';
 
 describe('User', () => {
@@ -41,12 +41,12 @@ describe('User', () => {
                 updatedAt: new Date(),
                 name: 'dummy-name',
                 email: 'dummy@email.com',
+                firstname: '',
+                lastname: '',
+                username: '',
+                isAdmin: false,
                 emailVerified: false,
-                password: 'dummy-password',
-                firstname: 'dummy',
-                lastname: 'user',
-                username: 'iamdummyuser',
-                isAdmin: false
+                password: 'dummy-password'
             });
 
             const user = new User();

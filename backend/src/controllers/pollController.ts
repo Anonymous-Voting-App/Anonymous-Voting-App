@@ -8,6 +8,8 @@ import * as IVotingService from '../services/IVotingService';
 import QuestionFactory from '../models/QuestionFactory';
 import { AssertionError } from 'assert';
 import BadRequestError from '../utils/badRequestError';
+import WebFingerprintFactory from '../models/user/WebFingerprintFactory';
+import Fingerprint from '../models/user/IdentifyingFeature';
 
 const internalServerError = (
     method: string,
@@ -18,12 +20,32 @@ const internalServerError = (
     return responses.internalServerError(req, res);
 };
 
+function makeIdentityFactory() {
+    const identityFactory = new WebFingerprintFactory(prisma);
+
+    identityFactory.setUseIp(true);
+    identityFactory.setUseCookie(true);
+
+    return identityFactory;
+}
+
+function makeFingerprint(req: Request) {
+    const identityFactory = makeIdentityFactory();
+
+    const userIdentity = identityFactory.createFromExpressRequest(req);
+
+    userIdentity.setSamenessCheck('oneOf');
+
+    return userIdentity;
+}
+
 const callService = async (
     method: keyof VotingService,
     req: Request,
     res: Response
 ): Promise<Response> => {
     const service = new VotingService(prisma, new QuestionFactory(prisma));
+    const userIdentity = makeFingerprint(req);
 
     try {
         if (typeof service[method] !== 'function') {
@@ -31,11 +53,13 @@ const callService = async (
         }
 
         type serviceFunction = (
-            body: string | IPolling.PollRequest | IVotingService.AnswerData
+            body: string | IPolling.PollRequest | IVotingService.AnswerData,
+            userIdentity: Fingerprint
         ) => IPolling.PollData | IPolling.AnswerData | null;
 
         const poll = await (service[method] as unknown as serviceFunction)(
-            req.body
+            req.body,
+            userIdentity
         );
 
         // Poll not found

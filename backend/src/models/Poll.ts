@@ -1,19 +1,17 @@
 import { pre, post } from '../utils/designByContract';
-import User from './User';
+import User from './user/User';
 import Question from './Question';
 import Answer from './Answer';
 import * as IPolling from './IPolling';
 import * as IPoll from './IPoll';
 import * as IQuestion from './IQuestion';
-import * as IUser from './IUser';
-/* import * as IAnswer from './IAnswer'; */
-/* import MultiQuestionCollection from './MultiQuestionCollection'; */
-/* import MultiQuestion from './MultiQuestion'; */
+import * as IUser from './user/IUser';
 import { PrismaClient } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 import QuestionFactory from './QuestionFactory';
 import AnswerCollection from './AnswerCollection';
 import QuestionCollection from './QuestionCollection';
+import Fingerprint from './user/Fingerprint';
 
 /**
  * A voting poll that can have questions and an owner.
@@ -313,26 +311,30 @@ export default class Poll {
     async _answerWithRights(
         questionId: string,
         answerData: IQuestion.AnswerData,
-        user: User
+        answerer: Fingerprint
     ): Promise<void> {
         const question = this.questions()[questionId];
         question.setDatabase(this.database());
 
-        await question.answer(answerData, user);
+        await question.answer(answerData, answerer);
     }
 
     /**
      *
      */
 
-    async _answerMultipleWithRights(
+    async _answerQuestionsWithRights(
         answers: Array<IQuestion.Answer>,
-        user: User
+        answerer: Fingerprint
     ): Promise<void> {
         for (let i = 0; i < answers.length; i++) {
             const answer = answers[i];
 
-            await this._answerWithRights(answer.questionId, answer.data, user);
+            await this._answerWithRights(
+                answer.questionId,
+                answer.data,
+                answerer
+            );
         }
     }
 
@@ -481,6 +483,34 @@ export default class Poll {
             this._answersMatchQuestions(answers) &&
             this._questionsAcceptAnswers(answers)
         );
+    }
+
+    /**
+     *
+     */
+
+    async _answerPollWithRights(
+        answers: Array<IQuestion.Answer>,
+        answerer: Fingerprint
+    ): Promise<void> {
+        await this._answerQuestionsWithRights(answers, answerer);
+        await answerer.createNewInDatabase();
+        await this.incrementAnswerCount();
+    }
+
+    /**
+     *
+     */
+
+    async _countUserAnswersInDb(answerer: Fingerprint): Promise<number> {
+        return await this.database().vote.count({
+            where: {
+                AND: [
+                    { voterId: answerer.id() } /* ,
+                    { pollId: this.id(  ) } */
+                ]
+            }
+        });
     }
 
     constructor(database: PrismaClient, questionFactory: QuestionFactory) {
@@ -713,12 +743,14 @@ export default class Poll {
      * If answers is not acceptable to poll
      * or the poll's questions, does nothing and throws BadRequestError.
      */
-    async answer(answers: Array<IQuestion.Answer>, user: User): Promise<void> {
+    async answer(
+        answers: Array<IQuestion.Answer>,
+        answerer: Fingerprint
+    ): Promise<void> {
         pre('given answers is valid', this._answersIsValid(answers));
 
-        if (this.userHasRightToAnswerPoll(user)) {
-            await this._answerMultipleWithRights(answers, user);
-            await this.incrementAnswerCount();
+        if (!(await this.hasBeenAnsweredBy(answerer))) {
+            await this._answerPollWithRights(answers, answerer);
         } else {
             // Make this return 403! - Joonas Hiltunen 04.11.2022
             throw new Error(
@@ -728,13 +760,16 @@ export default class Poll {
     }
 
     /**
-     * Whether given user has a right to answer the poll.
-     * A user might not have a right to answer if they
-     * have already answered the poll, for example.
+     * Whether given user has answered the poll previously.
      */
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    userHasRightToAnswerPoll(user: User): boolean {
-        return true;
+    async hasBeenAnsweredBy(answerer: Fingerprint): Promise<boolean> {
+        await answerer.loadFromDatabase();
+
+        if (answerer.wasFoundInDatabase()) {
+            return (await this._countUserAnswersInDb(answerer)) !== 0;
+        } else {
+            return false;
+        }
     }
 
     /**

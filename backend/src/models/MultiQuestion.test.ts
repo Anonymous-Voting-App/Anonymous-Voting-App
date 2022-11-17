@@ -1,8 +1,9 @@
 import MultiQuestion from './MultiQuestion';
 import Question from './Question';
 import Answer from './Answer';
-import User from './User';
+import User from './user/User';
 import { prismaMock } from '../utils/prisma_singleton';
+import Fingerprint from './user/Fingerprint';
 
 jest.mock('./Answer');
 
@@ -231,13 +232,9 @@ describe('MultiQuestion', () => {
     });
 
     const makeAnswerer = () => {
-        const answerer = new User();
+        const answerer = new Fingerprint(prismaMock);
 
         answerer.setId('1');
-        answerer.setIp('test-ip');
-        answerer.setAccountId('test-account-id');
-        answerer.setCookie('test-cookie');
-        answerer.setDatabase(prismaMock);
 
         return answerer;
     };

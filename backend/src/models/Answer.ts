@@ -1,9 +1,11 @@
 import { pre, post } from '../utils/designByContract';
-import User from './User';
+import User from './user/User';
 import * as IPolling from './IPolling';
 import * as IAnswer from './IAnswer';
-import * as IUser from './IUser';
+import * as IUser from './user/IUser';
 import { PrismaClient } from '@prisma/client';
+import Fingerprint from './user/Fingerprint';
+import * as IFingerprint from './user/IFingerprint';
 
 /**
  * An answer to a Question. Has the id of the question it
@@ -14,7 +16,7 @@ import { PrismaClient } from '@prisma/client';
 export default class Answer {
     _questionId = '';
     _value: string | number | boolean | object = '';
-    _answerer!: User;
+    _answerer!: Fingerprint;
     _loadedFromDatabase = false;
     _createdInDatabase = false;
     _id = '';
@@ -97,14 +99,17 @@ export default class Answer {
         return this._loadedFromDatabase;
     }
 
-    /** The User that gave the answer. */
-    answerer(): User {
+    /** The Fingerprint that gave the answer. */
+    answerer(): Fingerprint {
         return this._answerer;
     }
 
     /** Sets value of answerer. */
-    setAnswerer(answerer: User): void {
-        pre('argument answerer is of type User', answerer instanceof User);
+    setAnswerer(answerer: Fingerprint): void {
+        pre(
+            'argument answerer is of type Fingerprint',
+            answerer instanceof Fingerprint
+        );
 
         this._answerer = answerer;
 
@@ -156,10 +161,22 @@ export default class Answer {
     /**
      * Makes a new User from given database data object for user.
      */
-    _makeAnswerer(answererData: IUser.DatabaseData): User {
-        const answerer = new User();
+    _makeAnswerer(answererData: IFingerprint.DatabaseData): Fingerprint {
+        const answerer = new Fingerprint(this.database());
 
         answerer.setFromDatabaseData(answererData);
+
+        return answerer;
+    }
+
+    /**
+     *
+     */
+
+    _makeAnswererWithId(id: string): Fingerprint {
+        const answerer = new Fingerprint(this.database());
+
+        answerer.setId(id);
 
         return answerer;
     }
@@ -169,13 +186,13 @@ export default class Answer {
      */
     _makeAnswererFromDatabaseData(
         answerData: IAnswer.DatabaseData
-    ): User | undefined {
-        let answerer: User | undefined;
+    ): Fingerprint | undefined {
+        let answerer: Fingerprint | undefined;
 
         if (typeof answerData.voter === 'object') {
             answerer = this._makeAnswerer(answerData.voter);
         } else if (typeof answerData.voterId == 'string') {
-            answerer = this._makeAnswerer({ id: answerData.voterId });
+            answerer = this._makeAnswererWithId(answerData.voterId);
         }
 
         return answerer;
@@ -185,7 +202,7 @@ export default class Answer {
      * Sets own optional fields from given database data object.
      */
     _setOptionalsFromDatabaseData(answerData: IAnswer.DatabaseData): void {
-        const answerer: User | undefined =
+        const answerer: Fingerprint | undefined =
             this._makeAnswererFromDatabaseData(answerData);
 
         if (answerer !== undefined) {
@@ -221,7 +238,7 @@ export default class Answer {
 
     _addNewSubAnswerFromRequest(
         subRequest: IAnswer.Request,
-        answerer: User,
+        answerer: Fingerprint,
         questionId: string,
         id: string
     ): void {
@@ -240,7 +257,7 @@ export default class Answer {
 
     _setFromNestedRequest(
         request: IAnswer.Request,
-        answerer: User,
+        answerer: Fingerprint,
         questionId: string
     ): void {
         this.setValue('');
@@ -255,7 +272,7 @@ export default class Answer {
 
     _setFromShallowRequest(
         request: IAnswer.Request,
-        answerer: User,
+        answerer: Fingerprint,
         questionId: string
     ): void {
         this.setValue(request.answer.toString());
@@ -344,7 +361,7 @@ export default class Answer {
      */
     newDatabaseObject(): IAnswer.NewAnswerData {
         pre('questionId is set', this.questionId().length > 0);
-        pre('answerer is set', this.answerer() instanceof User);
+        pre('answerer is set', this.answerer() instanceof Fingerprint);
         pre('answerer is identifiable', this.answerer().isIdentifiable());
         pre('answerer id is set', this.answerer().id().length > 0);
 
@@ -384,13 +401,14 @@ export default class Answer {
      */
 
     privateDataObj(): IPolling.AnswerData {
-        return {
+        throw 'Error: Tried calling method that has not yet been implemented.';
+        /* return {
             id: this.id(),
             questionId: this.questionId(),
             value: this.value(),
             subAnswers: this.subAnswersDataObjs(),
             answerer: this.answerer().publicDataObj()
-        };
+        }; */
     }
 
     /**
@@ -399,7 +417,7 @@ export default class Answer {
 
     setFromRequest(
         request: IAnswer.Request,
-        answerer: User,
+        answerer: Fingerprint,
         questionId: string
     ): void {
         if (Array.isArray(request.answer)) {
@@ -415,7 +433,7 @@ export default class Answer {
 
     setSubAnswersFromRequest(
         request: IAnswer.Request,
-        answerer: User,
+        answerer: Fingerprint,
         questionId: string
     ): void {
         pre('request.answer is of type Array', Array.isArray(request.answer));
