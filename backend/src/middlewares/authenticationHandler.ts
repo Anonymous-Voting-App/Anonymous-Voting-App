@@ -3,6 +3,7 @@ import { verifyToken } from '../services/Auth';
 import { isAdmin } from '../services/AccountManager';
 import * as responses from '../utils/responses';
 import prisma from '../utils/prismaHandler';
+import logger from '../utils/logger';
 
 /**
  * Checks token and adds user to req.User if token contained it
@@ -14,16 +15,20 @@ export const authenticate = () => {
         res: Response,
         next: NextFunction
     ) => {
-        const user = verifyToken(req);
+        try {
+            const user = verifyToken(req);
 
-        if (!user) {
-            req.User = undefined;
-            req.UserIsAdmin = undefined;
+            if (!user) {
+                req.User = undefined;
+                return next();
+            }
+
+            req.User = user;
             return next();
+        } catch (e: unknown) {
+            logger.error(e);
+            return responses.internalServerError(req, res);
         }
-
-        req.User = user;
-        return next();
     };
 
     return middleware;
@@ -40,14 +45,19 @@ export const requireUser = () => {
         res: Response,
         next: NextFunction
     ) => {
-        const user = req.User;
+        try {
+            const user = req.User;
 
-        if (!user) {
-            return responses.forbidden(req, res);
+            if (!user) {
+                return responses.forbidden(req, res);
+            }
+
+            req.UserIsAdmin = await isAdmin(user.userName, prisma);
+            return next();
+        } catch (e: unknown) {
+            logger.error(e);
+            return responses.internalServerError(req, res);
         }
-
-        req.UserIsAdmin = await isAdmin(user.userName, prisma);
-        return next();
     };
 
     return middleware;
@@ -64,20 +74,25 @@ export const requireAdmin = () => {
         res: Response,
         next: NextFunction
     ) => {
-        const user = req.User;
+        try {
+            const user = req.User;
 
-        if (!user) {
-            return responses.forbidden(req, res);
+            if (!user) {
+                return responses.forbidden(req, res);
+            }
+
+            const userIsAdmin = await isAdmin(user.userName, prisma);
+            req.UserIsAdmin = userIsAdmin;
+
+            if (!userIsAdmin) {
+                return responses.unauthorized(req, res);
+            }
+
+            return next();
+        } catch (e: unknown) {
+            logger.error(e);
+            return responses.internalServerError(req, res);
         }
-
-        const userIsAdmin = await isAdmin(user.userName, prisma);
-        req.UserIsAdmin = userIsAdmin;
-
-        if (!userIsAdmin) {
-            return responses.unauthorized(req, res);
-        }
-
-        return next();
     };
 
     return middleware;

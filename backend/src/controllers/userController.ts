@@ -37,14 +37,14 @@ export const createAccount = async (req: Request, res: Response) => {
         }
 
         if (code === 500) {
-            return responses.custom(req, res, 500, 'Internal server error');
+            return responses.internalServerError(req, res);
         }
 
         logger.error(`Error while creating account`);
-        return responses.custom(req, res, 500, 'Unknown error');
+        return responses.internalServerError(req, res);
     } catch (e: unknown) {
-        logger.error(`Error while creating account: ${e}`);
-        return responses.custom(req, res, 500, 'Unknown error');
+        logger.error(e);
+        return responses.internalServerError(req, res);
     }
 };
 
@@ -69,12 +69,12 @@ export const login = async (req: Request, res: Response) => {
             );
         }
 
-        return res.json({
+        return responses.custom(req, res, 200, {
             token: Auth.signToken(data),
             user: data
         });
     } catch (e: unknown) {
-        logger.error(`Error while creating account: ${e}`);
-        return responses.custom(req, res, 500, 'Unknown error');
+        logger.error(e);
+        return responses.internalServerError(req, res);
     }
 };
