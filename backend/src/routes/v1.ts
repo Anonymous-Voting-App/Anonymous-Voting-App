@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { router as healthRouter } from './v1/health';
 import { router as pollRouter } from './v1/poll';
 import { router as userRouter } from './v1/user';
-import { authenticate } from '../middlewares/authenticationMiddleware';
+import { authenticate } from '../middlewares/authenticationHandler';
 import swaggerUi from 'swagger-ui-express';
 import swaggerDoc from './v1/swagger_api_v1.json';
 

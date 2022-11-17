@@ -2,7 +2,7 @@ import { Router } from 'express';
 import {
     requireAdmin,
     requireUser
-} from '../../middlewares/authenticationMiddleware';
+} from '../../middlewares/authenticationHandler';
 import {
     createPoll,
     answerPoll,
