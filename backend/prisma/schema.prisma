@@ -60,6 +60,7 @@ model Vote {
   value      String
   voterId    String   @db.Uuid
   parentId   String?  @db.Uuid
+  pollId     String   @db.Uuid
   parent     Vote?    @relation("SubVotes", fields: [parentId], references: [id])
   question   Question @relation("QuestionVotes", fields: [questionId], references: [id])
   subVotes   Vote[]   @relation("SubVotes")
@@ -77,4 +78,13 @@ model User {
   firstname     String
   lastname      String
   isAdmin       Boolean  @default(false)
+}
+
+model Fingerprint {
+  id                  String   @id @default(uuid()) @db.Uuid
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  ip                  String   @default("")
+  idCookie            String   @default("")
+  fingerprintJsId     String   @default("")
 }
