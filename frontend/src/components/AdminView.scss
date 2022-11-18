@@ -81,8 +81,12 @@
 
 .pinkLink {
     color: $lollipop;
+    text-decoration-color: $lollipop;
+    cursor: pointer;
 }
 
 .deleteLink {
     color: $cancel-background-color;
+    text-decoration-color: none;
+    cursor: pointer;
 }

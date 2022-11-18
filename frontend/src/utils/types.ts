@@ -1,16 +1,16 @@
-export interface OptionObj {
+export interface QuesOptionObj {
     title: string;
     description: string;
     type: string;
 }
 
-export interface PollObj {
+export interface PollQuesObj {
     title: string;
     description: string;
-    type: string;
-    minAnswer?: number;
-    maxAnswer?: number;
-    subQuestions: [OptionObj];
+    visualType: string;
+    minAnswers?: number;
+    maxAnswers?: number;
+    subQuestions: [QuesOptionObj];
 }
 
 export interface PollResultObj {
