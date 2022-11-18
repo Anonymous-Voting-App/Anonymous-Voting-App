@@ -1,5 +1,9 @@
 import { Router } from 'express';
 import {
+    requireAdmin,
+    requireUser
+} from '../../middlewares/authenticationHandler';
+import {
     createPoll,
     answerPoll,
     getPublicPoll,
@@ -23,7 +27,7 @@ router.get('/:publicId/answers', getPollAnswers);
 /**
  * Get results of a poll
  */
-router.get('/:publicId/results', getPollResults);
+router.get('/:publicId/results', requireUser(), getPollResults);
 
 /**
  * Answer poll
@@ -38,4 +42,4 @@ router.get('/:publicId', getPublicPoll);
 /**
  * Gets polls info for admin view
  */
-router.get('/admin/:privateId', getPrivatePoll);
+router.get('/admin/:privateId', requireAdmin(), getPrivatePoll);

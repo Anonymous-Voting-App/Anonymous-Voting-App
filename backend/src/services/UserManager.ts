@@ -44,36 +44,6 @@ export default class UserManager {
     }
 
     /**
-     * Creates new user with given options
-     * in database. Returns new user
-     * if it was created.
-     */
-    async createUser(
-        userOptions: IUserManager.CreateUserOptions
-    ): Promise<User | null> {
-        pre('userOptions is of type object', typeof userOptions === 'object');
-        const user = new User();
-
-        user.setDatabase(this.database());
-
-        if (typeof userOptions.ip === 'string') {
-            user.setIp(userOptions.ip);
-        }
-
-        if (typeof userOptions.cookie === 'string') {
-            user.setCookie(userOptions.cookie);
-        }
-
-        await user.createNewInDatabase();
-
-        if (user.createdInDatabase()) {
-            return user;
-        }
-
-        return null;
-    }
-
-    /**
      * Whether user with any of the given information
      * exists in database.
      */
