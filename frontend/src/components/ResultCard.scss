@@ -19,16 +19,16 @@
 }
 
 .question-wrapper {
-    margin-top: 1.65rem !important;
+    margin-top: 1.65rem;
     margin-bottom: 4rem;
     padding: 1.563rem 7.5rem 3.125rem 7.5rem;
-    display: flex !important;
-    flex-direction: column !important;
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    border-radius: 1.25rem !important;
+    border-radius: 1.25rem;
     border: 1px solid $black;
     background-color: $background-color !important;
-    min-width: 50rem !important;
+    min-width: 50rem;
 
     @include for-phone-only {
         min-width: 3rem !important;
@@ -41,30 +41,30 @@
     }
 
     @include for-tablet-landscape-up {
-        min-width: 20rem !important;
+        min-width: 34rem !important;
         padding: 1.563rem 7rem 3.125rem 7rem;
     }
 
     .question-type {
-        font-weight: 600 !important;
-        font-size: 20px !important;
+        font-weight: 600;
+        font-size: 20px;
 
         padding-bottom: 2.813rem;
 
         @include for-phone-only {
             padding-bottom: 1.813rem;
-            font-size: 20px !important;
+            font-size: 20px;
             line-height: 0.8;
         }
 
         @include for-tablet-portrait-up {
             padding-bottom: 1.813rem;
-            font-size: 25px !important;
+            font-size: 25px;
             line-height: 0.8;
         }
 
         @include for-tablet-landscape-up {
-            font-size: 30px !important;
+            font-size: 30px;
             padding-bottom: 1.813rem;
             line-height: 0.8;
         }
@@ -99,16 +99,6 @@
     .free-text-export {
         .MuiSvgIcon-root {
             font-size: 1.5rem !important;
-        }
-        .searchButton {
-            margin-top: 1rem;
-            width: 260px;
-            height: 40px;
-            border-radius: 20px !important;
-            text-transform: none !important;
-            border: 1px solid $main-color !important;
-            background-color: $main-color !important;
-            color: $background-color !important;
         }
         .export-link {
             margin-top: 5px;
