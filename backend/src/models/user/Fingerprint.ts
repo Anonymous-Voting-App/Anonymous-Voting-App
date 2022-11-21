@@ -234,11 +234,11 @@ export default class Fingerprint {
     
      newDatabaseObject(  ): IFingerprint.NewDbObject {
         
-        let obj = {  };
+        const obj = {  };
 
         for ( let i = 0; i < this._identifiers.length; i++ ) {
             
-            var identifier = this._identifiers[i];
+            const identifier = this._identifiers[i];
             
             identifier.addToNewDatabaseObject( obj );
             
@@ -254,7 +254,7 @@ export default class Fingerprint {
 
     async createNewInDatabase(): Promise<void> {
         
-        var data = await this._database.fingerprint.create( {
+        const data = await this._database.fingerprint.create( {
             
             data: this.newDatabaseObject(  )
             

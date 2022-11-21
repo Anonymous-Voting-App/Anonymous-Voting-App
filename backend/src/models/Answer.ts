@@ -23,7 +23,7 @@ export default class Answer {
     _database!: PrismaClient;
     _subAnswers: { [id: string]: Answer } = {};
     _parentId = '';
-    _pollId: string = "";
+    _pollId = "";
 	
 	/**  */
 	

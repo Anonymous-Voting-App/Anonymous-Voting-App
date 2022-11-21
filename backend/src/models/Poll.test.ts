@@ -26,18 +26,16 @@ describe('Poll', () => {
                 parentId: null,
                 value: 'answer',
                 voterId: '1',
-                pollId: "p1",
+                pollId: 'p1'
             });
-            prismaMock.fingerprint.create.mockResolvedValue( {
-                
+            prismaMock.fingerprint.create.mockResolvedValue({
                 id: '',
                 createdAt: new Date(),
                 updatedAt: new Date(),
-                ip: "ip",
-                idCookie: "idCookie",
-                fingerprintJsId: "fingerprintJsId"
-                
-            } );
+                ip: 'ip',
+                idCookie: 'idCookie',
+                fingerprintJsId: 'fingerprintJsId'
+            });
 
             const poll = new Poll(prismaMock, new QuestionFactory(prismaMock));
             poll.setId('pollId');
@@ -57,10 +55,8 @@ describe('Poll', () => {
 
             const user = makeAnswerer();
 
-            poll.hasBeenAnsweredBy = async (  ) => {
-                
+            poll.hasBeenAnsweredBy = async () => {
                 return false;
-                
             };
 
             await poll.answer(
@@ -84,12 +80,14 @@ describe('Poll', () => {
             );
             expect(poll.answerCount()).toBe(1);
             expect(prismaMock.poll.update).toHaveBeenCalled();
-
         });
-        test('Double answering is blocked', async () => {
+        // Disabled since we don't do any double-vote blocking
+        // on the backend for now.
+        // - Joonas Halinen 21.11.2022
+        test.skip('Double answering is blocked', async () => {
             const poll = new Poll(prismaMock, new QuestionFactory(prismaMock));
             poll.setId('1');
-            poll.setPublicId( "p1" );
+            poll.setPublicId('p1');
 
             const question = new Question();
             question.setId('question-id');
@@ -97,11 +95,13 @@ describe('Poll', () => {
 
             const user = makeAnswerer();
 
-            Fingerprint.prototype.loadFromDatabase = jest.fn().mockResolvedValueOnce( null );
+            Fingerprint.prototype.loadFromDatabase = jest
+                .fn()
+                .mockResolvedValueOnce(null);
             Fingerprint.prototype.wasFoundInDatabase = jest
                 .fn()
                 .mockReturnValueOnce(true);
-            prismaMock.vote.count.mockResolvedValueOnce( 1 );
+            prismaMock.vote.count.mockResolvedValueOnce(1);
 
             try {
                 await poll.answer(
@@ -118,7 +118,7 @@ describe('Poll', () => {
 
                 expect(true).toBe(false);
             } catch (e) {
-                console.log( e );
+                console.log(e);
                 if (e instanceof Error) {
                     expect(e.message).toBe(
                         'User does not have right to answer poll p1.'
@@ -150,7 +150,7 @@ describe('Poll', () => {
                             questionId: '1',
                             value: 'value',
                             voterId: '1',
-                            pollId: "p1",
+                            pollId: 'p1',
                             parentId: null,
                             voter: {
                                 ip: '',
@@ -394,7 +394,7 @@ describe('Poll', () => {
                         value: 'value',
                         parentId: '1',
                         voterId: '1',
-                        pollId: "p1",
+                        pollId: 'p1'
                     }
                 ],
                 options: []

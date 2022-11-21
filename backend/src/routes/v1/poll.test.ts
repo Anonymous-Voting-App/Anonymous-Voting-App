@@ -126,33 +126,30 @@ describe.skip('integration tests using server api', () => {
     });
 
     describe('answer poll', () => {
-        
         test('answer poll successfully', (resolve) => {
-
-            let command = answerPollCommand(  );
+            const command = answerPollCommand();
 
             exec(command, handleAnswerResponse.bind(null, resolve));
         });
 
-        test('fail trying to answer poll second time', (resolve) => {
+        // Disabled since we don't do any double-vote blocking
+        // on the backend for now.
+        // - Joonas Halinen 21.11.2022
+        test.skip('fail trying to answer poll second time', (resolve) => {
+            const command = answerPollCommand();
 
-            let command = answerPollCommand(  );
-
-            exec(command, ( err, stdout ) => {
-                
+            exec(command, (err, stdout) => {
                 const resultJson = extractJson(stdout);
-                
-                console.log( resultJson );
 
-                let result = JSON.parse( resultJson );
-                
-                expect( result.code ).toBe( 403 );
-                
-                resolve(  );
+                console.log(resultJson);
 
+                const result = JSON.parse(resultJson);
+
+                expect(result.code).toBe(403);
+
+                resolve();
             });
         });
-
     });
 
     describe('get public poll', () => {
@@ -216,8 +213,7 @@ describe.skip('integration tests using server api', () => {
         });
     });
 
-    function answerPollCommand(  ) {
-        
+    function answerPollCommand() {
         const multiQuestion = createdPoll
             .questions[0] as IPolling.MultiQuestionData;
         const scaleQuestion = createdPoll.questions[1];
@@ -269,7 +265,6 @@ describe.skip('integration tests using server api', () => {
         console.log(command);
 
         return command;
-        
     }
 
     function handleAnswerResponse(
@@ -283,15 +278,15 @@ describe.skip('integration tests using server api', () => {
 
         const resultJson = extractJson(stdout);
 
-        console.log( resultJson );
+        console.log(resultJson);
 
         const result = JSON.parse(resultJson);
 
-        expect( typeof result === "object" ).toBe( true );
-        expect( typeof result.fingerprint === "object" ).toBe( true );
-        expect( result.fingerprint.ip ).toBe( "127.0.0.1" );
-        expect( result.fingerprint.idCookie.length > 0 ).toBe( true );
-        expect( result.success ).toBe( true );
+        expect(typeof result === 'object').toBe(true);
+        expect(typeof result.fingerprint === 'object').toBe(true);
+        expect(result.fingerprint.ip).toBe('127.0.0.1');
+        expect(result.fingerprint.idCookie.length > 0).toBe(true);
+        expect(result.success).toBe(true);
 
         resolve();
     }

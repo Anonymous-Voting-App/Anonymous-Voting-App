@@ -506,10 +506,7 @@ export default class Poll {
     async _countUserAnswersInDb(answerer: Fingerprint): Promise<number> {
         return await this.database().vote.count({
             where: {
-                AND: [
-                    { voterId: answerer.id() } ,
-                    { pollId: this.id(  ) }
-                ]
+                AND: [{ voterId: answerer.id() }, { pollId: this.id() }]
             }
         });
     }
@@ -763,13 +760,18 @@ export default class Poll {
      * Whether given user has answered the poll previously.
      */
     async hasBeenAnsweredBy(answerer: Fingerprint): Promise<boolean> {
-        await answerer.loadFromDatabase();
+        return false;
+
+        // Disabled since we don't do any double-vote blocking
+        // on the backend for now.
+        // - Joonas Halinen 21.11.2022
+        /* await answerer.loadFromDatabase();
 
         if (answerer.wasFoundInDatabase()) {
             return ( (await this._countUserAnswersInDb(answerer)) !== 0 );
         } else {
             return false;
-        }
+        } */
     }
 
     /**
