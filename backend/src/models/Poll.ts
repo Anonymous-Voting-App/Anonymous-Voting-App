@@ -487,7 +487,7 @@ export default class Poll {
     }
 
     /**
-     *
+     * Answers poll without checking if the answerer has right to answer.
      */
 
     async _answerPollWithRights(
@@ -500,7 +500,8 @@ export default class Poll {
     }
 
     /**
-     *
+     * How many times the given answerer has answered
+     * this poll in the database.
      */
 
     async _countUserAnswersInDb(answerer: Fingerprint): Promise<number> {
