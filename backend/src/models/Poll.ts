@@ -6,9 +6,6 @@ import * as IPolling from './IPolling';
 import * as IPoll from './IPoll';
 import * as IQuestion from './IQuestion';
 import * as IUser from './IUser';
-/* import * as IAnswer from './IAnswer'; */
-/* import MultiQuestionCollection from './MultiQuestionCollection'; */
-/* import MultiQuestion from './MultiQuestion'; */
 import { PrismaClient } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 import QuestionFactory from './QuestionFactory';
@@ -319,8 +316,21 @@ export default class Poll {
         question.setDatabase(this.database());
 
         await question.answer(answerData, user);
+    }
 
-        await this.incrementAnswerCount();
+    /**
+     *
+     */
+
+    async _answerMultipleWithRights(
+        answers: Array<IQuestion.Answer>,
+        user: User
+    ): Promise<void> {
+        for (let i = 0; i < answers.length; i++) {
+            const answer = answers[i];
+
+            await this._answerWithRights(answer.questionId, answer.data, user);
+        }
     }
 
     /**
@@ -377,6 +387,97 @@ export default class Poll {
         question.setFromDatabaseData(questionData);
 
         this.questions()[question.id()] = question;
+    }
+
+    /**
+     * Whether given answer has corresponding question in
+     * poll. If so, alreadyMatched is updated accordingly.
+     * If alreadyMatched already contains the corresponding question id,
+     * returns false.
+     */
+
+    _answerMatchesQuestion(
+        alreadyMatched: { [questionId: string]: boolean },
+        answer: IQuestion.Answer
+    ): boolean {
+        if (
+            alreadyMatched[answer.questionId] !== true &&
+            this.questions()[answer.questionId] instanceof Question
+        ) {
+            alreadyMatched[answer.questionId] = true;
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Whether given answers match the questions of this poll.
+     * As in, whether for each of the answer there
+     * exists a question in the poll with the same id.
+     * Also demands that there are no duplicate answers for the
+     * same question.
+     */
+
+    _answersMatchQuestions(answers: Array<IQuestion.Answer>): boolean {
+        const alreadyMatched: { [questionId: string]: boolean } = {};
+
+        for (let i = 0; i < answers.length; i++) {
+            if (!this._answerMatchesQuestion(alreadyMatched, answers[i])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Whether poll's question accepts given answer data.
+     */
+
+    _questionAcceptsAnswer(
+        questionId: string,
+        data: IQuestion.AnswerData
+    ): boolean {
+        const question = this.questions()[questionId];
+
+        return question.answerDataIsAcceptable(data);
+    }
+
+    /**
+     * Whether all poll's questions accept the
+     * answer datas given.
+     */
+
+    _questionsAcceptAnswers(answers: Array<IQuestion.Answer>): boolean {
+        for (let i = 0; i < answers.length; i++) {
+            const answer = answers[i];
+
+            if (!this._questionAcceptsAnswer(answer.questionId, answer.data)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Whether given array of answer objects is a valid
+     * collection of answers for this poll. Only checks whether the question's
+     * match the poll's questions adequately, does not check answer validity
+     * for each question separately.
+     */
+
+    _answersIsValid(answers: Array<IQuestion.Answer>): boolean {
+        if (answers.length !== Object.keys(this.questions()).length) {
+            return false;
+        }
+
+        return (
+            this._answersMatchQuestions(answers) &&
+            this._questionsAcceptAnswers(answers)
+        );
     }
 
     constructor(database: PrismaClient, questionFactory: QuestionFactory) {
@@ -604,25 +705,17 @@ export default class Poll {
     }
 
     /**
-     * Gives an answer to a question in the poll from given user.
-     * Makes all needed modifications
-     * to database and returns Answer object representing
-     * the created answer.
-     * If given answer data is not of acceptable format for the question,
-     * does nothing and returns undefined.
+     * Answers all questions directly under the poll from given user.
+     * Makes all needed modifications to database.
+     * If answers is not acceptable to poll
+     * or the poll's questions, does nothing and throws BadRequestError.
      */
-    async answer(
-        questionId: string,
-        answerData: IQuestion.AnswerData,
-        user: User
-    ): Promise<void> {
-        pre(
-            'poll has question',
-            this.questions()[questionId] instanceof Question
-        );
+    async answer(answers: Array<IQuestion.Answer>, user: User): Promise<void> {
+        pre('given answers is valid', this._answersIsValid(answers));
 
         if (this.userHasRightToAnswerPoll(user)) {
-            await this._answerWithRights(questionId, answerData, user);
+            await this._answerMultipleWithRights(answers, user);
+            await this.incrementAnswerCount();
         } else {
             // Make this return 403! - Joonas Hiltunen 04.11.2022
             throw new Error(

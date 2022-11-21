@@ -1,39 +1,57 @@
 import React, { useEffect, useState } from 'react';
 import {
-    TextField,
     Button,
     FormControl,
     InputLabel,
     Select,
     MenuItem,
-    Paper
+    Paper,
+    OutlinedInput
 } from '@mui/material';
 import {
     KeyboardArrowDown,
     AddCircleOutline,
     RemoveCircleOutline,
-    HighlightOff
+    HighlightOff,
+    Close
 } from '@mui/icons-material';
 import InputAdornment from '@mui/material/InputAdornment';
 import './Question.scss';
-// import { QUESTION_TYPES } from './constants';
+import { QUESTION_TYPES } from './constants';
 
 function Question(props: any) {
-    // console.log(props);
+    const [shrink, setShrink] = useState({ ques: false, option: false });
+    const [notched, setNotched] = useState({ ques: false, option: false });
+    const [move, setMove] = useState({
+        ques: 'move-ques-label',
+        option: 'move-option-label'
+    }); //'move-label'
     const [showOptionBtn, setShowOptionBtn] = useState(false);
     const [quesOptions, setQuesOptions] = useState([
         { title: '', description: '', type: '' },
         { title: '', description: '', type: '' }
     ]);
     useEffect(() => {
+        if (
+            props.ques.visualType === 'radioBtn' ||
+            props.ques.visualType === 'checkBox'
+        ) {
+            setShowOptionBtn(true);
+        } else {
+            setShowOptionBtn(false);
+        }
         setQuesOptions(props.ques.subQuestions);
-    }, [props.ques.subQuestions]);
+    }, [props.ques.subQuestions, props.ques.visualType]);
 
     /**
      * Function to pass entered question text to pollcreation page(parent)
      * @param value
      */
-    const onQuestionInput = (value: string) => {
+    const onQuestionInput = (value: string, type: string) => {
+        setShrink({ ...shrink, ques: true });
+        setNotched({ ...notched, ques: true });
+        setMove({ ...move, ques: 'ques-label' });
+
         props.questionInputHandler(value, props.ind);
     };
 
@@ -42,8 +60,13 @@ function Question(props: any) {
      * @param value
      */
     const onTypeChange = (value: string) => {
+        console.log(value);
         props.typeChangehandler(value, props.ind);
-        setShowOptionBtn(true);
+        if (value === 'radioBtn' || value === 'checkBox') {
+            setShowOptionBtn(true);
+        } else {
+            setShowOptionBtn(false);
+        }
     };
 
     /**
@@ -67,6 +90,9 @@ function Question(props: any) {
         });
         setQuesOptions(newOptions);
         props.optionInputHandler(newOptions, props.ind);
+        setShrink({ ...shrink, option: true });
+        setNotched({ ...notched, option: true });
+        setMove({ ...move, option: 'option-label' });
     };
 
     /**
@@ -74,7 +100,12 @@ function Question(props: any) {
      * @param index - index of question for which options are added
      * @param value - option text
      */
-    const onOptionInput = (index: number, value: string) => {
+    const onOptionInput = (index: number, value: string, type: string) => {
+        if (value) {
+            setShrink({ ...shrink, option: true });
+            setNotched({ ...notched, option: true });
+            setMove({ ...move, option: 'option-label' });
+        }
         const newOptions = quesOptions.map((quesOption, optionIndex) => {
             if (optionIndex === index) {
                 return { title: value, description: value, type: 'boolean' };
@@ -89,11 +120,17 @@ function Question(props: any) {
         props.questionRemovalHandler(props.ind);
         // console.log(props, 'props after ques removal');
         setQuesOptions(props.ques.subQuestions);
+        setShrink({ ...shrink, option: true });
+        setNotched({ ...notched, option: true });
+        setMove({ ...move, option: 'option-label' });
     };
 
     return (
         <>
-            <Paper className="question-wrapper" elevation={3}>
+            <Paper className="question-wrapper main-wrap" elevation={3}>
+                <div className="close-icon">
+                    <Close onClick={() => removeQuestion()} />
+                </div>
                 <FormControl
                     className="type-dropdown"
                     sx={{ m: 1, minWidth: 120 }}
@@ -105,30 +142,40 @@ function Question(props: any) {
                         IconComponent={KeyboardArrowDown}
                         labelId="select-ques-type"
                         id="select-ques-type"
-                        value={props.ques.type}
+                        value={props.ques.visualType}
                         onChange={(event) => onTypeChange(event.target.value)}
                     >
-                        {/* <MenuItem value={''}>
-                            <em>None</em>
-                        </MenuItem> */}
-                        {/* {QUESTION_TYPES.map(item => {
-                            return <MenuItem value={item.value}>{item.type}</MenuItem>;
-                        })} */}
-                        <MenuItem value={'radioBtn'}>Pick one</MenuItem>
-                        <MenuItem value={'checkBox'}>Multi - choice</MenuItem>
+                        {QUESTION_TYPES.map((item) => {
+                            return (
+                                <MenuItem key={item.value} value={item.value}>
+                                    {item.type}
+                                </MenuItem>
+                            );
+                        })}
+                        {/* <MenuItem value={'radioBtn'}>Pick one</MenuItem>
+                        <MenuItem value={'checkBox'}>Multi - choice</MenuItem> */}
                     </Select>
                 </FormControl>
-                <TextField
-                    autoComplete="off"
-                    className="question-field"
-                    onChange={(event) => onQuestionInput(event.target.value)}
-                    type="text"
-                    value={props.ques.title}
-                    variant="outlined"
-                    inputProps={{ 'data-testid': 'question-field' }}
-                    multiline
-                    InputProps={{
-                        startAdornment: (
+                <FormControl className="question-field">
+                    <InputLabel
+                        id="question-label"
+                        shrink={shrink.ques}
+                        className={move.ques}
+                    >
+                        Enter question
+                    </InputLabel>
+                    <OutlinedInput
+                        notched={notched.ques}
+                        label="Enter question"
+                        autoComplete="off"
+                        onChange={(event) =>
+                            onQuestionInput(event.target.value, 'ques')
+                        }
+                        type="text"
+                        value={props.ques.title}
+                        inputProps={{ 'data-testid': 'question-field' }}
+                        multiline
+                        startAdornment={
                             <InputAdornment position="start">
                                 <span
                                     className="adornment-span"
@@ -137,19 +184,31 @@ function Question(props: any) {
                                     <HighlightOff />
                                 </span>
                             </InputAdornment>
-                        )
-                    }}
-                />
+                        }
+                    />
+                </FormControl>
                 {showOptionBtn ? (
                     <>
                         {quesOptions.map((quesOption, index) => (
-                            <TextField
-                                inputProps={{
-                                    'data-testid': `option-field-${index}`
-                                }}
+                            <FormControl
+                                key={`form-${index}`}
                                 className="option-field"
-                                InputProps={{
-                                    startAdornment: (
+                            >
+                                <InputLabel
+                                    key={`option-${index}`}
+                                    id="option-label"
+                                    shrink={shrink.option}
+                                    className={move.option}
+                                >
+                                    Enter option
+                                </InputLabel>
+                                <OutlinedInput
+                                    inputProps={{
+                                        'data-testid': `option-field-${index}`
+                                    }}
+                                    notched={notched.option}
+                                    label="Enter option"
+                                    startAdornment={
                                         <InputAdornment position="start">
                                             <span
                                                 className="adornment-span"
@@ -161,17 +220,20 @@ function Question(props: any) {
                                                 <RemoveCircleOutline />
                                             </span>
                                         </InputAdornment>
-                                    )
-                                }}
-                                autoComplete="off"
-                                variant="outlined"
-                                onChange={(event) =>
-                                    onOptionInput(index, event.target.value)
-                                }
-                                key={index}
-                                type="text"
-                                value={quesOption.title}
-                            />
+                                    }
+                                    autoComplete="off"
+                                    onChange={(event) =>
+                                        onOptionInput(
+                                            index,
+                                            event.target.value,
+                                            'option'
+                                        )
+                                    }
+                                    key={index}
+                                    type="text"
+                                    value={quesOption.title}
+                                />
+                            </FormControl>
                         ))}
                         <Button
                             className="add-option-btn"

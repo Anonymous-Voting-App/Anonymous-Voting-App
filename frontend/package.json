@@ -14,9 +14,11 @@
         "@types/node": "^16.11.59",
         "@types/react": "^18.0.20",
         "@types/react-dom": "^18.0.6",
+        "file-saver": "^2.0.5",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
         "react-scripts": "5.0.1",
+        "sheetjs-style": "^0.15.8",
         "typescript": "^4.8.3",
         "web-vitals": "^2.1.4"
     },
@@ -27,14 +29,16 @@
         "lint": "eslint .",
         "test": "react-scripts test",
         "test:ci": "CI=true npm test -- --watchAll=false --coverage",
-        "eject": "react-scripts eject"
+        "eject": "react-scripts eject",
+        "cypress": "cypress open"
     },
     "proxy": "http://localhost:8080",
     "eslintConfig": {
         "extends": [
             "react-app",
             "react-app/jest",
-            "prettier"
+            "prettier",
+            "plugin:cypress/recommended"
         ]
     },
     "browserslist": {
@@ -50,7 +54,11 @@
         ]
     },
     "devDependencies": {
+        "@types/file-saver": "^2.0.5",
+        "@typescript-eslint/eslint-plugin": "^5.43.0",
+        "cypress": "^11.0.1",
         "eslint-config-prettier": "^8.5.0",
+        "eslint-plugin-cypress": "^2.12.1",
         "react-router-dom": "^6.4.2",
         "sass": "^1.55.0"
     }

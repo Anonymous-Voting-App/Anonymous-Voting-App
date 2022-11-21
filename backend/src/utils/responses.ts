@@ -130,10 +130,14 @@ export const custom = (
     req: Request,
     res: Response,
     code: number,
-    message: string
+    message: string | object
 ) => {
-    return res.status(code).json({
-        code,
-        message
-    });
+    if (typeof message === 'string') {
+        return res.status(code).json({
+            code,
+            message
+        });
+    }
+
+    return res.status(code).json(message);
 };

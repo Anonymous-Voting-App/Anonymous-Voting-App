@@ -32,11 +32,6 @@ variable "cloudfront_alias_certificate_arn" {
   description = "ARN of the certificate for the cloudfront alias"
 }
 
-variable "backend_load_balancer_address" {
-  type        = string
-  description = "URL of the backend load balancer"
-}
-
 variable "s3_frontend_expiration_days" {
   default     = 30
   description = "Expiration time for non-current versions"

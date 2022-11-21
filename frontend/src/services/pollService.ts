@@ -1,14 +1,53 @@
-import { PollObj } from '../utils/types';
+import { PollQuesObj } from '../utils/types';
+import getBackendUrl from '../utils/getBackendUrl';
 
 // function to modify question type before calling api
-const updatePollBody = (questions: PollObj[]) => {
-    const updatedQuestions = questions.map((element) => {
-        console.log(element.type);
-        if (element.type === 'radioBtn' || element.type === 'checkBox')
-            return { ...element, visualType: element.type, type: 'multi' };
-        else return element;
-    });
-    // console.log(updatedQuestions);
+const updatePollBody = (questions: PollQuesObj[]) => {
+    const updatedQuestions = questions.map(
+        ({ subQuestions, minAnswers, maxAnswers, ...element }) => {
+            console.log(element.visualType);
+            let quesObj;
+            switch (element.visualType) {
+                case 'radioBtn':
+                case 'checkBox':
+                    quesObj = {
+                        type: 'multi',
+                        subQuestions: subQuestions,
+                        minAnswers: minAnswers,
+                        maxAnswers: maxAnswers,
+                        ...element
+                    };
+                    break;
+                case 'star':
+                    quesObj = {
+                        type: 'scale',
+                        step: 1,
+                        minValue: 1,
+                        maxValue: 5,
+                        ...element
+                    };
+                    break;
+                case 'yesNo':
+                case 'upDown':
+                    quesObj = {
+                        type: 'boolean',
+                        ...element
+                    };
+                    break;
+                case 'free':
+                    quesObj = {
+                        type: 'free',
+                        ...element
+                    };
+                    break;
+            }
+            return quesObj;
+            // if (element.type === 'radioBtn' || element.type === 'checkBox')
+            //     return { ...element, visualType: element.type, type: 'multi' };
+            // else return element;
+        }
+    );
+    console.log(updatedQuestions);
     return updatedQuestions;
 };
 
@@ -28,8 +67,8 @@ export const createPoll = async (title: string, questions: any) => {
         },
         questions: updatedQuestions
     };
-    // await fetch(`${window.location.origin}/api/poll`, {
-    const response = await fetch(`${window.location.origin}/api/poll`, {
+    console.log(pollContent);
+    const response = await fetch(`${getBackendUrl()}/api/poll`, {
         method: 'POST',
         body: JSON.stringify(pollContent),
         headers: {
@@ -49,10 +88,13 @@ export const createPoll = async (title: string, questions: any) => {
  * @returns
  */
 export const fetchPollResult = async (pollId: string) => {
-    console.log(pollId, 'poll results');
-
+    // pollId = '1576d894-2571-4281-933d-431d246bb460';
+    // a6fb06b2-7146-42c0-820b-346a9d1e0539
+    // 63189e12-7a23-4630-8984-5cc2a2629d24 - rating type ques only
+    // ee651f25-a6f7-4602-b517-2031396a0b26 - thumbs up/down
     const newResponse = await fetch(
-        `${window.location.origin}/api/poll/${pollId}/results`,
+        // `${window.location.origin}/dummy2.json`,
+        `${getBackendUrl()}/api/poll/${pollId}/results`,
         {
             headers: {
                 'Content-Type': 'application/json',
@@ -65,7 +107,7 @@ export const fetchPollResult = async (pollId: string) => {
     }
     const dataList = await newResponse.json();
     const formattedData = formatData(dataList);
-    console.log(formattedData, 'data');
+
     return formattedData;
 };
 
@@ -96,6 +138,12 @@ const setQuesArray = (item: any) => {
                     : [];
             options = formatRatingOptions(ratingOptions);
             break;
+        case 'free':
+            options =
+                item.answerValueStatistics.length > 0
+                    ? formatFreeTextOptions(item.answerValueStatistics)
+                    : formatFreeTextOptions(['No feedback']);
+            break;
         case 'yesNo':
         case 'upDown':
             const booleanOptions =
@@ -114,6 +162,13 @@ const setQuesArray = (item: any) => {
                 : item.answerCount,
         options: options
     };
+};
+
+const formatFreeTextOptions = (options: [any]) => {
+    const formattedTextOptions = options.map((option) => {
+        return { title: option, count: 0, percenatge: 0 };
+    });
+    return formattedTextOptions;
 };
 
 const formatMultiTypeOptions = (options: [any]) => {
@@ -160,7 +215,6 @@ const formatRatingOptions = (options: [any]) => {
                 : respOptions.find((item) => item.value === arr.title);
         return obj;
     });
-    console.log(ratingTypeOptions);
     // for fixing title - value keys
     ratingTypeOptions = ratingTypeOptions.map((option) => {
         return {
@@ -170,7 +224,9 @@ const formatRatingOptions = (options: [any]) => {
         };
     });
     console.log(ratingTypeOptions);
-    return ratingTypeOptions.length > 0 ? ratingTypeOptions : newArray;
+    return ratingTypeOptions.length > 0
+        ? ratingTypeOptions.reverse()
+        : newArray;
 };
 
 const formatBooleanOptions = (options: [any]) => {
@@ -179,8 +235,9 @@ const formatBooleanOptions = (options: [any]) => {
         { title: false, count: 0, percentage: 0 }
     ];
     const booleanTypeOptions = options.map((option) => {
+        console.log(option);
         return {
-            title: option.value ? 'Yes' : 'No',
+            title: option.value === 'true' ? 'Yes' : 'No',
             count: option.count,
             percentage:
                 (option.percentage * 100)
@@ -191,6 +248,6 @@ const formatBooleanOptions = (options: [any]) => {
                     : (option.percentage * 100).toFixed(1)
         };
     });
-
+    console.log(booleanTypeOptions);
     return booleanTypeOptions.length > 0 ? booleanTypeOptions : newArray;
 };

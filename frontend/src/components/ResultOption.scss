@@ -18,21 +18,23 @@
     }
 }
 
-.MuiSvgIcon-root {
-    font-size: 1rem !important;
+.MuiSvgIcon-root.check-icon {
+    font-size: 1rem;
     position: relative;
     top: 3px;
+
     @include for-phone-only {
-        font-size: 0.75rem !important;
+        font-size: 0.75rem;
     }
 }
 
 .pickone-multi-type {
     display: flex;
     flex-wrap: wrap;
-    min-width: 45rem !important;
+    min-width: 45rem;
     justify-content: center;
     margin-bottom: 1rem;
+
     @include for-phone-only {
         min-width: 3rem !important;
         flex-direction: column;
@@ -47,14 +49,51 @@
     }
 }
 
+.rating-type {
+    display: flex;
+}
+
+.upDown-type {
+    display: flex;
+    margin-bottom: 1rem;
+    .upDown-icon {
+        margin-right: 6rem;
+        .MuiSvgIcon-root {
+            font-size: 1.5rem;
+        }
+    }
+
+    .value {
+        display: flex;
+        // min-width: 6rem;
+        .MuiTypography-root {
+            display: flex;
+            align-items: center;
+        }
+    }
+}
+
 .option,
 .value {
     flex-basis: 50%;
 }
 
+.MuiRating-root {
+    margin-right: 5rem;
+}
+
+.MuiRating-icon {
+    color: $black;
+}
+
+.MuiRating-iconEmpty {
+    color: $black;
+}
+
 .icon-container {
     margin-right: 0.375rem;
 }
+
 .option-percent {
     margin-right: 0.5rem;
 }
