@@ -576,7 +576,7 @@ export default class Question {
 
         answer.setFromRequest(answerData, answerer, this.id());
         answer.setQuestionId(this.id());
-        answer.setPollId( this.pollId(  ) );
+        answer.setPollId(this.pollId());
 
         if (typeof parentAnswerId === 'string') {
             answer.setParentId(parentAnswerId);

@@ -9,7 +9,6 @@ import { PrismaClient } from '@prisma/client';
  */
 
 export default class IPIdentifier extends IdentifyingFeature {
-
     _ip = '';
 
     /**  */
@@ -73,11 +72,10 @@ export default class IPIdentifier extends IdentifyingFeature {
     }
 
     addToNewDatabaseObject(obj: IFingerprint.NewDbObject): void {
-        obj.ip = this.ip(  );
+        obj.ip = this.ip();
     }
 
     privateDataObj(): PrivateData {
-        return { ip: this.ip(  ) };
+        return { ip: this.ip() };
     }
-    
 }

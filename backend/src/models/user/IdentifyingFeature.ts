@@ -39,5 +39,5 @@ export default abstract class IdentifyingFeature {
 
     abstract privateDataObj(): IIdentifyingFeature.PrivateData;
 
-    abstract addToNewDatabaseObject( obj: IFingerprint.NewDbObject ): void;
+    abstract addToNewDatabaseObject(obj: IFingerprint.NewDbObject): void;
 }

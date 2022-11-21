@@ -1,6 +1,6 @@
 import { prismaMock } from '../../utils/prisma_singleton';
 import IPIdentifier from './IPIdentifier';
-import CookieIdentifier from ".//CookieIdentifier";
+import CookieIdentifier from './/CookieIdentifier';
 import Fingerprint from './Fingerprint';
 
 describe('Fingerprint', () => {
@@ -23,9 +23,7 @@ describe('Fingerprint', () => {
                             ip: 'ip'
                         },
                         {
-                            
-                            idCookie: "cookie"
-                            
+                            idCookie: 'cookie'
                         }
                     ]
                 }
@@ -52,9 +50,7 @@ describe('Fingerprint', () => {
                             ip: 'ip'
                         },
                         {
-                            
-                            idCookie: "cookie"
-                            
+                            idCookie: 'cookie'
                         }
                     ]
                 }

@@ -40,11 +40,7 @@ function makeFingerprint(req: Request) {
     return fingerprint;
 }
 
-function handleServiceError( 
-    req: Request,
-    res: Response,
-    e: unknown ) {
-    
+function handleServiceError(req: Request, res: Response, e: unknown) {
     // Bad request
     if (e instanceof AssertionError) {
         Logger.warn(`Bad Request: ${e.message}`);
@@ -54,7 +50,7 @@ function handleServiceError(
         Logger.warn(`Bad Request: ${e.message}`);
         Logger.warn(e.stack);
         return responses.badRequest(req, res);
-    } else if ( e instanceof ForbiddenError ) {
+    } else if (e instanceof ForbiddenError) {
         Logger.warn(`Forbidden: ${e.message}`);
         Logger.warn(e.stack);
         return responses.forbidden(req, res, e);
@@ -66,7 +62,6 @@ function handleServiceError(
     }
 
     return responses.internalServerError(req, res);
-    
 }
 
 const callService = async (
@@ -110,7 +105,7 @@ const callService = async (
 
         return internalServerError(method, req, res);
     } catch (e: unknown) {
-        return handleServiceError( req, res, e );
+        return handleServiceError(req, res, e);
     }
 };
 

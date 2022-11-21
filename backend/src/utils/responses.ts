@@ -75,7 +75,7 @@ export const unauthorized = (req: Request, res: Response) => {
 export const forbidden = (req: Request, res: Response, e?: Error) => {
     return res.status(403).json({
         code: 403,
-        message: e instanceof Error ? "Forbidden: " + e.message : 'Forbidden'
+        message: e instanceof Error ? 'Forbidden: ' + e.message : 'Forbidden'
     });
 };
 

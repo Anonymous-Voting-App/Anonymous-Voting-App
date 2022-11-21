@@ -26,7 +26,7 @@ describe('Answer', () => {
             expect(answer.newDatabaseObject()).toEqual({
                 questionId: 'test-question-id',
                 value: 'test-value',
-                pollId: "",
+                pollId: '',
                 voterId: '1',
                 parentId: null
             });
@@ -103,7 +103,7 @@ describe('Answer', () => {
                 questionId: 'q1',
                 parentId: null,
                 value: 'asd',
-                pollId: "p1",
+                pollId: 'p1',
                 voterId: 'v1'
             };
 
@@ -225,7 +225,7 @@ describe('Answer', () => {
             questionId: 'test-question-id',
             value: 'test-value',
             voterId: '1',
-            pollId: "p1",
+            pollId: 'p1',
             parentId: null,
             voter: {
                 ip: '',

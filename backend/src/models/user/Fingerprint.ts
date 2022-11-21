@@ -134,21 +134,15 @@ export default class Fingerprint {
     }
 
     /**
-     * 
+     *
      */
-    
-    _setFromCreatedDbData( data: IFingerprint.DatabaseData | undefined ): void {
-        
-        if ( typeof data === "object" ) {
-            
-            this.setFromDatabaseData( data );
-            
+
+    _setFromCreatedDbData(data: IFingerprint.DatabaseData | undefined): void {
+        if (typeof data === 'object') {
+            this.setFromDatabaseData(data);
         } else {
-            
-            throw new Error( "Error: Could not create fingerprint in database." );
-            
+            throw new Error('Error: Could not create fingerprint in database.');
         }
-        
     }
 
     constructor(database: PrismaClient) {
@@ -229,23 +223,19 @@ export default class Fingerprint {
     }
 
     /**
-     * 
+     *
      */
-    
-     newDatabaseObject(  ): IFingerprint.NewDbObject {
-        
-        const obj = {  };
 
-        for ( let i = 0; i < this._identifiers.length; i++ ) {
-            
+    newDatabaseObject(): IFingerprint.NewDbObject {
+        const obj = {};
+
+        for (let i = 0; i < this._identifiers.length; i++) {
             const identifier = this._identifiers[i];
-            
-            identifier.addToNewDatabaseObject( obj );
-            
+
+            identifier.addToNewDatabaseObject(obj);
         }
 
         return obj;
-        
     }
 
     /**
@@ -253,15 +243,11 @@ export default class Fingerprint {
      */
 
     async createNewInDatabase(): Promise<void> {
-        
-        const data = await this._database.fingerprint.create( {
-            
-            data: this.newDatabaseObject(  )
-            
-        } );
+        const data = await this._database.fingerprint.create({
+            data: this.newDatabaseObject()
+        });
 
-        this._setFromCreatedDbData( data );
-
+        this._setFromCreatedDbData(data);
     }
 
     /**
@@ -281,15 +267,13 @@ export default class Fingerprint {
      */
 
     async loadFromDatabase(): Promise<void> {
-        const data = await this.database(  ).fingerprint.findFirst( 
-            this.findSelfInDatabaseQuery(  ) as any
+        const data = await this.database().fingerprint.findFirst(
+            this.findSelfInDatabaseQuery() as any
         );
 
-        if ( data !== null ) {
-            
-            this.setFromDatabaseData( data );
-            this.setWasFoundInDatabase( true );
-            
+        if (data !== null) {
+            this.setFromDatabaseData(data);
+            this.setWasFoundInDatabase(true);
         }
     }
 
@@ -310,16 +294,12 @@ export default class Fingerprint {
     }
 
     /**
-     * 
+     *
      */
-    
-    async ensureExistsInDatabase(  ): Promise<void> {
-        
-        if ( !this.wasFoundInDatabase(  ) ) {
-            
-            await this.createNewInDatabase(  );
-            
+
+    async ensureExistsInDatabase(): Promise<void> {
+        if (!this.wasFoundInDatabase()) {
+            await this.createNewInDatabase();
         }
-        
     }
 }

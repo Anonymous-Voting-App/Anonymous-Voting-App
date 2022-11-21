@@ -33,9 +33,7 @@ export interface PrivateData {
 }
 
 export interface NewDbObject {
-    
     ip?: string;
     idCookie?: string;
     fingerprintJsId?: string;
-    
 }

@@ -23,26 +23,22 @@ export default class Answer {
     _database!: PrismaClient;
     _subAnswers: { [id: string]: Answer } = {};
     _parentId = '';
-    _pollId = "";
-	
-	/**  */
-	
-	pollId(): string {
-		
-		return this._pollId;
-		
-	}
-	
+    _pollId = '';
+
+    /**  */
+
+    pollId(): string {
+        return this._pollId;
+    }
+
     /** Sets value of pollId. */
-        
+
     setPollId(pollId: string): void {
-        
-        pre("argument pollId is of type string", typeof pollId === "string");
-	
+        pre('argument pollId is of type string', typeof pollId === 'string');
+
         this._pollId = pollId;
-        
-        post("_pollId is pollId", this._pollId === pollId);
-        
+
+        post('_pollId is pollId', this._pollId === pollId);
     }
 
     /** Id of a possible parent Answer. */
@@ -177,7 +173,7 @@ export default class Answer {
         this.setId(answerData.id);
         this.setQuestionId(answerData.questionId);
         this.setValue(answerData.value);
-        this.setPollId( answerData.pollId );
+        this.setPollId(answerData.pollId);
     }
 
     /**
@@ -390,7 +386,7 @@ export default class Answer {
             questionId: this.questionId(),
             value: this.value().toString(),
             voterId: this.answerer().id(),
-            pollId: this.pollId(  ),
+            pollId: this.pollId(),
             parentId: this.parentId().length > 0 ? this.parentId() : null
         };
 

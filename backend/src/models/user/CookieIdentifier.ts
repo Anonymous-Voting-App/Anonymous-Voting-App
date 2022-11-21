@@ -10,7 +10,6 @@ import crypto from 'crypto';
  */
 
 export default class CookieIdentifier extends IdentifyingFeature {
-
     _cookie = '';
 
     /**  */
@@ -60,10 +59,10 @@ export default class CookieIdentifier extends IdentifyingFeature {
     }
 
     addToNewDatabaseObject(obj: NewDbObject): void {
-        obj.idCookie = this.cookie(  );
+        obj.idCookie = this.cookie();
     }
 
     privateDataObj(): PrivateData {
-        return { idCookie: this.cookie(  ) };
+        return { idCookie: this.cookie() };
     }
 }
