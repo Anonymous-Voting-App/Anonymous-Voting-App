@@ -33,6 +33,27 @@ export default class Poll {
     _createdInDatabase = false;
     _questionFactory: QuestionFactory;
     _answerCount = 0;
+    _visualFlags: Array<string> = [  ];
+	
+	/**  */
+	
+	visualFlags(): Array<string> {
+		
+		return this._visualFlags;
+		
+	}
+	
+    /** Sets value of visualFlags. */
+        
+    setVisualFlags(visualFlags: Array<string>): void {
+        
+        pre("argument visualFlags is of type Array<string>", Array.isArray(visualFlags));
+	
+        this._visualFlags = visualFlags;
+        
+        post("_visualFlags is visualFlags", this._visualFlags === visualFlags);
+        
+    }
 
     /** How many times the poll has been answered. */
 
@@ -551,7 +572,8 @@ export default class Poll {
             adminLink: this.privateId(),
             pollLink: this.publicId(),
             resultLink: '',
-            creatorId: this.owner().id()
+            creatorId: this.owner().id(),
+            visualFlags: this.visualFlags(  )
         };
     }
 
@@ -698,6 +720,7 @@ export default class Poll {
         this.setPublicId(pollData.pollLink);
         this.setPrivateId(pollData.adminLink);
         this.setAnswerCount(pollData.answerCount);
+        this.setVisualFlags( pollData.visualFlags );
 
         if (!omitQuestions) {
             this.setQuestionsFromDatabaseData(pollData.questions || []);
@@ -805,7 +828,8 @@ export default class Poll {
             privateId: this.privateId(),
             type: this.type(),
             questions: this.questionsDataObjs(),
-            answers: this.answersDataObjs()
+            answers: this.answersDataObjs(),
+            visualFlags: this.visualFlags(  )
         };
 
         if (this.owner() instanceof User) {
@@ -826,7 +850,8 @@ export default class Poll {
             name: this.name(),
             publicId: this.publicId(),
             type: this.type(),
-            questions: this.questionsDataObjs()
+            questions: this.questionsDataObjs(),
+            visualFlags: this.visualFlags(  )
         };
 
         return result;
@@ -903,6 +928,9 @@ export default class Poll {
     setFromRequest(request: IPolling.PollRequest, owner: User): void {
         this.setOwner(owner);
         this.setName(request.name);
+        if ( Array.isArray( request.visualFlags ) ) {
+            this.setVisualFlags( request.visualFlags );
+        }
         this.setQuestionsFromRequests(request.questions);
     }
 
@@ -941,7 +969,8 @@ export default class Poll {
             publicId: this.publicId(),
             type: this.type(),
             answerCount: this.answerCount(),
-            questions: this.questionsResultObjs()
+            questions: this.questionsResultObjs(),
+            visualFlags: this.visualFlags(  )
         };
 
         return result;

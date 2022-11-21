@@ -22,6 +22,7 @@ model Poll {
   answerCount Int        @default(0)
   creator     User       @relation("PollUser", fields: [creatorId], references: [id])
   questions   Question[] @relation("PollQuestions")
+  visualFlags String[]
 }
 
 model Question {

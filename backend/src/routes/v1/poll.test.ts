@@ -10,7 +10,7 @@ import {
 
 jest.setTimeout(20000);
 
-describe.skip('integration tests using server api', () => {
+describe('integration tests using server api', () => {
     // The tests first create a poll and then this created
     // poll is used for the further tests.
     let createdPoll: IPolling.PollData;
@@ -99,10 +99,13 @@ describe.skip('integration tests using server api', () => {
                     \\"accountId\\": \\"1eb1cfae-09e7-4456-85cd-e2edfff80544\\", 
                     \\"ip\\": \\"123\\", 
                     \\"cookie\\": \\"c123\\" 
-                } 
+                },
+                \\"visualFlags\\": [\\"test1\\", \\"test2\\"] 
             }" http://localhost:8080/api/poll`;
 
             command = formatMultiLineCommandForConsole(command);
+
+            console.log( command );
 
             exec(command, async (err, stdout) => {
                 if (err) {
@@ -294,6 +297,7 @@ describe.skip('integration tests using server api', () => {
     function checkResults(results: IPolling.ResultData) {
         expect(results.answerCount).toBe(1);
         expect(results.questions.length).toBe(4);
+        expect( results.visualFlags ).toEqual( [ "test1", "test2" ] );
         expect(Object.keys(results.questions)).toEqual(
             Object.keys(createdPoll.questions)
         );
@@ -446,6 +450,7 @@ describe.skip('integration tests using server api', () => {
         expect(poll.id.length > 0).toBe(true);
         expect(poll.name).toBe('testPoll1');
         expect(poll.questions.length).toBe(4);
+        expect( poll.visualFlags ).toEqual( [ "test1", "test2" ] );
 
         checkMultiQuestion(
             poll.questions[0] as IPolling.MultiQuestionData,

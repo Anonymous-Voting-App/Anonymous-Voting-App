@@ -275,7 +275,8 @@ describe('Poll', () => {
                 pollLink: 'link',
                 resultLink: 'link',
                 isActive: true,
-                answerCount: 0
+                answerCount: 0,
+                visualFlags: [  ]
             });
 
             const poll = new Poll(prismaMock, new QuestionFactory(prismaMock));
@@ -304,6 +305,7 @@ describe('Poll', () => {
 
             poll.setFromDatabaseData(dummyDatabaseData as IPoll.DatabaseData);
             poll.owner().setId('d1b44abe-b336-497d-8148-11166b7c2489');
+            poll.setVisualFlags( [ "test" ] );
 
             const data = poll.newDatabaseObject();
 
@@ -312,7 +314,8 @@ describe('Poll', () => {
                 creatorId: 'd1b44abe-b336-497d-8148-11166b7c2489',
                 adminLink: 'privateId',
                 pollLink: 'publicId',
-                resultLink: ''
+                resultLink: '',
+                visualFlags: [ "test" ]
             });
         });
     });
@@ -325,6 +328,7 @@ describe('Poll', () => {
             poll.owner().setId('d1b44abe-b336-497d-8148-11166b7c2489');
             poll.questions()['1'].setAnswerCount(2);
             poll.questions()['1'].setAnswerPercentage(0.2);
+            poll.setVisualFlags( [ "test" ] );
 
             const data = poll.resultDataObj();
 
@@ -333,6 +337,7 @@ describe('Poll', () => {
                 publicId: 'publicId',
                 type: '',
                 answerCount: 0,
+                visualFlags: [ "test" ],
                 questions: [
                     {
                         title: '',
@@ -372,6 +377,7 @@ describe('Poll', () => {
         isActive: true,
         creatorId: '1',
         answerCount: 0,
+        visualFlags: [  ],
         questions: [
             {
                 createdAt: new Date(),

@@ -30,6 +30,7 @@ describe('VotingService', () => {
                 type: 'type',
                 publicId: 'publicId',
                 privateId: 'privateId',
+                visualFlags: [ "test" ],
                 questions: [
                     {
                         title: '',
@@ -207,6 +208,7 @@ describe('VotingService', () => {
                 name: 'name',
                 publicId: 'publicId',
                 type: 'type',
+                visualFlags: [ "test" ],
                 questions: [
                     {
                         title: '',
@@ -328,6 +330,8 @@ describe('VotingService', () => {
                 pollId: '1'
             }
         ]);
+
+        expect( poll?.visualFlags ).toEqual( [ "test" ] );
 
         if (isPrivate) {
             expect(poll?.answers).toEqual([]);
