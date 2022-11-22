@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import {
     Container,
     Typography,
+    Rating,
     Button,
     FormControl,
     FormControlLabel,
@@ -11,6 +12,8 @@ import {
     Checkbox,
     TextField
 } from '@mui/material';
+import ThumbDownIcon from '@mui/icons-material/ThumbDown';
+import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import { ArrowBack, ArrowForward } from '@mui/icons-material';
 import './PollAnswering.scss';
 import Question from './Question';
@@ -18,9 +21,12 @@ import Question from './Question';
 const PollAnswering = (props: any) => {
     const [showPickOne, setshowPickOne] = useState(true);
     const [showMultiChoice, setshowMultiChoice] = useState(false);
+    const [showStartRating, setsshowStartRating] = useState(true);
     const [showFreeText, setsshowFreeText] = useState(false);
+    const [showYesNo, setsshowYesNo] = useState(true);
+    const [showThumbsUpDown, setsshowThumbsUpDown] = useState(true);
 
-    const [IsFirst, setIsFirst] = useState('pickOne');
+    const [QuestionType, setQuestionType] = useState('pickOne');
 
     const [questions, setQuestions] = useState([
         {
@@ -34,17 +40,17 @@ const PollAnswering = (props: any) => {
     ]);
 
     const handleNextClick = () => {
-        if (IsFirst === 'pickOne') {
+        if (QuestionType === 'pickOne') {
             setshowMultiChoice(true);
             setshowPickOne(false);
-            setIsFirst('multiChoise');
+            setQuestionType('multiChoise');
             (
                 document.getElementById('submitButton') as HTMLInputElement
             ).disabled = false;
-        } else if (IsFirst === 'multiChoise') {
+        } else if (QuestionType === 'multiChoise') {
             setsshowFreeText(true);
             setshowMultiChoice(false);
-            setIsFirst('freeText');
+            setQuestionType('freeText');
         }
 
         (document.getElementById('submitButton') as HTMLInputElement).disabled =
@@ -52,14 +58,14 @@ const PollAnswering = (props: any) => {
     };
 
     const handlePreviousClick = () => {
-        if (IsFirst === 'freeText') {
+        if (QuestionType === 'freeText') {
             setshowMultiChoice(true);
             setsshowFreeText(false);
-            setIsFirst('multiChoise');
-        } else if (IsFirst === 'multiChoise') {
+            setQuestionType('multiChoise');
+        } else if (QuestionType === 'multiChoise') {
             setshowPickOne(true);
             setshowMultiChoice(false);
-            setIsFirst('pickOne');
+            setQuestionType('pickOne');
             (
                 document.getElementById('submitButton') as HTMLInputElement
             ).disabled = true;
@@ -116,7 +122,7 @@ const PollAnswering = (props: any) => {
                             display="inline"
                             id="total_num"
                         >
-                            3
+                            4
                         </Typography>
                         <Typography
                             className="questionNumberText"
@@ -180,7 +186,47 @@ const PollAnswering = (props: any) => {
                             display="inline"
                             id="total_num"
                         >
+                            4
+                        </Typography>
+                        <Typography className="" display="inline">
+                            {' '}
+                            questions
+                        </Typography>
+                    </div>
+                </div>
+            ) : null}
+
+            {showStartRating ? (
+                <div className="">
+                    <Typography className="questionType" variant="h4">
+                        Star rating:
+                    </Typography>
+                    <Typography className="questionTitle">
+                        What rate this vehicle: Car
+                    </Typography>
+                    <div className="answerContainer">
+                        <FormControl>
+                            <Rating name="rating-group" readOnly />
+                        </FormControl>
+                    </div>
+                    <div className="questionNumber">
+                        <Typography
+                            className=""
+                            display="inline"
+                            id="question_num"
+                        >
                             3
+                        </Typography>
+                        <Typography className="" display="inline">
+                            {' '}
+                            of{' '}
+                        </Typography>
+                        <Typography
+                            className=""
+                            display="inline"
+                            id="total_num"
+                        >
+                            4
                         </Typography>
                         <Typography className="" display="inline">
                             {' '}
@@ -213,7 +259,7 @@ const PollAnswering = (props: any) => {
                             display="inline"
                             id="question_num"
                         >
-                            3
+                            4
                         </Typography>
                         <Typography className="" display="inline">
                             {' '}
@@ -224,7 +270,95 @@ const PollAnswering = (props: any) => {
                             display="inline"
                             id="total_num"
                         >
-                            3
+                            4
+                        </Typography>
+                        <Typography className="" display="inline">
+                            {' '}
+                            questions
+                        </Typography>
+                    </div>
+                </div>
+            ) : null}
+
+            {showYesNo ? (
+                <div className="">
+                    <Typography className="questionType" variant="h4">
+                        Yes/No
+                    </Typography>
+                    <Typography className="questionTitle">
+                        Do you use this vehicle: Car
+                    </Typography>
+                    <div className="answerContainer">
+                        <FormControl>
+                            <Button>Yes</Button>
+                            <Button>No</Button>
+                        </FormControl>
+                    </div>
+                    <div className="questionNumber">
+                        <Typography
+                            className=""
+                            display="inline"
+                            id="question_num"
+                        >
+                            4
+                        </Typography>
+                        <Typography className="" display="inline">
+                            {' '}
+                            of{' '}
+                        </Typography>
+                        <Typography
+                            className=""
+                            display="inline"
+                            id="total_num"
+                        >
+                            4
+                        </Typography>
+                        <Typography className="" display="inline">
+                            {' '}
+                            questions
+                        </Typography>
+                    </div>
+                </div>
+            ) : null}
+
+            {showThumbsUpDown ? (
+                <div className="">
+                    <Typography className="questionType" variant="h4">
+                        Thumbs Up/Down:
+                    </Typography>
+                    <Typography className="questionTitle">
+                        Do you like this vehicle: Car
+                    </Typography>
+                    <div className="answerContainer">
+                        <FormControl>
+                            <div>
+                                <ThumbUpIcon
+                                    sx={{ fontSize: 100 }}
+                                ></ThumbUpIcon>
+                                <ThumbDownIcon
+                                    sx={{ fontSize: 100 }}
+                                ></ThumbDownIcon>
+                            </div>
+                        </FormControl>
+                    </div>
+                    <div className="questionNumber">
+                        <Typography
+                            className=""
+                            display="inline"
+                            id="question_num"
+                        >
+                            4
+                        </Typography>
+                        <Typography className="" display="inline">
+                            {' '}
+                            of{' '}
+                        </Typography>
+                        <Typography
+                            className=""
+                            display="inline"
+                            id="total_num"
+                        >
+                            4
                         </Typography>
                         <Typography className="" display="inline">
                             {' '}
