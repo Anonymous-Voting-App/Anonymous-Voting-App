@@ -6,7 +6,7 @@ describe('User', () => {
     describe('setFromDatabaseData', () => {
         test('Set user from database', () => {
             const user = new User();
-            
+
             user.setFromDatabaseData({
                 id: '1',
                 firstname: 'first',

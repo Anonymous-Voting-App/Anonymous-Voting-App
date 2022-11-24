@@ -164,7 +164,7 @@ export default class User implements DatabasedObject, SecurelyExposable {
     loadedFromDatabase(): boolean {
         return this._loadedFromDatabase;
     }
-    
+
     constructor(database?: PrismaClient) {
         if (database !== undefined) {
             this._database = database;
@@ -269,7 +269,6 @@ export default class User implements DatabasedObject, SecurelyExposable {
             firstName: this.firstName(),
             lastName: this.lastName(),
             email: this.email()
-
         };
     }
 
