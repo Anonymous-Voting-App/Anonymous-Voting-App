@@ -1,20 +1,18 @@
 import Answer from './Answer';
-import User from './User';
+import User from './user/User';
 import { prismaMock } from '../utils/prisma_singleton';
 import { AssertionError } from 'assert';
 import { Vote } from '@prisma/client';
+import Fingerprint from './user/Fingerprint';
 
-jest.mock('./User');
+jest.mock('./user/User');
 
 describe('Answer', () => {
     beforeEach(() => {
         jest.resetAllMocks();
 
-        User.prototype.ip = jest.fn().mockReturnValue('test-ip');
-        User.prototype.accountId = jest.fn().mockReturnValue('test-accound-id');
-        User.prototype.cookie = jest.fn().mockReturnValue('test-cookie');
-        User.prototype.id = jest.fn().mockReturnValue('1');
-        User.prototype.isIdentifiable = jest.fn().mockReturnValue(true);
+        Fingerprint.prototype.id = jest.fn().mockReturnValue('1');
+        Fingerprint.prototype.isIdentifiable = jest.fn().mockReturnValue(true);
     });
 
     describe('newDatabaseObject', () => {
@@ -23,11 +21,12 @@ describe('Answer', () => {
 
             answer.setQuestionId('test-question-id');
             answer.setValue('test-value');
-            answer.setAnswerer(new User());
+            answer.setAnswerer(makeAnswerer());
 
             expect(answer.newDatabaseObject()).toEqual({
                 questionId: 'test-question-id',
                 value: 'test-value',
+                pollId: '',
                 voterId: '1',
                 parentId: null
             });
@@ -70,7 +69,7 @@ describe('Answer', () => {
         });
 
         test('Answerer not identifiable', () => {
-            User.prototype.isIdentifiable = jest
+            Fingerprint.prototype.isIdentifiable = jest
                 .fn()
                 .mockReturnValueOnce(false);
 
@@ -79,7 +78,7 @@ describe('Answer', () => {
             answer.setValue('test-value');
             answer.setQuestionId('test-question-id');
 
-            const user = new User();
+            const user = new Fingerprint(prismaMock);
 
             answer.setAnswerer(user);
 
@@ -104,6 +103,7 @@ describe('Answer', () => {
                 questionId: 'q1',
                 parentId: null,
                 value: 'asd',
+                pollId: 'p1',
                 voterId: 'v1'
             };
 
@@ -212,12 +212,9 @@ describe('Answer', () => {
     });
 
     const makeAnswerer = () => {
-        const answerer = new User();
+        const answerer = new Fingerprint(prismaMock);
 
-        User.prototype.ip = jest.fn().mockReturnValue('test-ip');
-        User.prototype.accountId = jest.fn().mockReturnValue('test-accound-id');
-        User.prototype.cookie = jest.fn().mockReturnValue('test-cookie');
-        User.prototype.id = jest.fn().mockReturnValue('1');
+        Fingerprint.prototype.id = jest.fn().mockReturnValue('1');
 
         return answerer;
     };
@@ -228,9 +225,13 @@ describe('Answer', () => {
             questionId: 'test-question-id',
             value: 'test-value',
             voterId: '1',
+            pollId: 'p1',
             parentId: null,
             voter: {
-                id: '1'
+                ip: '',
+                id: '',
+                idCookie: '',
+                fingerprintJsId: ''
             }
         };
     };

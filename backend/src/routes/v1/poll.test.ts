@@ -127,58 +127,28 @@ describe.skip('integration tests using server api', () => {
 
     describe('answer poll', () => {
         test('answer poll successfully', (resolve) => {
-            const multiQuestion = createdPoll
-                .questions[0] as IPolling.MultiQuestionData;
-            const scaleQuestion = createdPoll.questions[1];
-            const numberQuestion = createdPoll.questions[2];
-            const booleanQuestion = createdPoll.questions[3];
-
-            let command = `curl -i -X POST -H "Content-Type: application/json" -d "{
-                                    \\"publicId\\": \\"${createdPoll.publicId}\\", 
-                                    \\"answers\\": [
-                                        {
-                                            \\"questionId\\": \\"${multiQuestion.id}\\",
-                                            \\"data\\": {
-                                                \\"subQuestionIds\\": [
-                                                    \\"${multiQuestion.subQuestions[0].id}\\",
-                                                    \\"${multiQuestion.subQuestions[1].id}\\"
-                                                ],
-                                                \\"answer\\": [ 
-                                                    { 
-                                                        \\"answer\\": \\"free-text-answer\\" 
-                                                    },
-                                                    { 
-                                                        \\"answer\\": true
-                                                    }
-                                                ] 
-                                            }
-                                        },
-                                        {
-                                            \\"questionId\\": \\"${scaleQuestion.id}\\",
-                                            \\"data\\": {
-                                                \\"answer\\": 0.002
-                                            }
-                                        },
-                                        {
-                                            \\"questionId\\": \\"${numberQuestion.id}\\",
-                                            \\"data\\": {
-                                                \\"answer\\": 2
-                                            }
-                                        },
-                                        {
-                                            \\"questionId\\": \\"${booleanQuestion.id}\\",
-                                            \\"data\\": {
-                                                \\"answer\\": true
-                                            }
-                                        }
-                                    ]
-                                }" http://localhost:8080/api/poll/${createdPoll.publicId}/answers`;
-
-            command = formatMultiLineCommandForConsole(command);
-
-            console.log(command);
+            const command = answerPollCommand();
 
             exec(command, handleAnswerResponse.bind(null, resolve));
+        });
+
+        // Disabled since we don't do any double-vote blocking
+        // on the backend for now.
+        // - Joonas Halinen 21.11.2022
+        test.skip('fail trying to answer poll second time', (resolve) => {
+            const command = answerPollCommand();
+
+            exec(command, (err, stdout) => {
+                const resultJson = extractJson(stdout);
+
+                console.log(resultJson);
+
+                const result = JSON.parse(resultJson);
+
+                expect(result.code).toBe(403);
+
+                resolve();
+            });
         });
     });
 
@@ -203,7 +173,7 @@ describe.skip('integration tests using server api', () => {
         });
     });
 
-    describe.skip('get public poll answers', () => {
+    /* describe.skip('get public poll answers', () => {
         test('get poll answers with public id', (resolve) => {
             exec(
                 `curl -i -X GET http://localhost:8080/api/poll/${createdPoll.publicId}/answers`,
@@ -220,7 +190,7 @@ describe.skip('integration tests using server api', () => {
                 }
             );
         });
-    });
+    }); */
 
     describe('get public poll results', () => {
         test('get poll results with public id', (resolve) => {
@@ -243,6 +213,60 @@ describe.skip('integration tests using server api', () => {
         });
     });
 
+    function answerPollCommand() {
+        const multiQuestion = createdPoll
+            .questions[0] as IPolling.MultiQuestionData;
+        const scaleQuestion = createdPoll.questions[1];
+        const numberQuestion = createdPoll.questions[2];
+        const booleanQuestion = createdPoll.questions[3];
+
+        let command = `curl -i -X POST -H "Content-Type: application/json" -d "{
+            \\"publicId\\": \\"${createdPoll.publicId}\\", 
+            \\"answers\\": [
+                {
+                    \\"questionId\\": \\"${multiQuestion.id}\\",
+                    \\"data\\": {
+                        \\"subQuestionIds\\": [
+                            \\"${multiQuestion.subQuestions[0].id}\\",
+                            \\"${multiQuestion.subQuestions[1].id}\\"
+                        ],
+                        \\"answer\\": [ 
+                            { 
+                                \\"answer\\": \\"free-text-answer\\" 
+                            },
+                            { 
+                                \\"answer\\": true
+                            }
+                        ] 
+                    }
+                },
+                {
+                    \\"questionId\\": \\"${scaleQuestion.id}\\",
+                    \\"data\\": {
+                        \\"answer\\": 0.002
+                    }
+                },
+                {
+                    \\"questionId\\": \\"${numberQuestion.id}\\",
+                    \\"data\\": {
+                        \\"answer\\": 2
+                    }
+                },
+                {
+                    \\"questionId\\": \\"${booleanQuestion.id}\\",
+                    \\"data\\": {
+                        \\"answer\\": true
+                    }
+                }
+            ]
+        }" http://localhost:8080/api/poll/${createdPoll.publicId}/answers`;
+
+        command = formatMultiLineCommandForConsole(command);
+        console.log(command);
+
+        return command;
+    }
+
     function handleAnswerResponse(
         resolve: jest.DoneCallback,
         err: ExecException | null,
@@ -254,9 +278,15 @@ describe.skip('integration tests using server api', () => {
 
         const resultJson = extractJson(stdout);
 
+        console.log(resultJson);
+
         const result = JSON.parse(resultJson);
 
-        expect(result).toEqual({ success: true });
+        expect(typeof result === 'object').toBe(true);
+        expect(typeof result.fingerprint === 'object').toBe(true);
+        expect(result.fingerprint.ip).toBe('127.0.0.1');
+        expect(result.fingerprint.idCookie.length > 0).toBe(true);
+        expect(result.success).toBe(true);
 
         resolve();
     }

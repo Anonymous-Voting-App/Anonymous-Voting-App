@@ -1,7 +1,8 @@
 import Question from './Question';
-import User from './User';
+import User from './user/User';
 import { prismaMock } from '../utils/prisma_singleton';
 import Answer from './Answer';
+import Fingerprint from './user/Fingerprint';
 
 describe('Question', () => {
     beforeEach(() => {
@@ -30,6 +31,7 @@ describe('Question', () => {
                 questionId: 'test-question-id',
                 parentId: null,
                 voterId: '1',
+                pollId: 'test-poll-id',
                 value: 'test-value'
             });
 
@@ -54,6 +56,7 @@ describe('Question', () => {
             expect(prismaMock.vote.create).toBeCalledWith({
                 data: {
                     questionId: 'test-question-id',
+                    pollId: 'test-poll-id',
                     value: 'test-value',
                     voterId: '1',
                     parentId: null
@@ -81,7 +84,8 @@ describe('Question', () => {
                         parentId: '',
                         questionId: 'test-id',
                         value: 'test',
-                        voterId: 'voter1'
+                        voterId: 'voter1',
+                        pollId: 'p1'
                     }
                 ]
             });
@@ -150,13 +154,9 @@ describe('Question', () => {
     });
 
     const makeAnswerer = () => {
-        const answerer = new User();
+        const answerer = new Fingerprint(prismaMock);
 
         answerer.setId('1');
-        answerer.setIp('test-ip');
-        answerer.setAccountId('test-account-id');
-        answerer.setCookie('test-cookie');
-        answerer.setDatabase(prismaMock);
 
         return answerer;
     };

@@ -1,7 +1,7 @@
 import { prismaMock } from '../utils/prisma_singleton';
 import Poll from './Poll';
 import Question from './Question';
-import User from './User';
+import User from './user/User';
 import * as IPoll from './IPoll';
 import QuestionFactory from './QuestionFactory';
 import {
@@ -10,6 +10,7 @@ import {
     Option as PrismaOption,
     Vote as PrismaVote
 } from '@prisma/client';
+import Fingerprint from './user/Fingerprint';
 
 describe('Poll', () => {
     beforeEach(() => {
@@ -24,7 +25,16 @@ describe('Poll', () => {
                 questionId: 'question-id',
                 parentId: null,
                 value: 'answer',
-                voterId: '1'
+                voterId: '1',
+                pollId: 'p1'
+            });
+            prismaMock.fingerprint.create.mockResolvedValue({
+                id: '',
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                ip: 'ip',
+                idCookie: 'idCookie',
+                fingerprintJsId: 'fingerprintJsId'
             });
 
             const poll = new Poll(prismaMock, new QuestionFactory(prismaMock));
@@ -44,6 +54,10 @@ describe('Poll', () => {
             poll.questions()[question.id()] = question;
 
             const user = makeAnswerer();
+
+            poll.hasBeenAnsweredBy = async () => {
+                return false;
+            };
 
             await poll.answer(
                 [
@@ -67,6 +81,53 @@ describe('Poll', () => {
             expect(poll.answerCount()).toBe(1);
             expect(prismaMock.poll.update).toHaveBeenCalled();
         });
+        // Disabled since we don't do any double-vote blocking
+        // on the backend for now.
+        // - Joonas Halinen 21.11.2022
+        test.skip('Double answering is blocked', async () => {
+            const poll = new Poll(prismaMock, new QuestionFactory(prismaMock));
+            poll.setId('1');
+            poll.setPublicId('p1');
+
+            const question = new Question();
+            question.setId('question-id');
+            poll.questions()[question.id()] = question;
+
+            const user = makeAnswerer();
+
+            Fingerprint.prototype.loadFromDatabase = jest
+                .fn()
+                .mockResolvedValueOnce(null);
+            Fingerprint.prototype.wasFoundInDatabase = jest
+                .fn()
+                .mockReturnValueOnce(true);
+            prismaMock.vote.count.mockResolvedValueOnce(1);
+
+            try {
+                await poll.answer(
+                    [
+                        {
+                            questionId: 'question-id',
+                            data: {
+                                answer: 'answer'
+                            }
+                        }
+                    ],
+                    user
+                );
+
+                expect(true).toBe(false);
+            } catch (e) {
+                console.log(e);
+                if (e instanceof Error) {
+                    expect(e.message).toBe(
+                        'User does not have right to answer poll p1.'
+                    );
+                } else {
+                    expect(true).toBe(false);
+                }
+            }
+        });
     });
 
     describe('setAnswersFromDatabaseData', () => {
@@ -89,11 +150,12 @@ describe('Poll', () => {
                             questionId: '1',
                             value: 'value',
                             voterId: '1',
+                            pollId: 'p1',
                             parentId: null,
                             voter: {
                                 ip: '',
-                                cookie: '',
-                                accountId: '',
+                                idCookie: '',
+                                fingerprintJsId: '',
                                 id: '1'
                             }
                         }
@@ -331,7 +393,8 @@ describe('Poll', () => {
                         questionId: '1',
                         value: 'value',
                         parentId: '1',
-                        voterId: '1'
+                        voterId: '1',
+                        pollId: 'p1'
                     }
                 ],
                 options: []
@@ -340,13 +403,9 @@ describe('Poll', () => {
     };
 
     const makeAnswerer = () => {
-        const answerer = new User();
+        const answerer = new Fingerprint(prismaMock);
 
         answerer.setId('1');
-        answerer.setIp('test-ip');
-        answerer.setAccountId('test-account-id');
-        answerer.setCookie('test-cookie');
-        answerer.setDatabase(prismaMock);
 
         return answerer;
     };

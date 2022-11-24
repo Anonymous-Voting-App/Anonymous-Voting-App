@@ -1,5 +1,6 @@
 import { PollData } from '../models/IPolling';
-import User from '../models/User';
+import User from '../models/user/User';
+import Fingerprint from '../models/user/Fingerprint';
 import UserManager from './UserManager';
 import Poll from '../models/Poll';
 import * as IPolling from '../models/IPolling';
@@ -150,15 +151,13 @@ describe('VotingService', () => {
                 }
             ];
 
-            await service.answerPoll({
-                publicId: '1',
-                answers: answersData,
-                answerer: {
-                    ip: '1',
-                    cookie: '2',
-                    accountId: '3'
-                }
-            });
+            await service.answerPoll(
+                {
+                    publicId: '1',
+                    answers: answersData
+                },
+                createMockUser()
+            );
 
             expect(Poll.prototype.answer).toHaveBeenCalledTimes(1);
             expect(Poll.prototype.answer).toHaveBeenCalledWith(
@@ -174,22 +173,20 @@ describe('VotingService', () => {
             );
 
             try {
-                await service.answerPoll({
-                    publicId: '1',
-                    answers: [
-                        {
-                            questionId: 'q1',
-                            data: {
-                                answer: true
+                await service.answerPoll(
+                    {
+                        publicId: '1',
+                        answers: [
+                            {
+                                questionId: 'q1',
+                                data: {
+                                    answer: true
+                                }
                             }
-                        }
-                    ],
-                    answerer: {
-                        ip: '1',
-                        cookie: '2',
-                        accountId: '3'
-                    }
-                });
+                        ]
+                    },
+                    createMockUser()
+                );
             } catch (e: unknown) {
                 expect(e instanceof Error).toBe(true);
                 expect((e as Error).message).toBe(
@@ -305,11 +302,8 @@ describe('VotingService', () => {
     });
 
     const createMockUser = () => {
-        const user = new User();
-        user.setDatabase(prismaMock);
+        const user = new Fingerprint(prismaMock);
         user.setId('1eb1cfae-09e7-4456-85cd-e2edfff80544');
-        user.setIp('');
-        user.setCookie('');
         return user;
     };
 

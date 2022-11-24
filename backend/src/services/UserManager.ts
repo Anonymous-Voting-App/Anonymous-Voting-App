@@ -1,4 +1,4 @@
-import User from '../models/User';
+import User from '../models/user/User';
 import { pre, post } from '../utils/designByContract';
 import { PrismaClient } from '@prisma/client';
 import * as IUserManager from './IUserManager';

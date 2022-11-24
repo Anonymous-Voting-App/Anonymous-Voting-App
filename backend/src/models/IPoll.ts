@@ -1,5 +1,5 @@
 import * as IQuestion from './IQuestion';
-import * as IUser from './IUser';
+import * as IUser from './user/IUser';
 
 export interface FindSelfInDbQuery {
     OR: Array<{ [identifyingProp: string]: string }>;
