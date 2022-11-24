@@ -175,7 +175,7 @@ describe.skip('integration tests for poll api', () => {
             );
         });
     });
-
+    
     // Disabled because we don't use this api call
     // so maintaining tests for it is useless extra work.
     // - Joonas Halinen 22.11.2022
