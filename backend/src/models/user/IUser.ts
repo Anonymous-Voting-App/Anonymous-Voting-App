@@ -6,7 +6,20 @@ export interface FindSelfDatabaseQuery {
 
 export interface DatabaseData {
     id: string;
-    ip?: string;
-    cookie?: string;
-    accountId?: string;
+    firstname: string;
+    lastname: string;
+    username: string;
+    email: string;
+}
+
+export interface PrivateData {
+    id: string;
+    userName: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+}
+
+export interface PublicData {
+    id: string;
 }

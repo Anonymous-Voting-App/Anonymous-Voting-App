@@ -2,25 +2,96 @@ import { pre, post } from '../../utils/designByContract';
 import * as IUser from './/IUser';
 import { PrismaClient } from '@prisma/client';
 import Fingerprint from './IdentifyingFeature';
+import SecurelyExposable from '../objects/SecurelyExposable';
+import DatabasedObject from '../database/DatabasedObject';
 
 /**
- * A user of the anonymous voting app.
+ * A registered user of the anonymous voting app.
  * Can be connected to the database.
- * The user can be identified either with ip
- * or cookie or accountId.
- * Only registered users have account ids.
- * The same User class is used for registered users
- * and anonymous users.
  */
-export default class User {
-    _ip = '';
-    _cookie = '';
-    _accountId = '';
+export default class User implements DatabasedObject, SecurelyExposable {
     _loadedFromDatabase = false;
     _database!: PrismaClient;
     _id = '';
     _createdInDatabase = false;
     _fingerprint!: Fingerprint;
+    _userName = '';
+    _firstName = '';
+    _lastName = '';
+    _email = '';
+
+    /**  */
+
+    email(): string {
+        return this._email;
+    }
+
+    /** Sets value of email. */
+
+    setEmail(email: string): void {
+        pre('argument email is of type string', typeof email === 'string');
+
+        this._email = email;
+
+        post('_email is email', this._email === email);
+    }
+
+    /**  */
+
+    lastName(): string {
+        return this._lastName;
+    }
+
+    /** Sets value of lastName. */
+
+    setLastName(lastName: string): void {
+        pre(
+            'argument lastName is of type string',
+            typeof lastName === 'string'
+        );
+
+        this._lastName = lastName;
+
+        post('_lastName is lastName', this._lastName === lastName);
+    }
+
+    /**  */
+
+    firstName(): string {
+        return this._firstName;
+    }
+
+    /** Sets value of firstName. */
+
+    setFirstName(firstName: string): void {
+        pre(
+            'argument firstName is of type string',
+            typeof firstName === 'string'
+        );
+
+        this._firstName = firstName;
+
+        post('_firstName is firstName', this._firstName === firstName);
+    }
+
+    /**  */
+
+    userName(): string {
+        return this._userName;
+    }
+
+    /** Sets value of userName. */
+
+    setUserName(userName: string): void {
+        pre(
+            'argument userName is of type string',
+            typeof userName === 'string'
+        );
+
+        this._userName = userName;
+
+        post('_userName is userName', this._userName === userName);
+    }
 
     /**  */
 
@@ -94,49 +165,26 @@ export default class User {
         return this._loadedFromDatabase;
     }
 
-    /** Account id of user if user is registered. */
-    accountId(): string {
-        return this._accountId;
+    constructor(database?: PrismaClient) {
+        if (database !== undefined) {
+            this._database = database;
+        }
     }
 
-    /** Sets value of accountId. */
-    setAccountId(accountId: string): void {
-        pre(
-            'argument accountId is of type string',
-            typeof accountId === 'string'
-        );
-
-        this._accountId = accountId;
-
-        post('_accountId is accountId', this._accountId === accountId);
+    databaseTable(): string {
+        return 'user';
     }
 
-    /** Possible cookie (active or inactive) the account has. */
-    cookie(): string {
-        return this._cookie;
+    createNewInDatabase(): void {
+        throw new Error('Method not implemented.');
     }
 
-    /** Sets value of cookie. */
-    setCookie(cookie: string): void {
-        pre('argument cookie is of type string', typeof cookie === 'string');
+    clone(): DatabasedObject {
+        const user = new User();
 
-        this._cookie = cookie;
+        Object.assign(user, this);
 
-        post('_cookie is cookie', this._cookie === cookie);
-    }
-
-    /** IP address of the user. Mostly needed for identifying anonymous users. */
-    ip(): string {
-        return this._ip;
-    }
-
-    /** Sets value of ip. */
-    setIp(ip: string): void {
-        pre('argument ip is of type string', typeof ip === 'string');
-
-        this._ip = ip;
-
-        post('_ip is ip', this._ip === ip);
+        return user;
     }
 
     /**
@@ -146,7 +194,7 @@ export default class User {
         // For now this should be enough - Joonas Hiltunen 02.10.2022
         return {
             where: {
-                id: this.accountId()
+                id: this.id()
             }
         };
     }
@@ -156,10 +204,13 @@ export default class User {
      */
     setFromDatabaseData(userData: IUser.DatabaseData): void {
         pre('userData is of type object', typeof userData === 'object');
-
         pre('userData.id is of type string', typeof userData.id === 'string');
 
         this.setId(userData.id);
+        this.setFirstName(userData.firstname);
+        this.setLastName(userData.lastname);
+        this.setUserName(userData.username);
+        this.setEmail(userData.email);
     }
 
     /**
@@ -169,12 +220,7 @@ export default class User {
     async existsInDatabase(): Promise<boolean> {
         let result = false;
 
-        if (
-            this.id().length > 0 ||
-            this.ip().length > 0 ||
-            this.cookie().length > 0 ||
-            this.accountId().length > 0
-        ) {
+        if (this.id().length > 0) {
             result =
                 (await this._database.user.findFirst(
                     this.findSelfInDatabaseQuery()
@@ -191,13 +237,7 @@ export default class User {
      * .loadedFromDatabase() becomes true.
      */
     async loadFromDatabase(): Promise<void> {
-        pre(
-            'either id, ip, cookie or accountId is set',
-            this.id().length > 0 ||
-                this.ip().length > 0 ||
-                this.cookie().length > 0 ||
-                this.accountId().length > 0
-        );
+        pre('id is set', this.id().length > 0);
 
         const data = await this._database.user.findFirst(
             this.findSelfInDatabaseQuery()
@@ -211,28 +251,24 @@ export default class User {
     }
 
     /**
-     * Whether the user can be identified at least somehow.
-     * The user can be identified if they have either a
-     * cookie, ip or account id set.
+     * A data object of the user's non-sensitive public information.
      */
-    isIdentifiable(): boolean {
-        if (this.ip().length > 0) {
-            return true;
-        } else if (this.accountId().length > 0) {
-            return true;
-        } else if (this.cookie().length > 0) {
-            return true;
-        }
-
-        return false;
+    publicDataObj(): IUser.PublicData {
+        return {
+            id: this.id()
+        };
     }
 
     /**
-     * A data object of the user's non-sensitive public information.
+     * A data object of the user's sensitive private information.
      */
-    publicDataObj(): IUser.DatabaseData {
+    privateDataObj(): IUser.PrivateData {
         return {
-            id: this.id()
+            id: this.id(),
+            userName: this.userName(),
+            firstName: this.firstName(),
+            lastName: this.lastName(),
+            email: this.email()
         };
     }
 

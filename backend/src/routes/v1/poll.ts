@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import {
     requireAdmin,
-    requireUser
+    requireUser,
+    authenticate
 } from '../../middlewares/authenticationHandler';
 import {
     createPoll,
@@ -9,7 +10,10 @@ import {
     getPublicPoll,
     getPrivatePoll,
     getPollAnswers,
-    getPollResults
+    getPollResults,
+    editPoll,
+    deletePoll,
+    searchByName
 } from '../../controllers/pollController';
 
 export const router = Router();
@@ -42,4 +46,24 @@ router.get('/:publicId', getPublicPoll);
 /**
  * Gets polls info for admin view
  */
-router.get('/admin/:privateId', requireAdmin(), getPrivatePoll);
+router.get('/admin/:privateId', authenticate(), requireAdmin(), getPrivatePoll);
+
+/**
+ * Gets private info of polls as admin using poll name search string
+ */
+router.get(
+    '/admin/searchByName/:searchString',
+    authenticate(),
+    requireAdmin(),
+    searchByName
+);
+
+/**
+ * Deletes poll as admin
+ */
+router.delete('/admin/:privateId', authenticate(), requireAdmin(), deletePoll);
+
+/**
+ * Edits poll as admin
+ */
+router.patch('/admin/:privateId', authenticate(), requireAdmin(), editPoll);

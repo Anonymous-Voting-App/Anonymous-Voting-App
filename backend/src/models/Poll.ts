@@ -13,13 +13,19 @@ import AnswerCollection from './AnswerCollection';
 import QuestionCollection from './QuestionCollection';
 import Fingerprint from './user/Fingerprint';
 import ForbiddenError from '../utils/forbiddenError';
+import Any from './objects/Any';
+import DatabasedObject from './database/DatabasedObject';
+import SecurelyExposable from './objects/SecurelyExposable';
 
 /**
  * A voting poll that can have questions and an owner.
  * Also has link ids to the poll's admin view
  * and public view. Linked to Prisma database.
  */
-export default class Poll {
+export default class Poll
+    extends Any
+    implements DatabasedObject, SecurelyExposable
+{
     _id = '';
     _name = '';
     _type = '';
@@ -33,6 +39,49 @@ export default class Poll {
     _createdInDatabase = false;
     _questionFactory: QuestionFactory;
     _answerCount = 0;
+    _visualFlags: Array<string> = [];
+    _databaseTable = 'poll';
+
+    /**  */
+
+    databaseTable(): string {
+        return this._databaseTable;
+    }
+
+    /** Sets value of databaseTable. */
+
+    setDatabaseTable(databaseTable: string): void {
+        pre(
+            'argument databaseTable is of type string',
+            typeof databaseTable === 'string'
+        );
+
+        this._databaseTable = databaseTable;
+
+        post(
+            '_databaseTable is databaseTable',
+            this._databaseTable === databaseTable
+        );
+    }
+
+    /**  */
+
+    visualFlags(): Array<string> {
+        return this._visualFlags;
+    }
+
+    /** Sets value of visualFlags. */
+
+    setVisualFlags(visualFlags: Array<string>): void {
+        pre(
+            'argument visualFlags is of type Array<string>',
+            Array.isArray(visualFlags)
+        );
+
+        this._visualFlags = visualFlags;
+
+        post('_visualFlags is visualFlags', this._visualFlags === visualFlags);
+    }
 
     /** How many times the poll has been answered. */
 
@@ -513,6 +562,8 @@ export default class Poll {
     }
 
     constructor(database: PrismaClient, questionFactory: QuestionFactory) {
+        super();
+
         pre('database is of type object', typeof database === 'object');
 
         this._database = database;
@@ -551,7 +602,8 @@ export default class Poll {
             adminLink: this.privateId(),
             pollLink: this.publicId(),
             resultLink: '',
-            creatorId: this.owner().id()
+            creatorId: this.owner().id(),
+            visualFlags: this.visualFlags()
         };
     }
 
@@ -624,7 +676,8 @@ export default class Poll {
                             }
                         }
                     }
-                }
+                },
+                creator: true
             }
         });
     }
@@ -687,23 +740,25 @@ export default class Poll {
             'pollData.adminLink is of type string',
             typeof pollData.adminLink === 'string'
         );
-        pre(
-            'pollData.questions is of type Array',
-            Array.isArray(pollData.questions)
-        );
 
         this.setId(pollData.id);
         this.setName(pollData.name);
-        this.setOwnerFromDatabaseData(pollData);
         this.setPublicId(pollData.pollLink);
         this.setPrivateId(pollData.adminLink);
         this.setAnswerCount(pollData.answerCount);
+        this.setVisualFlags(pollData.visualFlags);
 
-        if (!omitQuestions) {
+        if (typeof pollData.creator === 'object') {
+            this.setOwnerFromDatabaseData(pollData.creator);
+        }
+
+        if (!omitQuestions && Array.isArray(pollData.questions)) {
             this.setQuestionsFromDatabaseData(pollData.questions || []);
         }
 
-        this.setAnswersFromDatabaseData(pollData.questions || []);
+        if (Array.isArray(pollData.questions)) {
+            this.setAnswersFromDatabaseData(pollData.questions || []);
+        }
     }
 
     /**
@@ -805,7 +860,8 @@ export default class Poll {
             privateId: this.privateId(),
             type: this.type(),
             questions: this.questionsDataObjs(),
-            answers: this.answersDataObjs()
+            answers: this.answersDataObjs(),
+            visualFlags: this.visualFlags()
         };
 
         if (this.owner() instanceof User) {
@@ -826,7 +882,8 @@ export default class Poll {
             name: this.name(),
             publicId: this.publicId(),
             type: this.type(),
-            questions: this.questionsDataObjs()
+            questions: this.questionsDataObjs(),
+            visualFlags: this.visualFlags()
         };
 
         return result;
@@ -903,6 +960,9 @@ export default class Poll {
     setFromRequest(request: IPolling.PollRequest, owner: User): void {
         this.setOwner(owner);
         this.setName(request.name);
+        if (Array.isArray(request.visualFlags)) {
+            this.setVisualFlags(request.visualFlags);
+        }
         this.setQuestionsFromRequests(request.questions);
     }
 
@@ -941,7 +1001,8 @@ export default class Poll {
             publicId: this.publicId(),
             type: this.type(),
             answerCount: this.answerCount(),
-            questions: this.questionsResultObjs()
+            questions: this.questionsResultObjs(),
+            visualFlags: this.visualFlags()
         };
 
         return result;
@@ -965,5 +1026,77 @@ export default class Poll {
 
         this.setAnswerCount(this.answerCount() + 1);
         this._setQuestionsParentAnswerCount();
+    }
+
+    /**
+     * Updates poll's database entry to match the Poll instance's data.
+     */
+
+    async updateInDatabase(): Promise<void> {
+        await this._database.poll.update({
+            where: { id: this.id() },
+            data: this.newDatabaseObject()
+        });
+    }
+
+    /**
+     * Modifies Poll instance from given edit request object
+     * and then updates the instance's data to database.
+     */
+
+    async updateFromEditRequest(req: IPolling.PollEditRequest): Promise<void> {
+        this.setFromEditRequest(req);
+        await this.updateInDatabase();
+    }
+
+    /**
+     * Modifies Poll instance's data based on given edit request object.
+     */
+
+    setFromEditRequest(req: IPolling.PollEditRequest): void {
+        pre(
+            'req.privateId is of type string',
+            typeof req.privateId === 'string'
+        );
+
+        this._privateId = req.privateId;
+
+        if (typeof req.name === 'string') {
+            this.setName(req.name);
+        }
+
+        if (typeof req.owner === 'string') {
+            const owner = new User(this.database());
+            owner.setId(req.owner);
+
+            this.setOwner(owner);
+        }
+
+        if (Array.isArray(req.visualFlags)) {
+            this.setVisualFlags(req.visualFlags);
+        }
+    }
+
+    clone(): Poll {
+        const poll = new Poll(this.database(), this.questionFactory());
+
+        Object.assign(poll, this);
+
+        return poll;
+    }
+
+    /**
+     * Deletes poll and all data that is dependent on it from database.
+     */
+
+    async delete(): Promise<void> {
+        pre('this.id(  ) is of type string', typeof this.id() === 'string');
+        pre('id is set', this.id().length > 0);
+
+        await this.database().poll.delete({
+            where: {
+                id: this.id()
+            }
+        });
     }
 }

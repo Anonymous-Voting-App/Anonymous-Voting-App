@@ -11,6 +11,7 @@ export interface NewDatabaseObject {
     pollLink: string;
     resultLink: string;
     creatorId: string;
+    visualFlags: Array<string>;
 }
 
 export interface DatabaseData {
@@ -22,4 +23,5 @@ export interface DatabaseData {
     creator?: IUser.DatabaseData;
     questions?: Array<IQuestion.DatabaseData>;
     answerCount: number;
+    visualFlags: Array<string>;
 }
