@@ -38,7 +38,7 @@ export interface PollData {
     type: string;
     publicId: string;
     privateId?: string;
-    owner?: IUser.DatabaseData;
+    owner?: IUser.PublicData;
     questions: QuestionData[];
     answers?: AnswerData[];
     visualFlags: Array<string>;
@@ -54,6 +54,13 @@ export interface PollRequest {
         accountId: string;
     };
     questions: Array<IQuestion.QuestionRequest>;
+    visualFlags?: Array<string>;
+}
+
+export interface PollEditRequest {
+    name?: string;
+    owner?: string;
+    privateId: string;
     visualFlags?: Array<string>;
 }
 

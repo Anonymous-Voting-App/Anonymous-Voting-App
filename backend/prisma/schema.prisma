@@ -20,7 +20,7 @@ model Poll {
   resultLink  String
   isActive    Boolean    @default(true)
   answerCount Int        @default(0)
-  creator     User       @relation("PollUser", fields: [creatorId], references: [id])
+  creator     User       @relation("PollUser", fields: [creatorId], references: [id], onDelete: Cascade)
   questions   Question[] @relation("PollQuestions")
   visualFlags String[]
 }
@@ -38,8 +38,8 @@ model Question {
   description  String     @default("")
   title        String     @default("")
   visualType   String     @default("default")
-  parent       Question?  @relation("SubQuestions", fields: [parentId], references: [id])
-  poll         Poll       @relation("PollQuestions", fields: [pollId], references: [id])
+  parent       Question?  @relation("SubQuestions", fields: [parentId], references: [id], onDelete: Cascade)
+  poll         Poll       @relation("PollQuestions", fields: [pollId], references: [id], onDelete: Cascade)
   options      Option[]   @relation("QuestionOptions")
   subQuestions Question[] @relation("SubQuestions")
   votes        Vote[]     @relation("QuestionVotes")
@@ -62,8 +62,8 @@ model Vote {
   voterId    String   @db.Uuid
   parentId   String?  @db.Uuid
   pollId     String   @db.Uuid
-  parent     Vote?    @relation("SubVotes", fields: [parentId], references: [id])
-  question   Question @relation("QuestionVotes", fields: [questionId], references: [id])
+  parent     Vote?    @relation("SubVotes", fields: [parentId], references: [id], onDelete: Cascade)
+  question   Question @relation("QuestionVotes", fields: [questionId], references: [id], onDelete: Cascade)
   subVotes   Vote[]   @relation("SubVotes")
 }
 

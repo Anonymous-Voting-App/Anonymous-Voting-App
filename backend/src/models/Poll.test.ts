@@ -8,7 +8,8 @@ import {
     Poll as PrismaPoll,
     Question as PrismaQuestion,
     Option as PrismaOption,
-    Vote as PrismaVote
+    Vote as PrismaVote,
+    User as PrismaUser
 } from '@prisma/client';
 import Fingerprint from './user/Fingerprint';
 
@@ -210,7 +211,9 @@ describe('Poll', () => {
         test('Set data from database data', () => {
             const poll = new Poll(prismaMock, new QuestionFactory(prismaMock));
 
-            poll.setFromDatabaseData(dummyDatabaseData as IPoll.DatabaseData);
+            poll.setFromDatabaseData(
+                dummyDatabaseData as unknown as IPoll.DatabaseData
+            );
 
             expect(poll.id()).toBe('1');
             expect(poll.name()).toBe('name');
@@ -276,7 +279,7 @@ describe('Poll', () => {
                 resultLink: 'link',
                 isActive: true,
                 answerCount: 0,
-                visualFlags: [  ]
+                visualFlags: []
             });
 
             const poll = new Poll(prismaMock, new QuestionFactory(prismaMock));
@@ -303,9 +306,11 @@ describe('Poll', () => {
         test('Create new database object for poll', () => {
             const poll = new Poll(prismaMock, new QuestionFactory(prismaMock));
 
-            poll.setFromDatabaseData(dummyDatabaseData as IPoll.DatabaseData);
+            poll.setFromDatabaseData(
+                dummyDatabaseData as unknown as IPoll.DatabaseData
+            );
             poll.owner().setId('d1b44abe-b336-497d-8148-11166b7c2489');
-            poll.setVisualFlags( [ "test" ] );
+            poll.setVisualFlags(['test']);
 
             const data = poll.newDatabaseObject();
 
@@ -315,7 +320,7 @@ describe('Poll', () => {
                 adminLink: 'privateId',
                 pollLink: 'publicId',
                 resultLink: '',
-                visualFlags: [ "test" ]
+                visualFlags: ['test']
             });
         });
     });
@@ -324,11 +329,13 @@ describe('Poll', () => {
         test('Create new result object for poll', () => {
             const poll = new Poll(prismaMock, new QuestionFactory(prismaMock));
 
-            poll.setFromDatabaseData(dummyDatabaseData as IPoll.DatabaseData);
+            poll.setFromDatabaseData(
+                dummyDatabaseData as unknown as IPoll.DatabaseData
+            );
             poll.owner().setId('d1b44abe-b336-497d-8148-11166b7c2489');
             poll.questions()['1'].setAnswerCount(2);
             poll.questions()['1'].setAnswerPercentage(0.2);
-            poll.setVisualFlags( [ "test" ] );
+            poll.setVisualFlags(['test']);
 
             const data = poll.resultDataObj();
 
@@ -337,7 +344,7 @@ describe('Poll', () => {
                 publicId: 'publicId',
                 type: '',
                 answerCount: 0,
-                visualFlags: [ "test" ],
+                visualFlags: ['test'],
                 questions: [
                     {
                         title: '',
@@ -361,12 +368,59 @@ describe('Poll', () => {
         });
     });
 
+    describe('setFromEditRequest', () => {
+        test('edit all possible values', () => {
+            const req = {
+                name: 'test',
+                privateId: 'p1',
+                visualFlags: ['test1', 'test2'],
+                owner: 'o1'
+            };
+
+            const poll = new Poll(prismaMock, new QuestionFactory(prismaMock));
+
+            poll.setFromEditRequest(req);
+
+            expect(poll.name()).toEqual('test');
+            expect(poll.privateId()).toEqual('p1');
+            expect(poll.visualFlags()).toEqual(['test1', 'test2']);
+            expect(poll.owner().id()).toEqual('o1');
+        });
+    });
+
+    describe('updateInDatabase', () => {
+        test('sends expected update to database with normal data', async () => {
+            const poll = new Poll(prismaMock, new QuestionFactory(prismaMock));
+
+            poll.setId('1');
+
+            const newDbObj = {
+                name: 'test',
+                adminLink: 'adminLink',
+                publicLink: 'publicLink',
+                pollLink: 'pollLink',
+                resultLink: 'resultLink',
+                creatorId: 'creatorId',
+                visualFlags: ['test']
+            };
+
+            poll.newDatabaseObject = () => newDbObj;
+
+            await poll.updateInDatabase();
+
+            expect(prismaMock.poll.update).toHaveBeenCalledWith({
+                where: { id: '1' },
+                data: newDbObj
+            });
+        });
+    });
+
     const dummyDatabaseData: PrismaPoll & {
         questions: (PrismaQuestion & {
             options: PrismaOption[];
             votes: PrismaVote[];
         })[];
-    } = {
+    } & { creator: PrismaUser } = {
         createdAt: new Date(),
         updatedAt: new Date(),
         id: '1',
@@ -376,8 +430,15 @@ describe('Poll', () => {
         resultLink: 'publicId',
         isActive: true,
         creatorId: '1',
+        creator: {
+            id: '1',
+            firstname: 'first',
+            lastname: 'last',
+            email: 'email',
+            username: 'user'
+        } as PrismaUser,
         answerCount: 0,
-        visualFlags: [  ],
+        visualFlags: [],
         questions: [
             {
                 createdAt: new Date(),

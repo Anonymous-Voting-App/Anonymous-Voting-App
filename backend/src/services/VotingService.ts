@@ -9,6 +9,7 @@ import { PrismaClient } from '@prisma/client';
 import QuestionFactory from '../models/QuestionFactory';
 import BadRequestError from '../utils/badRequestError';
 import Fingerprint from '../models/user/Fingerprint';
+import DatabasedObjectCollection from '../models/database/DatabasedObjectCollection';
 
 /**
  * Service of the anonymous voting app
@@ -79,6 +80,21 @@ export default class VotingService {
         const poll = new Poll(this.database(), this.questionFactory());
 
         poll.setPublicId(publicId);
+
+        await poll.loadFromDatabase();
+
+        return poll;
+    }
+
+    /**
+     * New Poll instance with given privateId and loaded
+     * from database.
+     */
+
+    async _loadPollWithPrivateId(privateId: string): Promise<Poll> {
+        const poll = new Poll(this.database(), this.questionFactory());
+
+        poll.setPrivateId(privateId);
 
         await poll.loadFromDatabase();
 
@@ -177,6 +193,63 @@ export default class VotingService {
     }
 
     /**
+     * Deletes poll with given privateId. If no such poll found,
+     * does nothing and returns null.
+     */
+    async deletePoll(
+        privateId: string
+    ): Promise<IVotingService.SuccessObject | null> {
+        pre('privateId is of type string', typeof privateId === 'string');
+
+        const poll = await this._loadPollWithPrivateId(privateId);
+
+        if (poll.loadedFromDatabase()) {
+            await poll.delete();
+
+            return { success: true };
+        }
+
+        return null;
+    }
+
+    /**
+     * Edits existing poll based on given data.
+     */
+    async editPoll(
+        editOptions: IPolling.PollEditRequest
+    ): Promise<IVotingService.SuccessObject | null> {
+        pre('editOptions is of type object', typeof editOptions === 'object');
+        pre(
+            'editOptions.privateId is of type string',
+            typeof editOptions.privateId === 'string'
+        );
+        pre(
+            'editOptions.name? is of type string',
+            typeof editOptions.name === 'string' ||
+                editOptions.name === undefined
+        );
+        pre(
+            'editOptions.owner? is of type string',
+            typeof editOptions.owner === 'string' ||
+                editOptions.owner === undefined
+        );
+        pre(
+            'editOptions.visualFlags? is of type array',
+            Array.isArray(editOptions.visualFlags) ||
+                editOptions.visualFlags === undefined
+        );
+
+        const poll = await this._loadPollWithPrivateId(editOptions.privateId);
+
+        if (poll.loadedFromDatabase()) {
+            await poll.updateFromEditRequest(editOptions);
+            return { success: true };
+        }
+
+        return null;
+    }
+
+    /**
      * Returns a poll having given public id.
      * If no such poll exists, return null.
      */
@@ -253,17 +326,38 @@ export default class VotingService {
     ): Promise<IPolling.PollData | null> {
         pre('privateId is of type string', typeof privateId === 'string');
 
-        const poll = new Poll(this.database(), this.questionFactory());
+        const poll = await this._loadPollWithPrivateId(privateId);
 
-        poll.setPrivateId(privateId);
-
-        if (await poll.existsInDatabase()) {
-            await poll.loadFromDatabase();
-
+        if (poll.loadedFromDatabase()) {
             return poll.privateDataObj();
         }
 
         return null;
+    }
+
+    /**
+     * Returns a poll having given private id.
+     * If no such poll exists, returns null.
+     */
+    async searchPollsByName(
+        searchText: string
+    ): Promise<{ data: Array<IPolling.PollData> } | null> {
+        pre('searchText is of type string', typeof searchText === 'string');
+
+        const polls = new DatabasedObjectCollection(
+            new Poll(this.database(), this.questionFactory())
+        );
+
+        await polls.loadFromDatabase({
+            where: { name: { contains: searchText } },
+            include: { questions: false }
+        });
+
+        return {
+            data: Object.values(
+                await polls.gather('privateDataObj')
+            ) as Array<IPolling.PollData>
+        };
     }
 
     /**

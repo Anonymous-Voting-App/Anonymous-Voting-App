@@ -113,6 +113,26 @@ export const createPoll = async (req: Request, res: Response) => {
     return await callService('createPoll', req, res);
 };
 
+export const deletePoll = async (req: Request, res: Response) => {
+    try {
+        req.body = req.params.privateId;
+    } catch (e) {
+        return responses.badRequest(req, res);
+    }
+
+    return await callService('deletePoll', req, res);
+};
+
+export const editPoll = async (req: Request, res: Response) => {
+    try {
+        req.body.privateId = req.params.privateId;
+    } catch (e) {
+        return responses.badRequest(req, res);
+    }
+
+    return await callService('editPoll', req, res);
+};
+
 export const answerPoll = async (req: Request, res: Response) => {
     try {
         req.body.publicId = req.params.publicId;
@@ -161,4 +181,14 @@ export const getPrivatePoll = async (req: Request, res: Response) => {
     }
 
     return await callService('getPollWithPrivateId', req, res);
+};
+
+export const searchByName = async (req: Request, res: Response) => {
+    try {
+        req.body = req.params.searchString;
+    } catch (e) {
+        return responses.badRequest(req, res);
+    }
+
+    return await callService('searchPollsByName', req, res);
 };
