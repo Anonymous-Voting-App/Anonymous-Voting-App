@@ -1,5 +1,6 @@
 import { PollData } from '../models/IPolling';
-import User from '../models/User';
+import User from '../models/user/User';
+import Fingerprint from '../models/user/Fingerprint';
 import UserManager from './UserManager';
 import Poll from '../models/Poll';
 import * as IPolling from '../models/IPolling';
@@ -8,9 +9,11 @@ import VotingService from './VotingService';
 import Answer from '../models/Answer';
 import QuestionFactory from '../models/QuestionFactory';
 import BadRequestError from '../utils/badRequestError';
+import DatabasedObjectCollection from '../models/database/DatabasedObjectCollection';
 
 jest.mock('./UserManager');
 jest.mock('../models/Poll');
+jest.mock('../models/database/DatabasedObjectCollection');
 
 describe('VotingService', () => {
     beforeEach(() => {
@@ -29,6 +32,7 @@ describe('VotingService', () => {
                 type: 'type',
                 publicId: 'publicId',
                 privateId: 'privateId',
+                visualFlags: ['test'],
                 questions: [
                     {
                         title: '',
@@ -150,15 +154,13 @@ describe('VotingService', () => {
                 }
             ];
 
-            await service.answerPoll({
-                publicId: '1',
-                answers: answersData,
-                answerer: {
-                    ip: '1',
-                    cookie: '2',
-                    accountId: '3'
-                }
-            });
+            await service.answerPoll(
+                {
+                    publicId: '1',
+                    answers: answersData
+                },
+                createMockUser()
+            );
 
             expect(Poll.prototype.answer).toHaveBeenCalledTimes(1);
             expect(Poll.prototype.answer).toHaveBeenCalledWith(
@@ -174,22 +176,20 @@ describe('VotingService', () => {
             );
 
             try {
-                await service.answerPoll({
-                    publicId: '1',
-                    answers: [
-                        {
-                            questionId: 'q1',
-                            data: {
-                                answer: true
+                await service.answerPoll(
+                    {
+                        publicId: '1',
+                        answers: [
+                            {
+                                questionId: 'q1',
+                                data: {
+                                    answer: true
+                                }
                             }
-                        }
-                    ],
-                    answerer: {
-                        ip: '1',
-                        cookie: '2',
-                        accountId: '3'
-                    }
-                });
+                        ]
+                    },
+                    createMockUser()
+                );
             } catch (e: unknown) {
                 expect(e instanceof Error).toBe(true);
                 expect((e as Error).message).toBe(
@@ -210,6 +210,7 @@ describe('VotingService', () => {
                 name: 'name',
                 publicId: 'publicId',
                 type: 'type',
+                visualFlags: ['test'],
                 questions: [
                     {
                         title: '',
@@ -304,12 +305,76 @@ describe('VotingService', () => {
         });
     });
 
+    describe('editPoll', () => {
+        test('existing poll is edited', async () => {
+            Poll.prototype.updateFromEditRequest = jest.fn();
+            Poll.prototype.loadedFromDatabase = jest
+                .fn()
+                .mockReturnValueOnce(true);
+            Poll.prototype.loadFromDatabase = jest.fn();
+
+            const editData = {
+                name: 'test',
+                privateId: 'p1'
+            };
+
+            const service = new VotingService(
+                prismaMock,
+                new QuestionFactory(prismaMock)
+            );
+
+            await service.editPoll(editData);
+
+            expect(Poll.prototype.updateFromEditRequest).toHaveBeenCalled();
+        });
+
+        test('non-existing poll is not edited', async () => {
+            Poll.prototype.updateFromEditRequest = jest.fn();
+            Poll.prototype.loadedFromDatabase = jest
+                .fn()
+                .mockReturnValueOnce(false);
+            Poll.prototype.loadFromDatabase = jest.fn();
+
+            const editData = {
+                name: 'test',
+                privateId: 'p1'
+            };
+
+            const service = new VotingService(
+                prismaMock,
+                new QuestionFactory(prismaMock)
+            );
+
+            await service.editPoll(editData);
+
+            expect(Poll.prototype.updateFromEditRequest).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('searchPolls', () => {
+        test('sends correct query & returns gathered privateDataObjs', async () => {
+            DatabasedObjectCollection.prototype.loadFromDatabase = jest.fn();
+            DatabasedObjectCollection.prototype.gather = jest
+                .fn()
+                .mockResolvedValue({ '1': 'a', '2': 'b' });
+
+            const service = new VotingService(
+                prismaMock,
+                new QuestionFactory(prismaMock)
+            );
+
+            const polls = await service.searchPollsByName('test');
+
+            expect(
+                DatabasedObjectCollection.prototype.gather
+            ).toHaveBeenCalledWith('privateDataObj');
+            expect(polls).toEqual({ data: ['a', 'b'] });
+        });
+    });
+
     const createMockUser = () => {
-        const user = new User();
-        user.setDatabase(prismaMock);
+        const user = new Fingerprint(prismaMock);
         user.setId('1eb1cfae-09e7-4456-85cd-e2edfff80544');
-        user.setIp('');
-        user.setCookie('');
         return user;
     };
 
@@ -334,6 +399,8 @@ describe('VotingService', () => {
                 pollId: '1'
             }
         ]);
+
+        expect(poll?.visualFlags).toEqual(['test']);
 
         if (isPrivate) {
             expect(poll?.answers).toEqual([]);

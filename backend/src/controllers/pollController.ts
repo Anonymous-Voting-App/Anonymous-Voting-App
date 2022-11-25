@@ -8,6 +8,9 @@ import * as IVotingService from '../services/IVotingService';
 import QuestionFactory from '../models/QuestionFactory';
 import { AssertionError } from 'assert';
 import BadRequestError from '../utils/badRequestError';
+import WebFingerprintFactory from '../models/user/WebFingerprintFactory';
+import Fingerprint from '../models/user/Fingerprint';
+import ForbiddenError from '../utils/forbiddenError';
 
 const internalServerError = (
     method: string,
@@ -18,12 +21,56 @@ const internalServerError = (
     return responses.internalServerError(req, res);
 };
 
+function makeFingerprintFactory() {
+    const fingerprintFactory = new WebFingerprintFactory(prisma);
+
+    fingerprintFactory.setUseIp(true);
+    fingerprintFactory.setUseCookie(true);
+
+    return fingerprintFactory;
+}
+
+function makeFingerprint(req: Request) {
+    const fingerprintFactory = makeFingerprintFactory();
+
+    const fingerprint = fingerprintFactory.createFromExpressRequest(req);
+
+    fingerprint.setSamenessCheck('oneOf');
+
+    return fingerprint;
+}
+
+function handleServiceError(req: Request, res: Response, e: unknown) {
+    // Bad request
+    if (e instanceof AssertionError) {
+        Logger.warn(`Bad Request: ${e.message}`);
+        Logger.warn(e.stack);
+        return responses.badRequest(req, res);
+    } else if (e instanceof BadRequestError) {
+        Logger.warn(`Bad Request: ${e.message}`);
+        Logger.warn(e.stack);
+        return responses.badRequest(req, res);
+    } else if (e instanceof ForbiddenError) {
+        Logger.warn(`Forbidden: ${e.message}`);
+        Logger.warn(e.stack);
+        return responses.forbidden(req, res, e);
+    }
+
+    if (e instanceof Error) {
+        Logger.error(e.message);
+        Logger.error(e.stack);
+    }
+
+    return responses.internalServerError(req, res);
+}
+
 const callService = async (
     method: keyof VotingService,
     req: Request,
     res: Response
 ): Promise<Response> => {
     const service = new VotingService(prisma, new QuestionFactory(prisma));
+    const fingerprint = makeFingerprint(req);
 
     try {
         if (typeof service[method] !== 'function') {
@@ -31,11 +78,13 @@ const callService = async (
         }
 
         type serviceFunction = (
-            body: string | IPolling.PollRequest | IVotingService.AnswerData
+            body: string | IPolling.PollRequest | IVotingService.AnswerData,
+            fingerprint: Fingerprint
         ) => IPolling.PollData | IPolling.AnswerData | null;
 
         const poll = await (service[method] as unknown as serviceFunction)(
-            req.body
+            req.body,
+            fingerprint
         );
 
         // Poll not found
@@ -56,28 +105,32 @@ const callService = async (
 
         return internalServerError(method, req, res);
     } catch (e: unknown) {
-        // Bad request
-        if (e instanceof AssertionError) {
-            Logger.warn(`Bad Request: ${e.message}`);
-            Logger.warn(e.stack);
-            return responses.badRequest(req, res);
-        } else if (e instanceof BadRequestError) {
-            Logger.warn(`Bad Request: ${e.message}`);
-            Logger.warn(e.stack);
-            return responses.badRequest(req, res);
-        }
-
-        if (e instanceof Error) {
-            Logger.error(e.message);
-            Logger.error(e.stack);
-        }
-
-        return responses.internalServerError(req, res);
+        return handleServiceError(req, res, e);
     }
 };
 
 export const createPoll = async (req: Request, res: Response) => {
     return await callService('createPoll', req, res);
+};
+
+export const deletePoll = async (req: Request, res: Response) => {
+    try {
+        req.body = req.params.privateId;
+    } catch (e) {
+        return responses.badRequest(req, res);
+    }
+
+    return await callService('deletePoll', req, res);
+};
+
+export const editPoll = async (req: Request, res: Response) => {
+    try {
+        req.body.privateId = req.params.privateId;
+    } catch (e) {
+        return responses.badRequest(req, res);
+    }
+
+    return await callService('editPoll', req, res);
 };
 
 export const answerPoll = async (req: Request, res: Response) => {
@@ -128,4 +181,14 @@ export const getPrivatePoll = async (req: Request, res: Response) => {
     }
 
     return await callService('getPollWithPrivateId', req, res);
+};
+
+export const searchByName = async (req: Request, res: Response) => {
+    try {
+        req.body = req.params.searchString;
+    } catch (e) {
+        return responses.badRequest(req, res);
+    }
+
+    return await callService('searchPollsByName', req, res);
 };

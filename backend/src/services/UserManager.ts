@@ -1,4 +1,4 @@
-import User from '../models/User';
+import User from '../models/user/User';
 import { pre, post } from '../utils/designByContract';
 import { PrismaClient } from '@prisma/client';
 import * as IUserManager from './IUserManager';
@@ -64,9 +64,6 @@ export default class UserManager {
 
         const user = new User();
         user.setDatabase(this.database());
-        user.setIp(userOptions.ip || '');
-        user.setCookie(userOptions.cookie || '');
-        user.setAccountId(userOptions.accountId || '');
 
         return await user.existsInDatabase();
     }
@@ -81,14 +78,11 @@ export default class UserManager {
         const user = new User();
 
         user.setDatabase(this.database());
-        user.setId('1eb1cfae-09e7-4456-85cd-e2edfff80544');
-        user.setIp('');
-        user.setCookie('');
 
         // Hard coded account id of a dummy user
         // as a temporary solution so that
         // voting without having a user account possible.
-        user.setAccountId('1eb1cfae-09e7-4456-85cd-e2edfff80544');
+        user.setId('1eb1cfae-09e7-4456-85cd-e2edfff80544');
 
         await user.loadFromDatabase();
 

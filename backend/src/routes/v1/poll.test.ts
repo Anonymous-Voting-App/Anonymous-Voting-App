@@ -10,7 +10,7 @@ import {
 
 jest.setTimeout(20000);
 
-describe.skip('integration tests using server api', () => {
+describe.skip('integration tests for poll api', () => {
     // The tests first create a poll and then this created
     // poll is used for the further tests.
     let createdPoll: IPolling.PollData;
@@ -99,10 +99,13 @@ describe.skip('integration tests using server api', () => {
                     \\"accountId\\": \\"1eb1cfae-09e7-4456-85cd-e2edfff80544\\", 
                     \\"ip\\": \\"123\\", 
                     \\"cookie\\": \\"c123\\" 
-                } 
+                },
+                \\"visualFlags\\": [\\"test1\\", \\"test2\\"] 
             }" http://localhost:8080/api/poll`;
 
             command = formatMultiLineCommandForConsole(command);
+
+            console.log(command);
 
             exec(command, async (err, stdout) => {
                 if (err) {
@@ -115,7 +118,7 @@ describe.skip('integration tests using server api', () => {
 
                 const poll: IPolling.PollData = JSON.parse(resultJson);
 
-                checkPrivatePoll(poll);
+                checkUneditedPrivatePoll(poll);
 
                 // Save poll into global for further tests.
                 createdPoll = poll;
@@ -125,64 +128,34 @@ describe.skip('integration tests using server api', () => {
         });
     });
 
-    describe('answer poll', () => {
+    describe.skip('answer poll', () => {
         test('answer poll successfully', (resolve) => {
-            const multiQuestion = createdPoll
-                .questions[0] as IPolling.MultiQuestionData;
-            const scaleQuestion = createdPoll.questions[1];
-            const numberQuestion = createdPoll.questions[2];
-            const booleanQuestion = createdPoll.questions[3];
-
-            let command = `curl -i -X POST -H "Content-Type: application/json" -d "{
-                                    \\"publicId\\": \\"${createdPoll.publicId}\\", 
-                                    \\"answers\\": [
-                                        {
-                                            \\"questionId\\": \\"${multiQuestion.id}\\",
-                                            \\"data\\": {
-                                                \\"subQuestionIds\\": [
-                                                    \\"${multiQuestion.subQuestions[0].id}\\",
-                                                    \\"${multiQuestion.subQuestions[1].id}\\"
-                                                ],
-                                                \\"answer\\": [ 
-                                                    { 
-                                                        \\"answer\\": \\"free-text-answer\\" 
-                                                    },
-                                                    { 
-                                                        \\"answer\\": true
-                                                    }
-                                                ] 
-                                            }
-                                        },
-                                        {
-                                            \\"questionId\\": \\"${scaleQuestion.id}\\",
-                                            \\"data\\": {
-                                                \\"answer\\": 0.002
-                                            }
-                                        },
-                                        {
-                                            \\"questionId\\": \\"${numberQuestion.id}\\",
-                                            \\"data\\": {
-                                                \\"answer\\": 2
-                                            }
-                                        },
-                                        {
-                                            \\"questionId\\": \\"${booleanQuestion.id}\\",
-                                            \\"data\\": {
-                                                \\"answer\\": true
-                                            }
-                                        }
-                                    ]
-                                }" http://localhost:8080/api/poll/${createdPoll.publicId}/answers`;
-
-            command = formatMultiLineCommandForConsole(command);
-
-            console.log(command);
+            const command = answerPollCommand();
 
             exec(command, handleAnswerResponse.bind(null, resolve));
         });
+
+        // Disabled since we don't do any double-vote blocking
+        // on the backend for now.
+        // - Joonas Halinen 21.11.2022
+        test.skip('fail trying to answer poll second time', (resolve) => {
+            const command = answerPollCommand();
+
+            exec(command, (err, stdout) => {
+                const resultJson = extractJson(stdout);
+
+                console.log(resultJson);
+
+                const result = JSON.parse(resultJson);
+
+                expect(result.code).toBe(403);
+
+                resolve();
+            });
+        });
     });
 
-    describe('get public poll', () => {
+    describe.skip('get public poll', () => {
         test('get poll with public id', (resolve) => {
             exec(
                 `curl -i -X GET http://localhost:8080/api/poll/${createdPoll.publicId}`,
@@ -195,7 +168,7 @@ describe.skip('integration tests using server api', () => {
 
                     console.log(resultJson);
 
-                    checkPublicPoll(JSON.parse(resultJson));
+                    checkUneditedPublicPoll(JSON.parse(resultJson));
 
                     resolve();
                 }
@@ -203,7 +176,10 @@ describe.skip('integration tests using server api', () => {
         });
     });
 
-    describe.skip('get public poll answers', () => {
+    // Disabled because we don't use this api call
+    // so maintaining tests for it is useless extra work.
+    // - Joonas Halinen 22.11.2022
+    /* describe('get public poll answers', () => {
         test('get poll answers with public id', (resolve) => {
             exec(
                 `curl -i -X GET http://localhost:8080/api/poll/${createdPoll.publicId}/answers`,
@@ -220,9 +196,9 @@ describe.skip('integration tests using server api', () => {
                 }
             );
         });
-    });
+    }); */
 
-    describe('get public poll results', () => {
+    describe.skip('get public poll results', () => {
         test('get poll results with public id', (resolve) => {
             exec(
                 `curl -i -X GET http://localhost:8080/api/poll/${createdPoll.publicId}/results`,
@@ -243,6 +219,193 @@ describe.skip('integration tests using server api', () => {
         });
     });
 
+    describe('edit poll', () => {
+        test('edit poll as admin', (resolve) => {
+            loginAsAdmin().then((token) => {
+                let command = `
+                    curl -i -X PATCH -H "Authorization: Bearer ${token}"
+                    -H "Content-Type: application/json" -d "{
+                    \\"name\\": \\"changed-name\\", 
+                    \\"owner\\": \\"c236207a-f48d-4aca-b2be-a75c496dee3d\\",
+                    \\"visualFlags\\": [\\"changed-flag\\"] 
+                }" http://localhost:8080/api/poll/admin/${createdPoll.privateId}`;
+
+                command = formatMultiLineCommandForConsole(command);
+
+                console.log(command);
+
+                exec(command, (err, stdout) => {
+                    if (err) {
+                        throw new Error('Error: ' + err);
+                    }
+
+                    const resultJson = extractJson(stdout);
+                    const result = JSON.parse(resultJson);
+
+                    expect(result).toEqual({ success: true });
+
+                    resolve();
+                });
+            });
+        });
+    });
+
+    describe('get private poll', () => {
+        test('get private poll info as admin', (resolve) => {
+            loginAsAdmin().then((token) => {
+                let command = `curl -i -X GET -H "Authorization: Bearer ${token}" 
+                                 http://localhost:8080/api/poll/admin/${createdPoll.privateId}`;
+                command = formatMultiLineCommandForConsole(command);
+                console.log(command);
+
+                exec(command, (err, stdout) => {
+                    if (err) {
+                        throw err;
+                    }
+
+                    const resultJson = extractJson(stdout);
+
+                    console.log(resultJson);
+
+                    checkEditedPrivatePoll(JSON.parse(resultJson));
+
+                    resolve();
+                });
+            });
+        });
+    });
+
+    describe.skip('search private polls by name', () => {
+        test('search as admin', (resolve) => {
+            loginAsAdmin().then((token) => {
+                let command = `curl -i -X GET -H "Authorization: Bearer ${token}" 
+                                 http://localhost:8080/api/poll/admin/searchByName/test`;
+                command = formatMultiLineCommandForConsole(command);
+                console.log(command);
+
+                exec(command, (err, stdout) => {
+                    if (err) {
+                        throw err;
+                    }
+
+                    const resultJson = extractJson(stdout);
+
+                    console.log(resultJson);
+
+                    checkSearchedPolls(JSON.parse(resultJson).data, 'test');
+
+                    resolve();
+                });
+            });
+        });
+    });
+
+    describe.skip('delete poll', () => {
+        test('delete poll as admin', (resolve) => {
+            loginAsAdmin().then((token) => {
+                let command = `
+                    curl -i -X DELETE -H "Authorization: Bearer ${token}" 
+                    http://localhost:8080/api/poll/admin/${createdPoll.privateId}`;
+
+                command = formatMultiLineCommandForConsole(command);
+
+                console.log(command);
+
+                exec(command, (err, stdout) => {
+                    if (err) {
+                        throw new Error('Error: ' + err);
+                    }
+
+                    const resultJson = extractJson(stdout);
+                    const result = JSON.parse(resultJson);
+
+                    expect(result).toEqual({ success: true });
+
+                    resolve();
+                });
+            });
+        });
+    });
+
+    async function loginAsAdmin() {
+        return new Promise<string>((resolve, reject) => {
+            let command = `
+                curl -i -X POST -H "Content-Type: application/json" -d "{
+                \\"username\\": \\"admin\\", 
+                \\"password\\": \\"123456\\"
+            }" http://localhost:8080/api/user/login`;
+
+            command = formatMultiLineCommandForConsole(command);
+
+            console.log(command);
+
+            exec(command, (err, stdout) => {
+                if (err) {
+                    throw new Error('Error: ' + err);
+                }
+
+                const resultJson = extractJson(stdout);
+                const result = JSON.parse(resultJson);
+
+                resolve(result.token);
+            });
+        });
+    }
+
+    function answerPollCommand() {
+        const multiQuestion = createdPoll
+            .questions[0] as IPolling.MultiQuestionData;
+        const scaleQuestion = createdPoll.questions[1];
+        const numberQuestion = createdPoll.questions[2];
+        const booleanQuestion = createdPoll.questions[3];
+
+        let command = `curl -i -X POST -H "Content-Type: application/json" -d "{
+            \\"publicId\\": \\"${createdPoll.publicId}\\", 
+            \\"answers\\": [
+                {
+                    \\"questionId\\": \\"${multiQuestion.id}\\",
+                    \\"data\\": {
+                        \\"subQuestionIds\\": [
+                            \\"${multiQuestion.subQuestions[0].id}\\",
+                            \\"${multiQuestion.subQuestions[1].id}\\"
+                        ],
+                        \\"answer\\": [ 
+                            { 
+                                \\"answer\\": \\"free-text-answer\\" 
+                            },
+                            { 
+                                \\"answer\\": true
+                            }
+                        ] 
+                    }
+                },
+                {
+                    \\"questionId\\": \\"${scaleQuestion.id}\\",
+                    \\"data\\": {
+                        \\"answer\\": 0.002
+                    }
+                },
+                {
+                    \\"questionId\\": \\"${numberQuestion.id}\\",
+                    \\"data\\": {
+                        \\"answer\\": 2
+                    }
+                },
+                {
+                    \\"questionId\\": \\"${booleanQuestion.id}\\",
+                    \\"data\\": {
+                        \\"answer\\": true
+                    }
+                }
+            ]
+        }" http://localhost:8080/api/poll/${createdPoll.publicId}/answers`;
+
+        command = formatMultiLineCommandForConsole(command);
+        console.log(command);
+
+        return command;
+    }
+
     function handleAnswerResponse(
         resolve: jest.DoneCallback,
         err: ExecException | null,
@@ -254,16 +417,38 @@ describe.skip('integration tests using server api', () => {
 
         const resultJson = extractJson(stdout);
 
+        console.log(resultJson);
+
         const result = JSON.parse(resultJson);
 
-        expect(result).toEqual({ success: true });
+        expect(typeof result === 'object').toBe(true);
+        expect(typeof result.fingerprint === 'object').toBe(true);
+        expect(result.fingerprint.ip).toBe('127.0.0.1');
+        expect(result.fingerprint.idCookie.length > 0).toBe(true);
+        expect(result.success).toBe(true);
 
         resolve();
+    }
+
+    function checkSearchedPolls(
+        polls: Array<IPolling.PollData>,
+        searchText: string
+    ) {
+        expect(polls.length > 0).toBe(true);
+        console.log('Polls found: ' + polls.length);
+
+        for (let i = 0; i < polls.length; i++) {
+            const poll = polls[i];
+
+            console.log('Found poll: ' + poll.name + ', ' + poll.id);
+            expect(poll.name.includes(searchText)).toBe(true);
+        }
     }
 
     function checkResults(results: IPolling.ResultData) {
         expect(results.answerCount).toBe(1);
         expect(results.questions.length).toBe(4);
+        expect(results.visualFlags).toEqual(['test1', 'test2']);
         expect(Object.keys(results.questions)).toEqual(
             Object.keys(createdPoll.questions)
         );
@@ -408,13 +593,31 @@ describe.skip('integration tests using server api', () => {
         expect(typeof subAnswer.answerer).toBe('object');
     }
 
-    function checkPrivatePoll(poll: IPolling.PollData) {
+    function checkUneditedPrivatePoll(poll: IPolling.PollData) {
+        checkUneditedPublicPoll(poll);
+    }
+
+    function checkEditedPrivatePoll(poll: IPolling.PollData) {
+        checkEditedPublicPoll(poll);
+        expect(poll.owner).toEqual({
+            id: 'c236207a-f48d-4aca-b2be-a75c496dee3d'
+        });
+    }
+
+    function checkEditedPublicPoll(poll: IPolling.PollData) {
+        expect(poll.name).toBe('changed-name');
+        expect(poll.visualFlags).toEqual(['changed-flag']);
+        checkPublicPoll(poll);
+    }
+
+    function checkUneditedPublicPoll(poll: IPolling.PollData) {
+        expect(poll.name).toBe('testPoll1');
+        expect(poll.visualFlags).toEqual(['test1', 'test2']);
         checkPublicPoll(poll);
     }
 
     function checkPublicPoll(poll: IPolling.PollData) {
         expect(poll.id.length > 0).toBe(true);
-        expect(poll.name).toBe('testPoll1');
         expect(poll.questions.length).toBe(4);
 
         checkMultiQuestion(

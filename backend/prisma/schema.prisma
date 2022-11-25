@@ -20,8 +20,9 @@ model Poll {
   resultLink  String
   isActive    Boolean    @default(true)
   answerCount Int        @default(0)
-  creator     User       @relation("PollUser", fields: [creatorId], references: [id])
+  creator     User       @relation("PollUser", fields: [creatorId], references: [id], onDelete: Cascade)
   questions   Question[] @relation("PollQuestions")
+  visualFlags String[]
 }
 
 model Question {
@@ -37,8 +38,8 @@ model Question {
   description  String     @default("")
   title        String     @default("")
   visualType   String     @default("default")
-  parent       Question?  @relation("SubQuestions", fields: [parentId], references: [id])
-  poll         Poll       @relation("PollQuestions", fields: [pollId], references: [id])
+  parent       Question?  @relation("SubQuestions", fields: [parentId], references: [id], onDelete: Cascade)
+  poll         Poll       @relation("PollQuestions", fields: [pollId], references: [id], onDelete: Cascade)
   options      Option[]   @relation("QuestionOptions")
   subQuestions Question[] @relation("SubQuestions")
   votes        Vote[]     @relation("QuestionVotes")
@@ -60,8 +61,9 @@ model Vote {
   value      String
   voterId    String   @db.Uuid
   parentId   String?  @db.Uuid
-  parent     Vote?    @relation("SubVotes", fields: [parentId], references: [id])
-  question   Question @relation("QuestionVotes", fields: [questionId], references: [id])
+  pollId     String   @db.Uuid
+  parent     Vote?    @relation("SubVotes", fields: [parentId], references: [id], onDelete: Cascade)
+  question   Question @relation("QuestionVotes", fields: [questionId], references: [id], onDelete: Cascade)
   subVotes   Vote[]   @relation("SubVotes")
 }
 
@@ -77,4 +79,13 @@ model User {
   firstname     String
   lastname      String
   isAdmin       Boolean  @default(false)
+}
+
+model Fingerprint {
+  id                  String   @id @default(uuid()) @db.Uuid
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  ip                  String   @default("")
+  idCookie            String   @default("")
+  fingerprintJsId     String   @default("")
 }
