@@ -1,5 +1,5 @@
 import { AssertionError } from 'assert';
-import { prismaMock } from '../utils/prisma_singleton';
+import { prismaMock } from '../../utils/prisma_singleton';
 import User from './User';
 
 describe('User', () => {
@@ -7,9 +7,19 @@ describe('User', () => {
         test('Set user from database', () => {
             const user = new User();
 
-            user.setFromDatabaseData({ id: '1' });
+            user.setFromDatabaseData({
+                id: '1',
+                firstname: 'first',
+                lastname: 'last',
+                username: 'user',
+                email: 'email'
+            });
 
             expect(user.id()).toBe('1');
+            expect(user.firstName()).toBe('first');
+            expect(user.lastName()).toBe('last');
+            expect(user.userName()).toBe('user');
+            expect(user.email()).toBe('email');
         });
     });
 
@@ -20,23 +30,27 @@ describe('User', () => {
                 createdAt: new Date(),
                 updatedAt: new Date(),
                 email: 'dummy@email.com',
+                firstname: 'first',
+                lastname: 'last',
+                username: 'user',
+                isAdmin: false,
                 emailVerified: false,
-                password: 'dummy-password',
-                firstname: 'dummy',
-                lastname: 'user',
-                username: 'iamdummyuser',
-                isAdmin: false
+                password: 'dummy-password'
             });
 
             const user = new User();
 
             user._database = prismaMock;
-            user.setAccountId('1');
+            user.setId('1');
 
             await user.loadFromDatabase();
 
             expect(user.loadedFromDatabase()).toBe(true);
-            expect(user.accountId()).toBe('1');
+            expect(user.id()).toBe('6dae07ca-d63e-4dc4-96df-ee90b2fc68b2');
+            expect(user.firstName()).toBe('first');
+            expect(user.lastName()).toBe('last');
+            expect(user.userName()).toBe('user');
+            expect(user.email()).toBe('dummy@email.com');
         });
 
         test('Data not found', async () => {
@@ -60,9 +74,7 @@ describe('User', () => {
                 expect(true).toBeFalsy();
             } catch (e: unknown) {
                 if (e instanceof AssertionError) {
-                    expect(e.message).toBe(
-                        'either id, ip, cookie or accountId is set'
-                    );
+                    expect(e.message).toBe('id is set');
                 } else {
                     expect(true).toBeFalsy();
                 }

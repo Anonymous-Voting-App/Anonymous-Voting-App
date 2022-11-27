@@ -1,11 +1,12 @@
-import * as IUser from './IUser';
+import * as IFingerprint from './user/IFingerprint';
 
 export interface DatabaseData {
     id: string;
     questionId: string;
     voterId: string;
-    voter?: IUser.DatabaseData;
+    voter?: IFingerprint.DatabaseData;
     parentId: string | null;
+    pollId: string;
     subVotes?: Array<DatabaseData>;
     value: string;
 }
@@ -15,6 +16,7 @@ export interface NewAnswerData {
     value: string;
     voterId: string;
     parentId: string | null;
+    pollId: string;
     subVotes?: Array<NewAnswerData>;
 }
 

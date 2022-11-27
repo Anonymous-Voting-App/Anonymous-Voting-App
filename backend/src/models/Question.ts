@@ -1,11 +1,12 @@
 import { pre, post } from '../utils/designByContract';
-import User from './/User';
+import User from './user/User';
 import Answer from './Answer';
 import * as IPolling from './IPolling';
 import * as IQuestion from './IQuestion';
 import * as IAnswer from './IAnswer';
 import { PrismaClient } from '@prisma/client';
 import BadRequestError from '../utils/badRequestError';
+import Fingerprint from './user/Fingerprint';
 
 /**
  * A question that a Poll can have. Connected to Prisma database.
@@ -332,7 +333,7 @@ export default class Question {
 
     async _addNewAnswer(
         answerData: IQuestion.AnswerData,
-        answerer: User,
+        answerer: Fingerprint,
         parentAnswerId?: string
     ): Promise<Answer> {
         const answer = this.makeAnswer(answerData, answerer, parentAnswerId);
@@ -568,13 +569,14 @@ export default class Question {
 
     makeAnswer(
         answerData: IQuestion.AnswerData,
-        answerer: User,
+        answerer: Fingerprint,
         parentAnswerId?: string
     ): Answer {
         const answer = new Answer(this.database());
 
         answer.setFromRequest(answerData, answerer, this.id());
         answer.setQuestionId(this.id());
+        answer.setPollId(this.pollId());
 
         if (typeof parentAnswerId === 'string') {
             answer.setParentId(parentAnswerId);
@@ -593,10 +595,10 @@ export default class Question {
      */
     async answer(
         answerData: IQuestion.AnswerData,
-        answerer: User,
+        answerer: Fingerprint,
         parentAnswerId?: string
     ): Promise<Answer | void> {
-        pre('answerer is of type User', answerer instanceof User);
+        pre('answerer is of type Fingerprint', answerer instanceof Fingerprint);
         if (this.answerDataIsAcceptable(answerData)) {
             return await this._addNewAnswer(
                 answerData,

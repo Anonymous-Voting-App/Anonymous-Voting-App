@@ -1,14 +1,25 @@
-import { Paper, Typography } from '@mui/material';
-// import React, { useState } from 'react';
+import { Link, Paper, Typography } from '@mui/material';
 import './ResultCard.scss';
 import { ResultOptionObj } from '../utils/types';
 import ResultOption from './ResultOption';
+import * as FileSaver from 'file-saver';
+import * as XLSX from 'sheetjs-style';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 const ResultCard = (props: any) => {
-    // const [options, setOptions] = useState<ResultOptionObj[]>(
-    //     props.ques.options
-    // );
     const options: ResultOptionObj[] = props.ques.options;
+    // console.log(options)
+    const fileType =
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+    const fileExtension = '.xlsx';
+    const handleExport = () => {
+        const fileName = 'Data';
+        const ws = XLSX.utils.json_to_sheet(options);
+        const wb = { Sheets: { data: ws }, SheetNames: ['data'] };
+        const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+        const data = new Blob([excelBuffer], { type: fileType });
+        FileSaver.saveAs(data, fileName + fileExtension);
+    };
 
     const setQuesType = (type: string) => {
         switch (type) {
@@ -18,7 +29,7 @@ const ResultCard = (props: any) => {
                 return 'Pick one';
             case 'star':
                 return 'Star rating';
-            case 'textfield':
+            case 'free':
                 return 'Free text';
             case 'yesNo':
                 return 'Yes/No';
@@ -49,11 +60,35 @@ const ResultCard = (props: any) => {
                             totalCount={props.ques.totalCount}
                             highestCount={highestCount.count}
                             type={props.ques.type}
-                            optionData={option}
+                            optionData={
+                                quesType === 'Free text' && index > 1
+                                    ? ''
+                                    : option
+                            }
                         ></ResultOption>
                     </div>
                 ))}
             </div>
+            {quesType === 'Free text' ? (
+                <div className="free-text-export">
+                    {options.length === 1 &&
+                    options[0].title === 'No feedback' ? null : (
+                        <>
+                            <div>
+                                <MoreVertIcon></MoreVertIcon>
+                            </div>
+                            <div className="export-link">
+                                <Link
+                                    className="pinkLink"
+                                    onClick={handleExport}
+                                >
+                                    Export Data
+                                </Link>
+                            </div>
+                        </>
+                    )}
+                </div>
+            ) : null}
         </Paper>
     );
 };

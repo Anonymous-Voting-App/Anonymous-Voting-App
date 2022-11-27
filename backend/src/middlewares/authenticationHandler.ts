@@ -49,7 +49,7 @@ export const requireUser = () => {
             const user = req.User;
 
             if (!user) {
-                return responses.forbidden(req, res);
+                return responses.unauthorized(req, res);
             }
 
             req.UserIsAdmin = await isAdmin(user.userName, prisma);
@@ -78,14 +78,14 @@ export const requireAdmin = () => {
             const user = req.User;
 
             if (!user) {
-                return responses.forbidden(req, res);
+                return responses.unauthorized(req, res);
             }
 
             const userIsAdmin = await isAdmin(user.userName, prisma);
             req.UserIsAdmin = userIsAdmin;
 
             if (!userIsAdmin) {
-                return responses.unauthorized(req, res);
+                return responses.forbidden(req, res);
             }
 
             return next();

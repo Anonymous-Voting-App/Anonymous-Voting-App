@@ -9,6 +9,7 @@
         "resolveJsonModule": true,
         "removeComments": true
     },
+    "include": ["./src/**/*.ts"],
     "exclude": ["**/*.test.ts", "**/prisma_singleton.ts"],
     "files": ["./src/types/express/index.d.ts"]
 }
