@@ -48,7 +48,6 @@ const PollAnswering = () => {
             severity: status.severity
         });
         handleSearchClick();
-        console.log(status, 'notification data');
     };
 
     const handleClose = () => {
@@ -105,7 +104,6 @@ const PollAnswering = () => {
             .then((response) => {
                 console.log(response.data);
                 if (response.data.length > 0) {
-                    console.log('called');
                     setShowErrorMsg(false);
                     return response.data;
                 }

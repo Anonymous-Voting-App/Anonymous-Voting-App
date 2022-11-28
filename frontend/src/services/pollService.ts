@@ -1,6 +1,7 @@
 import { PollQuesObj } from '../utils/types';
 import getBackendUrl from '../utils/getBackendUrl';
 
+//token to be dynamically set once login integrated
 const token =
     // 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImMyMzYyMDdhLWY0OGQtNGFjYS1iMmJlLWE3NWM0OTZkZWUzZCIsImZpcnN0TmFtZSI6IkFkIiwibGFzdE5hbWUiOiJNaW4iLCJlbWFpbCI6Impvb25hcy5oYWxpbmVuQHR1bmkuZmkiLCJ1c2VyTmFtZSI6ImFkbWluIiwiaWF0IjoxNjY5NDY1Nzc0LCJleHAiOjE2Njk2Mzg1NzQsInN1YiI6ImMyMzYyMDdhLWY0OGQtNGFjYS1iMmJlLWE3NWM0OTZkZWUzZCJ9.6-SpV4i3F1tPHgDu5u89o3E6hP9EoB-VV84hJwOPFtM';
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImMyMzYyMDdhLWY0OGQtNGFjYS1iMmJlLWE3NWM0OTZkZWUzZCIsImZpcnN0TmFtZSI6IkFkIiwibGFzdE5hbWUiOiJNaW4iLCJlbWFpbCI6Impvb25hcy5oYWxpbmVuQHR1bmkuZmkiLCJ1c2VyTmFtZSI6ImFkbWluIiwiaWF0IjoxNjY5MzgyMzkzLCJleHAiOjE2Njk1NTUxOTMsInN1YiI6ImMyMzYyMDdhLWY0OGQtNGFjYS1iMmJlLWE3NWM0OTZkZWUzZCJ9.EqRI1mwWDITv5BRQjbvXWy4xvwb67ACdjN6RVEuFPPw';
@@ -285,12 +286,9 @@ export const fetchSearchResult = async (
     return dataList;
 };
 
-// poll/admin/:privateId
 export const deletePoll = async (pollId: string) => {
     const newResponse = await fetch(
-        // `${window.location.origin}/dummy2.json`,
         `${getBackendUrl()}/api/poll/admin/${pollId}`,
-
         {
             method: 'DELETE',
             headers: {
