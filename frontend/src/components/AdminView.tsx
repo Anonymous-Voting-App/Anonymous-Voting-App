@@ -199,7 +199,10 @@ const PollAnswering = () => {
                         return (
                             <Box key={user} className="listItem">
                                 <Typography>{user}</Typography>
-                                <Link className="pinkLink" href="#">
+                                <Link
+                                    className="pinkLink"
+                                    onClick={() => handleEdit(user)}
+                                >
                                     Edit
                                 </Link>
                                 <Link
