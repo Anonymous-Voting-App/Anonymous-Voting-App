@@ -122,6 +122,13 @@ const PollAnswering = () => {
                 return [];
             });
         return searchResult;
+    const handleResult = (user: string) => {
+        // navigate('/result', {replace: true});
+        navigate(`result`);
+    };
+
+    const handleEdit = (user: string) => {
+        navigate(`edit`, { state: { username: user } });
     };
 
     return (

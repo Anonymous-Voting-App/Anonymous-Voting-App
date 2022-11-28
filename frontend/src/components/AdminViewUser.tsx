@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 import {
     Typography,
     Link,
@@ -8,7 +9,9 @@ import {
 } from '@mui/material';
 import './AdminViewUser.scss';
 
-const AdminViewUser = () => {
+const AdminViewUser = (props: any) => {
+    const location = useLocation();
+
     const handleAdminToggle = () => {
         console.log('toggled');
     };
@@ -21,7 +24,7 @@ const AdminViewUser = () => {
             <div className="profileContents">
                 <div className="row">
                     <Typography className="subtitle">Username:</Typography>
-                    <Typography>username</Typography>
+                    <Typography>{location.state.username}</Typography>
                     <Link className="pinkLink">Edit</Link>
                 </div>
                 <div className="userIdRow">
