@@ -11,6 +11,7 @@ import AdminView from './AdminView';
 import PollResult from './PollResult';
 import { StyledEngineProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import AdminViewUser from './AdminViewUser';
 
 function App() {
     const [open, setOpen] = useState(false);
@@ -75,6 +76,10 @@ function App() {
                                         showNotification={handleNotification}
                                     />
                                 }
+                            />
+                            <Route
+                                path="admin/edit"
+                                element={<AdminViewUser />}
                             />
                         </Routes>
                         <BasicSnackbar
