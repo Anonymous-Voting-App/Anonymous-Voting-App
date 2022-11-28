@@ -36,7 +36,7 @@ const PollAnswering = () => {
     };
 
     const handleEdit = (user: string) => {
-        navigate(`edit`);
+        navigate(`edit`, { state: { username: user } });
     };
 
     return (

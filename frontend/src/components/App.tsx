@@ -79,7 +79,7 @@ function App() {
                             />
                             <Route
                                 path="admin/edit"
-                                element={<AdminViewUser />}
+                                element={<AdminViewUser username={''} />}
                             />
                         </Routes>
                         <BasicSnackbar
