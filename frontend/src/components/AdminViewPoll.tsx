@@ -2,10 +2,8 @@ import React, { useState } from 'react';
 import { Typography, Link, Box } from '@mui/material';
 import './AdminViewPoll.scss';
 import { deletePoll } from '../services/pollService';
-import { useNavigate } from 'react-router-dom';
 
 const AdminViewPoll = (props: any) => {
-    let navigate = useNavigate();
     const [showMessage, setShowMessage] = useState(false);
 
     const handleViewResult = (pollId: string) => {
@@ -46,11 +44,6 @@ const AdminViewPoll = (props: any) => {
                     message: 'Error occured while deleting poll'
                 });
             });
-    };
-
-    const handleResult = (user: string) => {
-        // navigate('/result', {replace: true});
-        navigate(`result`);
     };
 
     return (
