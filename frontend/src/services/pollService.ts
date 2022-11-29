@@ -1,6 +1,11 @@
 import { PollQuesObj } from '../utils/types';
 import getBackendUrl from '../utils/getBackendUrl';
 
+//token to be dynamically set once login integrated
+const token =
+    // 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImMyMzYyMDdhLWY0OGQtNGFjYS1iMmJlLWE3NWM0OTZkZWUzZCIsImZpcnN0TmFtZSI6IkFkIiwibGFzdE5hbWUiOiJNaW4iLCJlbWFpbCI6Impvb25hcy5oYWxpbmVuQHR1bmkuZmkiLCJ1c2VyTmFtZSI6ImFkbWluIiwiaWF0IjoxNjY5NDY1Nzc0LCJleHAiOjE2Njk2Mzg1NzQsInN1YiI6ImMyMzYyMDdhLWY0OGQtNGFjYS1iMmJlLWE3NWM0OTZkZWUzZCJ9.6-SpV4i3F1tPHgDu5u89o3E6hP9EoB-VV84hJwOPFtM';
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImMyMzYyMDdhLWY0OGQtNGFjYS1iMmJlLWE3NWM0OTZkZWUzZCIsImZpcnN0TmFtZSI6IkFkIiwibGFzdE5hbWUiOiJNaW4iLCJlbWFpbCI6Impvb25hcy5oYWxpbmVuQHR1bmkuZmkiLCJ1c2VyTmFtZSI6ImFkbWluIiwiaWF0IjoxNjY5MzgyMzkzLCJleHAiOjE2Njk1NTUxOTMsInN1YiI6ImMyMzYyMDdhLWY0OGQtNGFjYS1iMmJlLWE3NWM0OTZkZWUzZCJ9.EqRI1mwWDITv5BRQjbvXWy4xvwb67ACdjN6RVEuFPPw';
+
 // function to modify question type before calling api
 const updatePollBody = (questions: PollQuesObj[]) => {
     const updatedQuestions = questions.map(
@@ -250,4 +255,54 @@ const formatBooleanOptions = (options: [any]) => {
     });
     console.log(booleanTypeOptions);
     return booleanTypeOptions.length > 0 ? booleanTypeOptions : newArray;
+};
+
+export const fetchSearchResult = async (
+    searchString: string,
+    searchType: string
+) => {
+    const searchBy = searchType === 'poll' ? 'searchByName' : 'searchByID';
+    const authToken = token;
+
+    // const searchBy = 'searchByName';
+    // searchString = 'polltest101';
+    const newResponse = await fetch(
+        // `${window.location.origin}/dummy2.json`,
+        `${getBackendUrl()}/api/poll/admin/${searchBy}/${searchString}`,
+        {
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                Authorization: `Bearer ${authToken}`
+            }
+        }
+    );
+    if (newResponse.status !== 200) {
+        throw new Error('Request Failed');
+    }
+    const dataList = await newResponse.json();
+    console.log(dataList);
+
+    return dataList;
+};
+
+export const deletePoll = async (pollId: string) => {
+    const newResponse = await fetch(
+        `${getBackendUrl()}/api/poll/admin/${pollId}`,
+        {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                Authorization: `Bearer ${token}`
+            }
+        }
+    );
+    if (newResponse.status !== 200) {
+        throw new Error('Request Failed');
+    }
+    const dataList = await newResponse.json();
+    console.log(dataList);
+
+    return dataList;
 };
