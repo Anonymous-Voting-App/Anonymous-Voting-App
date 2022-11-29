@@ -1,5 +1,4 @@
 @import '../styles/colors';
-
 @mixin for-phone-only {
     @media (max-width: 599px) {
         @content;
@@ -33,7 +32,6 @@
 .searchBy {
     @extend .button;
     margin-top: 83px;
-
     .MuiSvgIcon-root {
         left: 1.875rem;
     }
@@ -63,30 +61,30 @@
 
 .searchButton,
 .searchButton:hover {
-    @extend .button;
-    background-color: $main-color;
+    border-radius: 20px;
+    width: 16.25rem;
     color: $background-color;
+    background-color: $main-color;
+    text-transform: none;
+    border: 2px solid $main-color;
+    @include for-phone-only {
+        font-size: 2.5rem;
+    }
 }
 
-.listItems {
-    padding-top: 83px;
+.css-1rwt2y5-MuiButtonBase-root-MuiButton-root.Mui-disabled {
+    color: rgba(0, 0, 0, 0.26);
+    box-shadow: none;
+    border: none;
+    //border: rgba(1, 1, 1, 0.515);
+    background-color: rgba(0, 0, 0, 0.12);
 }
 
-.listItem {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    padding-bottom: 20px;
+.searchContent {
+    padding-top: 60px;
 }
 
-.pinkLink {
-    color: $lollipop;
-    text-decoration-color: $lollipop;
-    cursor: pointer;
-}
-
-.deleteLink {
-    color: $cancel-background-color;
-    text-decoration-color: none;
-    cursor: pointer;
+.countData {
+    margin-bottom: 20px;
+    font-size: 12px;
 }
