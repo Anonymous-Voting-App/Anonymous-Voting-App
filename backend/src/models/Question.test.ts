@@ -135,7 +135,8 @@ describe('Question', () => {
                 type: 'test-type',
                 pollId: 'test-poll-id',
                 answerCount: 3,
-                answerPercentage: 1,
+                answerPercentage: 0,
+                visualType: undefined,
                 answerValueStatistics: [
                     {
                         value: 'test1',

@@ -64,7 +64,8 @@ export default class BooleanQuestion extends Question {
      * Sets the boolean question's properties from
      * given database data. .answerCount() of a boolean
      * question is always the same as the parent's answerCount.
-     * Thus, answerPercentage() is also always 1.
+     * Thus, answerPercentage() is also always 1, except
+     * when the parent has 0 (in which case we define the percentage as 0).
      */
 
     setFromDatabaseData(questionData: IQuestion.DatabaseData): void {
@@ -72,7 +73,11 @@ export default class BooleanQuestion extends Question {
 
         this.setAnswerCount(this.parentAnswerCount());
 
-        this.setAnswerPercentage(1);
+        if (this.parentAnswerCount() === 0) {
+            this.setAnswerPercentage(0);
+        } else {
+            this.setAnswerPercentage(1);
+        }
     }
 
     /**

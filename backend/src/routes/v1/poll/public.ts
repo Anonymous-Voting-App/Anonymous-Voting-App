@@ -1,24 +1,30 @@
 import { Router } from 'express';
-
 import {
     answerPoll,
     createPoll,
     getPollAnswers,
     getPollResults,
-    getPublicPoll
+    getPublicPoll,
+    getUserPolls
 } from '../../../controllers/pollController';
+import { requireUser } from '../../../middlewares/authenticationHandler';
 
 export const router = Router();
 
 /**
  * Create poll
  */
-router.post('/', createPoll);
+router.post('/', requireUser(), createPoll);
 
 /**
  * Gets polls public information
  */
 router.get('/:publicId', getPublicPoll);
+
+/**
+ * Answer a poll
+ */
+router.post('/:publicId/answers', answerPoll);
 
 /**
  * Get answers of a poll
@@ -31,6 +37,6 @@ router.get('/:publicId/answers', getPollAnswers);
 router.get('/:publicId/results', getPollResults);
 
 /**
- * Answer poll
+ * Get user's own polls.
  */
-router.post('/:publicId/answers', answerPoll);
+router.get('/', requireUser(), getUserPolls);

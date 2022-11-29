@@ -194,7 +194,7 @@ describe('MultiQuestion', () => {
             );
             expect(
                 Question.prototype.setAnswerPercentage
-            ).toHaveBeenNthCalledWith(1, 1);
+            ).toHaveBeenNthCalledWith(1, 0);
             expect(Question.prototype.setAnswerCount).toHaveBeenCalledTimes(2);
             expect(Question.prototype.setAnswerPercentage).toHaveBeenCalled();
         });

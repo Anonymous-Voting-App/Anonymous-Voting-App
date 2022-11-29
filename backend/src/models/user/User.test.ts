@@ -12,7 +12,9 @@ describe('User', () => {
                 firstname: 'first',
                 lastname: 'last',
                 username: 'user',
-                email: 'email'
+                email: 'email',
+                password: 'pass',
+                isAdmin: true
             });
 
             expect(user.id()).toBe('1');
@@ -20,6 +22,8 @@ describe('User', () => {
             expect(user.lastName()).toBe('last');
             expect(user.userName()).toBe('user');
             expect(user.email()).toBe('email');
+            expect(user.password()).toBe('pass');
+            expect(user.isAdmin()).toBe(true);
         });
     });
 
