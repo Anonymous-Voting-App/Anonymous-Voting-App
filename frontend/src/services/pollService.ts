@@ -62,7 +62,11 @@ const updatePollBody = (questions: PollQuesObj[]) => {
  * @param questions
  * @returns
  */
-export const createPoll = async (title: string, questions: any) => {
+export const createPoll = async (
+    title: string,
+    questions: any,
+    visualFlags: any
+) => {
     const updatedQuestions = updatePollBody(questions);
     const pollContent = {
         name: title,
@@ -70,7 +74,8 @@ export const createPoll = async (title: string, questions: any) => {
         owner: {
             accountId: '3fa85f64-5717-4562-b3fc-2c963f66afa6' // hardcoded
         },
-        questions: updatedQuestions
+        questions: updatedQuestions,
+        visualFlags: visualFlags
     };
     console.log(pollContent);
     const response = await fetch(`${getBackendUrl()}/api/poll`, {
