@@ -19,10 +19,6 @@ describe('submit a poll with the option to show vote count', () => {
 
     it('can submit poll', () => {
         cy.get('.submit-poll-btn').click();
-        cy.get('.MuiAlert-filledError').should(
-            'have.css',
-            'background-color',
-            'rgb(183, 222, 189)'
-        );
+        cy.get('.MuiAlert-filledSuccess').should('exist');
     });
 });
