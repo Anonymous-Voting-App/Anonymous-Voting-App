@@ -44,7 +44,6 @@ jobs:
                   working-directory: frontend
                   browser: ${{ matrix.browser }}
                   record: true
-                  parallel: true
                   group: 'UI'
                   spec: cypress/e2e/*
 
@@ -71,7 +70,6 @@ jobs:
                   working-directory: frontend
                   browser: ${{ matrix.browser }}
                   record: true
-                  parallel: true
                   group: 'UI'
                   spec: cypress/e2e/*
 
@@ -98,6 +96,5 @@ jobs:
                   working-directory: frontend
                   browser: ${{ matrix.browser }}
                   record: true
-                  parallel: true
                   group: 'UI'
                   spec: cypress/e2e/*
