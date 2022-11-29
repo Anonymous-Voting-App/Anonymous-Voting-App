@@ -11,6 +11,9 @@ import BadRequestError from '../utils/badRequestError';
 import WebFingerprintFactory from '../models/user/WebFingerprintFactory';
 import Fingerprint from '../models/user/Fingerprint';
 import ForbiddenError from '../utils/forbiddenError';
+import User from '../models/user/User';
+import * as IUser from '../models/user/IUser';
+import * as IAccountManager from '../services/IAccountManager';
 
 const internalServerError = (
     method: string,
@@ -40,25 +43,35 @@ function makeFingerprint(req: Request) {
     return fingerprint;
 }
 
+function makeUser(req: Request) {
+    const user = new User(prisma);
+    user.setFingerprint(makeFingerprint(req));
+
+    if (typeof req.User === 'object') {
+        user.setFromPrivateDataObj(req.User as IUser.PrivateData);
+    }
+
+    return user;
+}
+
 function handleServiceError(req: Request, res: Response, e: unknown) {
     // Bad request
     if (e instanceof AssertionError) {
         Logger.warn(`Bad Request: ${e.message}`);
-        Logger.warn(e.stack);
         return responses.badRequest(req, res);
     } else if (e instanceof BadRequestError) {
         Logger.warn(`Bad Request: ${e.message}`);
-        Logger.warn(e.stack);
         return responses.badRequest(req, res);
     } else if (e instanceof ForbiddenError) {
         Logger.warn(`Forbidden: ${e.message}`);
-        Logger.warn(e.stack);
-        return responses.forbidden(req, res, e);
+        return responses.forbidden(req, res);
     }
 
     if (e instanceof Error) {
         Logger.error(e.message);
-        Logger.error(e.stack);
+        Logger.warn(e.stack);
+    } else {
+        Logger.warn(e);
     }
 
     return responses.internalServerError(req, res);
@@ -69,22 +82,22 @@ const callService = async (
     req: Request,
     res: Response
 ): Promise<Response> => {
-    const service = new VotingService(prisma, new QuestionFactory(prisma));
-    const fingerprint = makeFingerprint(req);
-
     try {
+        const service = new VotingService(prisma, new QuestionFactory(prisma));
+        const user = makeUser(req);
+
         if (typeof service[method] !== 'function') {
             return internalServerError(method, req, res);
         }
 
         type serviceFunction = (
             body: string | IPolling.PollRequest | IVotingService.AnswerData,
-            fingerprint: Fingerprint
+            user: User
         ) => IPolling.PollData | IPolling.AnswerData | null;
 
         const poll = await (service[method] as unknown as serviceFunction)(
             req.body,
-            fingerprint
+            user
         );
 
         // Poll not found
@@ -181,6 +194,16 @@ export const getPrivatePoll = async (req: Request, res: Response) => {
     }
 
     return await callService('getPollWithPrivateId', req, res);
+};
+
+export const getUserPolls = async (req: Request, res: Response) => {
+    try {
+        req.body = (req.User as IAccountManager.UserData).id;
+    } catch (e) {
+        return responses.badRequest(req, res);
+    }
+
+    return await callService('getUserPolls', req, res);
 };
 
 export const searchByName = async (req: Request, res: Response) => {

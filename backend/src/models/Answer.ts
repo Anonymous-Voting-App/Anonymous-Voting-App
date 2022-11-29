@@ -407,7 +407,7 @@ export default class Answer {
         for (const id in this.subAnswers()) {
             const subAnswer = this.subAnswers()[id];
 
-            objs.push(subAnswer.privateDataObj());
+            objs.push(subAnswer.publicDataObj());
         }
 
         return objs;
@@ -418,15 +418,13 @@ export default class Answer {
      * Contains information of who the answerer is.
      */
 
-    privateDataObj(): IPolling.AnswerData {
-        throw 'Error: Tried calling method that has not yet been implemented.';
-        /* return {
+    publicDataObj(): IPolling.AnswerData {
+        return {
             id: this.id(),
             questionId: this.questionId(),
             value: this.value(),
-            subAnswers: this.subAnswersDataObjs(),
-            answerer: this.answerer().publicDataObj()
-        }; */
+            subAnswers: this.subAnswersDataObjs()
+        };
     }
 
     /**

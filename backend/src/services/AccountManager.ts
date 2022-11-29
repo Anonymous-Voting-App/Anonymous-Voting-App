@@ -2,6 +2,19 @@ import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import * as IAccountManager from './IAccountManager';
 import logger from '../utils/logger';
+import DatabasedObjectCollection from '../models/database/DatabasedObjectCollection';
+import User from '../models/user/User';
+import * as IUser from '../models/user/IUser';
+import { pre } from '../utils/designByContract';
+
+async function _loadUserWithId(id: string, prisma: PrismaClient) {
+    const user = new User(prisma);
+    user.setId(id);
+
+    await user.loadFromDatabase();
+
+    return user;
+}
 
 export const createUser = async (
     email: string,
@@ -108,4 +121,54 @@ export const isAdmin = async (
         logger.error(e);
         return false;
     }
+};
+
+export const searchUsersByName = async (
+    searchText: string,
+    prisma: PrismaClient
+): Promise<{ data: Array<IUser.PrivateData> }> => {
+    pre('searchText is of type string', typeof searchText === 'string');
+
+    const users = new DatabasedObjectCollection(new User(prisma));
+
+    await users.loadFromDatabase({
+        where: { username: { contains: searchText } }
+    });
+
+    return {
+        data: Object.values(
+            await users.gather('privateDataObj')
+        ) as Array<IUser.PrivateData>
+    };
+};
+
+export const deleteUser = async (
+    id: string,
+    prisma: PrismaClient
+): Promise<{ success: true } | null> => {
+    const user = new User(prisma);
+
+    user.setId(id);
+
+    await user.delete();
+
+    return { success: true };
+};
+
+export const editUser = async (
+    editOptions: IUser.EditRequest,
+    prisma: PrismaClient
+): Promise<{ success: true } | null> => {
+    pre('editOptions is of type object', typeof editOptions === 'object');
+    pre('editOptions.id is of type string', typeof editOptions.id === 'string');
+
+    const user = await _loadUserWithId(editOptions.id, prisma);
+
+    if (user.loadedFromDatabase()) {
+        await user.updateFromEditRequest(editOptions);
+
+        return { success: true };
+    }
+
+    return null;
 };

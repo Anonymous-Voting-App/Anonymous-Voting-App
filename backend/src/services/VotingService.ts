@@ -3,11 +3,8 @@ import User from '../models/user/User';
 import Poll from '../models/Poll';
 import * as IPolling from '../models/IPolling';
 import * as IVotingService from './IVotingService';
-import * as IUserManager from './IUserManager';
-import UserManager from './/UserManager';
 import { PrismaClient } from '@prisma/client';
 import QuestionFactory from '../models/QuestionFactory';
-import BadRequestError from '../utils/badRequestError';
 import Fingerprint from '../models/user/Fingerprint';
 import DatabasedObjectCollection from '../models/database/DatabasedObjectCollection';
 
@@ -16,7 +13,6 @@ import DatabasedObjectCollection from '../models/database/DatabasedObjectCollect
  * offering all voting / polling functionalities.
  */
 export default class VotingService {
-    _userManager: UserManager;
     _database: PrismaClient;
     _questionFactory: QuestionFactory;
 
@@ -54,23 +50,6 @@ export default class VotingService {
         post('_database is database', this._database === database);
     }
 
-    /** UserManager the voting service uses for accessing / editing the app's users. */
-    userManager(): UserManager {
-        return this._userManager;
-    }
-
-    /** Sets value of userManager. */
-    setUserManager(userManager: UserManager): void {
-        pre(
-            'argument userManager is of type UserManager',
-            userManager instanceof UserManager
-        );
-
-        this._userManager = userManager;
-
-        post('_userManager is userManager', this._userManager === userManager);
-    }
-
     /**
      * New Poll instance with given publicId and loaded
      * from database.
@@ -102,23 +81,6 @@ export default class VotingService {
     }
 
     /**
-     * User retrieved from database with given user data
-     * if one exists. Throws error if user not found.
-     */
-
-    async _tryGettingUser(userData: IUserManager.UserOptions): Promise<User> {
-        // Currently returns just the same dummy user for any answer request.
-        const user = await this.userManager().getUser(userData);
-
-        if (!(user instanceof User)) {
-            // Make this return 401
-            throw new Error('User not found.');
-        }
-
-        return user;
-    }
-
-    /**
      * Answers a poll when poll is already assumed to exist.
      */
 
@@ -135,7 +97,6 @@ export default class VotingService {
 
         this._database = database;
         this._questionFactory = questionFactory;
-        this._userManager = new UserManager(database);
     }
 
     /**
@@ -144,7 +105,8 @@ export default class VotingService {
      * If not, returns null.
      */
     async createPoll(
-        pollOptions: IPolling.PollRequest
+        pollOptions: IPolling.PollRequest,
+        user: User
     ): Promise<IPolling.PollData | null> {
         pre('pollOptions is of type object', typeof pollOptions === 'object');
         pre(
@@ -160,33 +122,11 @@ export default class VotingService {
             Array.isArray(pollOptions.questions)
         );
         pre(
-            'pollOptions.owner is of type object',
-            typeof pollOptions.owner === 'object'
-        );
-        pre(
-            'pollOptions.owner.ip is of type string',
-            typeof pollOptions.owner.ip === 'string' || !pollOptions.owner.ip
-        );
-        pre(
-            'pollOptions.owner.cookie is of type string',
-            typeof pollOptions.owner.cookie === 'string' ||
-                !pollOptions.owner.cookie
-        );
-        pre(
-            'pollOptions.owner.accountId is of type string',
-            typeof pollOptions.owner.accountId === 'string'
-        );
-        pre(
             'there is at least one question in the poll',
             pollOptions.questions.length > 0
         );
 
         const poll = new Poll(this.database(), this.questionFactory());
-        const user = await this.userManager().getUser(pollOptions.owner);
-
-        if (!user) {
-            throw new BadRequestError('User not found.');
-        }
 
         await poll.createInDatabaseFromRequest(pollOptions, user);
         return poll.privateDataObj();
@@ -336,8 +276,8 @@ export default class VotingService {
     }
 
     /**
-     * Returns a poll having given private id.
-     * If no such poll exists, returns null.
+     * Returns polls that contain the given search string
+     * in their name.
      */
     async searchPollsByName(
         searchText: string
@@ -350,7 +290,31 @@ export default class VotingService {
 
         await polls.loadFromDatabase({
             where: { name: { contains: searchText } },
-            include: { questions: false }
+            include: { questions: false, creator: true }
+        });
+
+        return {
+            data: Object.values(
+                await polls.gather('privateDataObj')
+            ) as Array<IPolling.PollData>
+        };
+    }
+
+    /**
+     * Returns a user's own polls.
+     */
+    async getUserPolls(
+        userId: string
+    ): Promise<{ data: Array<IPolling.PollData> } | null> {
+        pre('userId is of type string', typeof userId === 'string');
+
+        const polls = new DatabasedObjectCollection(
+            new Poll(this.database(), this.questionFactory())
+        );
+
+        await polls.loadFromDatabase({
+            where: { creatorId: userId },
+            include: { questions: false, creator: true }
         });
 
         return {
@@ -367,7 +331,7 @@ export default class VotingService {
      */
     async answerPoll(
         answerData: IVotingService.AnswerData,
-        userIdentity: Fingerprint
+        user: User
     ): Promise<IVotingService.SuccessObject | null> {
         pre('answerData is of type object', typeof answerData === 'object');
 
@@ -384,14 +348,18 @@ export default class VotingService {
         const poll = await this._loadPollWithPublicId(answerData.publicId);
 
         if (poll.loadedFromDatabase()) {
-            await this._answerExistingPoll(poll, answerData, userIdentity);
+            await this._answerExistingPoll(
+                poll,
+                answerData,
+                user.fingerprint()
+            );
         } else {
             return null;
         }
 
         return {
             success: true,
-            fingerprint: userIdentity.privateDataObj()
+            fingerprint: user.fingerprint().privateDataObj()
         };
     }
 }

@@ -10,6 +10,8 @@ export interface DatabaseData {
     lastname: string;
     username: string;
     email: string;
+    isAdmin: boolean;
+    password: string;
 }
 
 export interface PrivateData {
@@ -18,8 +20,30 @@ export interface PrivateData {
     firstName: string;
     lastName: string;
     email: string;
+    isAdmin: boolean;
+    password: string;
 }
 
 export interface PublicData {
     id: string;
+    userName: string;
+}
+
+export interface EditRequest {
+    id: string;
+    userName?: string;
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    isAdmin?: boolean;
+    password?: string;
+}
+
+export interface NewDatabaseObject {
+    firstname: string;
+    lastname: string;
+    username: string;
+    email: string;
+    isAdmin: boolean;
+    password: string;
 }

@@ -435,7 +435,9 @@ describe('Poll', () => {
             firstname: 'first',
             lastname: 'last',
             email: 'email',
-            username: 'user'
+            username: 'user',
+            password: 'pass',
+            isAdmin: true
         } as PrismaUser,
         answerCount: 0,
         visualFlags: [],

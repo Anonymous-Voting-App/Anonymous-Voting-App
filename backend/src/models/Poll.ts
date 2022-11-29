@@ -914,7 +914,7 @@ export default class Poll
         for (const id in this.answers()) {
             const answer = this.answers()[id];
 
-            result.push(answer.privateDataObj());
+            result.push(answer.publicDataObj());
         }
 
         return result;

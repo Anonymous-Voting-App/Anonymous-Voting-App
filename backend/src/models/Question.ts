@@ -25,7 +25,7 @@ export default class Question {
     _databaseData!: IQuestion.DatabaseData;
     _parentId = '';
     _answerCount = 0;
-    _answerPercentage = 1;
+    _answerPercentage = 0;
     _visualType!: string;
     _parentAnswerCount = 0;
 
@@ -275,14 +275,14 @@ export default class Question {
 
     /**
      * The ratio of answerCount to parentAnswerCount.
-     * If parentAnswerCount is 0, returns 1.
+     * If parentAnswerCount is 0, returns 0.
      */
 
     _calculateAnswerPercentage(
         answerCount: number,
         parentAnswerCount: number
     ): number {
-        return parentAnswerCount !== 0 ? answerCount / parentAnswerCount : 1;
+        return parentAnswerCount !== 0 ? answerCount / parentAnswerCount : 0;
     }
 
     /**

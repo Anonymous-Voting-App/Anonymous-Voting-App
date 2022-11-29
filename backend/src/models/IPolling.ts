@@ -25,7 +25,6 @@ export interface AnswerData {
     questionId: string;
     value: string | number | boolean | object | null;
     subAnswers: Array<AnswerData>;
-    answerer: IUser.DatabaseData;
 }
 
 export interface AnswersData {
@@ -47,12 +46,6 @@ export interface PollData {
 export interface PollRequest {
     name: string;
     type: string;
-    owner: {
-        id: string;
-        ip: string;
-        cookie: string;
-        accountId: string;
-    };
     questions: Array<IQuestion.QuestionRequest>;
     visualFlags?: Array<string>;
 }
