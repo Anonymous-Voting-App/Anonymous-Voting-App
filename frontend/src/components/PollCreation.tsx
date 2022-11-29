@@ -11,8 +11,11 @@ import './PollCreation.scss';
 import Question from './Question';
 import { createPoll } from '../services/pollService';
 import { PollQuesObj } from '../utils/types';
+import { useNavigate } from 'react-router-dom';
 
 function PollCreation(props: any) {
+    const navigate = useNavigate();
+
     const [showQuesContainer, setShowQuesContainer] = useState(false);
     const [questions, setQuestions] = useState<PollQuesObj[]>([
         {
@@ -192,7 +195,7 @@ function PollCreation(props: any) {
     const submitHandler = () => {
         console.log(questions, pollName, showCount);
 
-        createPoll(pollName, questions)
+        createPoll(pollName, questions, [])
             .then((response) => {
                 console.log(response.publicId);
                 // 1576d894-2571-4281-933d-431d246bb460
@@ -201,6 +204,7 @@ function PollCreation(props: any) {
                     severity: 'success',
                     message: 'Poll Created successfully'
                 });
+                navigate(`result/${response.publicId}`);
             })
             .catch((error) => {
                 console.log(error);
