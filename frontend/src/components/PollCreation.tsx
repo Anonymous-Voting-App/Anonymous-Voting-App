@@ -194,8 +194,8 @@ function PollCreation(props: any) {
      */
     const submitHandler = () => {
         console.log(questions, pollName, showCount);
-
-        createPoll(pollName, questions, [])
+        const countData = showCount ? 'showCount' : 'hideCount';
+        createPoll(pollName, questions, countData)
             .then((response) => {
                 console.log(response.publicId);
                 // 1576d894-2571-4281-933d-431d246bb460

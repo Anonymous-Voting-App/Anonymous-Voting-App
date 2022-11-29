@@ -60,7 +60,7 @@ const updatePollBody = (questions: PollQuesObj[]) => {
 export const createPoll = async (
     title: string,
     questions: any,
-    visualFlags: any
+    visualFlags: string
 ) => {
     const updatedQuestions = updatePollBody(questions);
     const pollContent = {
@@ -70,7 +70,7 @@ export const createPoll = async (
             accountId: '3fa85f64-5717-4562-b3fc-2c963f66afa6' // hardcoded
         },
         questions: updatedQuestions,
-        visualFlags: visualFlags
+        visualFlags: [visualFlags]
     };
     console.log(pollContent);
     const response = await fetch(`${getBackendUrl()}/api/poll`, {
