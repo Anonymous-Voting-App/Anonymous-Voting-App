@@ -1,28 +1,51 @@
 import { render, screen, fireEvent } from '@testing-library/react';
+import { BrowserRouter as Router } from 'react-router-dom';
 import PollCreation from '../PollCreation';
 // import UserEvent from '@testing-library/user-event';
 
+const mockedUsedNavigate = jest.fn();
+jest.mock('react-router-dom', () => ({
+    ...jest.requireActual('react-router-dom'),
+    useNavigate: () => mockedUsedNavigate
+}));
+
 test('Renders page heading', () => {
-    render(<PollCreation />);
+    render(
+        <Router>
+            <PollCreation />
+        </Router>
+    );
     const pageTitle = screen.getByText('Create poll');
     expect(pageTitle).toBeInTheDocument();
 });
 
 test('Renders submit button for submitting the poll questions', () => {
-    render(<PollCreation />);
+    render(
+        <Router>
+            <PollCreation />
+        </Router>
+    );
     const button = screen.getByRole('button', { name: 'Submit Poll' });
     expect(button).toBeInTheDocument();
     expect(button.getAttribute('type')).toBe('submit');
 });
 
 test('Renders button for adding a poll question', () => {
-    render(<PollCreation />);
+    render(
+        <Router>
+            <PollCreation />
+        </Router>
+    );
     const button = screen.getByRole('button', { name: 'Add a question' });
     expect(button).toBeInTheDocument();
 });
 
 test('Page includes text input for poll name', () => {
-    render(<PollCreation />);
+    render(
+        <Router>
+            <PollCreation />
+        </Router>
+    );
     const field = screen.getByTestId('poll-name-field');
     expect(field).toBeInTheDocument();
 
