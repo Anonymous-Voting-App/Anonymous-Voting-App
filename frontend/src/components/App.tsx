@@ -76,6 +76,15 @@ function App() {
                                     />
                                 }
                             />
+                            <Route
+                                path={'/result/' + pollId}
+                                element={
+                                    <PollResult
+                                        pollId={pollId}
+                                        showNotification={handleNotification}
+                                    />
+                                }
+                            />
                         </Routes>
                         <BasicSnackbar
                             open={open}
