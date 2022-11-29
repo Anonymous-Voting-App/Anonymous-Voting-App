@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import {
     Typography,
-    Link,
     Container,
     FormControlLabel,
     Switch,
@@ -13,14 +12,8 @@ import './AdminViewUser.scss';
 const AdminViewUser = (props: any) => {
     const location = useLocation();
 
-    const [usernameEditDisabled, setUsernameEditDisabled] = useState(true);
-
     const handleAdminToggle = () => {
         console.log('toggled');
-    };
-
-    const handleUsernameEdit = () => {
-        setUsernameEditDisabled(!usernameEditDisabled);
     };
 
     return (
@@ -31,12 +24,7 @@ const AdminViewUser = (props: any) => {
             <div className="profileContents">
                 <div className="row">
                     <Typography className="subtitle">Username:</Typography>
-                    <TextField
-                        value={location.state.username}
-                        disabled={usernameEditDisabled}
-                    >
-                        {}
-                    </TextField>
+                    <TextField value={location.state.username}>{}</TextField>
                 </div>
                 <div className="userIdRow">
                     <Typography className="subtitle">User ID:</Typography>
