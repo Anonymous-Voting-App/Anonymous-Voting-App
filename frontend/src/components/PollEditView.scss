@@ -1,0 +1,105 @@
+@import '../styles/colors';
+@mixin for-phone-only {
+    @media (max-width: 599px) {
+        @content;
+    }
+}
+
+.poll-edit-view-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    .page-header {
+        margin-top: 173px;
+        display: flex;
+        justify-content: center;
+        .MuiTypography-root {
+            font-weight: 600;
+            @include for-phone-only {
+                font-size: 2rem;
+            }
+        }
+        .MuiSvgIcon-root {
+            transform: rotate(90deg);
+            font-size: 3rem !important;
+            @include for-phone-only {
+                font-size: 2rem !important;
+            }
+        }
+    }
+    .field-mui {
+        .MuiInputBase-root {
+            border-bottom: 1px solid $main-color;
+            &.MuiInput-underline:after {
+                border-bottom: black;
+            }
+        }
+    }
+    .edit-info {
+        margin-top: 60px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        .label-field-container {
+            display: flex;
+            gap: 8.5rem;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+        .label {
+            position: relative; // to set the labe text inline with textfiled
+            top: 5px;
+            .MuiTypography-root {
+                font-weight: 800;
+            }
+        }
+        .switch-field {
+            gap: 3.2rem;
+        }
+        .id-field {
+            gap: 9rem;
+        }
+    }
+    .vote-count-switch {
+        .MuiSwitch-switchBase {
+            color: $black;
+            position: absolute;
+            size: large;
+            top: 2px;
+            left: 3px;
+        }
+        .MuiSwitch-thumb {
+            height: 15px;
+            width: 15px;
+        }
+        .Mui-checked + .MuiSwitch-track {
+            border: 1px solid $black;
+            background-color: $lollipop;
+            opacity: 10;
+        }
+        .MuiSwitch-track {
+            border: 1px solid $black;
+            background-color: $toggle-background-color;
+            opacity: 10;
+        }
+        .Mui-checked.css-5ryogn-MuiButtonBase-root-MuiSwitch-switchBase {
+            color: $black;
+            .MuiSwitch-thumb {
+                height: 15px;
+                width: 15px;
+                outline: $black;
+            }
+        }
+    }
+    .searchButton,
+    .searchButton:hover {
+        margin-top: 4.875rem;
+        width: 260px;
+        height: 40px;
+        border-radius: 20px;
+        text-transform: none;
+        background-color: $main-color;
+        color: $background-color;
+    }
+}

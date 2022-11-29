@@ -11,6 +11,7 @@ import AdminView from './AdminView';
 import PollResult from './PollResult';
 import { StyledEngineProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import PollEditView from './PollEditView';
 
 function App() {
     const [open, setOpen] = useState(false);
@@ -63,6 +64,10 @@ function App() {
                             <Route path="/answer" element={<PollAnswering />} />
                             <Route path="/admin" element={<AdminView />} />
                             <Route path="/login" element={<Login />} />
+                            <Route
+                                path="/polledit"
+                                element={<PollEditView />}
+                            />
                             <Route
                                 path="/register"
                                 element={<Registration />}
