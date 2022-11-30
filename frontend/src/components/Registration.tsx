@@ -1,9 +1,13 @@
 import { useState } from 'react';
 import { Typography, Paper, Button } from '@mui/material';
 import './LoginAndRegister.scss';
+import { register } from '../services/loginAndRegisterService';
 import Field from './Field';
+import { useNavigate } from 'react-router-dom';
 
 function Registration() {
+    const navigate = useNavigate();
+
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [password2, setPassword2] = useState('');
@@ -32,6 +36,12 @@ function Registration() {
                 setEmail(value);
                 break;
         }
+    };
+
+    const handleRegister = () => {
+        register();
+
+        navigate('/login');
     };
 
     return (
@@ -95,6 +105,7 @@ function Registration() {
                 className="login-btn"
                 sx={{ mt: '4.5rem', width: 200 }}
                 variant="outlined"
+                onClick={handleRegister}
             >
                 Register
             </Button>

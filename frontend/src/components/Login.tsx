@@ -1,10 +1,13 @@
 import Field from './Field';
 import './LoginAndRegister.scss';
+import { login } from '../services/loginAndRegisterService';
 import { useState } from 'react';
 import { Typography, Button, Link } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 function Login(props: any) {
+    const navigate = useNavigate();
+
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
@@ -12,9 +15,15 @@ function Login(props: any) {
         index === 0 ? setUsername(value) : setPassword(value);
     };
 
-    const navigate = useNavigate();
+    const handleLogin = () => {
+        login(username, password).then((response) => {
+            console.log(response);
+        });
 
-    const handleClick = () => {
+        navigate('/');
+    };
+
+    const handleRegisterClick = () => {
         navigate('/register');
     };
 
@@ -43,6 +52,7 @@ function Login(props: any) {
                     className="login-btn"
                     sx={{ mt: '4.5rem', width: 200 }}
                     variant="outlined"
+                    onClick={handleLogin}
                 >
                     Login
                 </Button>
@@ -52,7 +62,10 @@ function Login(props: any) {
                 <Typography className="bottom-text">
                     Don't have an account?
                 </Typography>
-                <Link className="bottom-text link" onClick={handleClick}>
+                <Link
+                    className="bottom-text link"
+                    onClick={handleRegisterClick}
+                >
                     Register
                 </Link>
             </div>
