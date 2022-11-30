@@ -5,6 +5,22 @@ import * as responses from '../utils/responses';
 import * as Auth from '../services/Auth';
 import logger from '../utils/logger';
 
+type NoArgsFunction = () => any;
+
+async function _callService(func: NoArgsFunction, req: Request, res: Response) {
+    try {
+        const result = await func();
+
+        return responses.custom(req, res, 200, result);
+    } catch (e) {
+        if (e instanceof Error) {
+            console.log(e.stack);
+        }
+
+        return responses.internalServerError(req, res);
+    }
+}
+
 export const createAccount = async (req: Request, res: Response) => {
     try {
         const password = req.body.password as string;
@@ -77,4 +93,43 @@ export const login = async (req: Request, res: Response) => {
         logger.error(e);
         return responses.internalServerError(req, res);
     }
+};
+
+export const searchUsersByName = async (req: Request, res: Response) => {
+    const searchText = req.params.searchText as string;
+
+    return await _callService(
+        AccountManager.searchUsersByName.bind(null, searchText, prisma),
+        req,
+        res
+    );
+};
+
+export const deleteUser = async (req: Request, res: Response) => {
+    try {
+        const id = req.params.id as string;
+
+        const response = await AccountManager.deleteUser(id, prisma);
+
+        if (response === null) {
+            return responses.internalServerError(req, res);
+        }
+
+        return responses.custom(req, res, 200, response);
+    } catch (e: unknown) {
+        logger.error(e);
+        return responses.internalServerError(req, res);
+    }
+};
+
+export const editUser = async (req: Request, res: Response) => {
+    if (typeof req.body === 'object') {
+        req.body.id = req.params.id;
+    }
+
+    return await _callService(
+        AccountManager.editUser.bind(null, req.body, prisma),
+        req,
+        res
+    );
 };

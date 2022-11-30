@@ -1,9 +1,10 @@
 import { pre, post } from '../../utils/designByContract';
 import * as IUser from './/IUser';
 import { PrismaClient } from '@prisma/client';
-import Fingerprint from './IdentifyingFeature';
+import Fingerprint from './Fingerprint';
 import SecurelyExposable from '../objects/SecurelyExposable';
 import DatabasedObject from '../database/DatabasedObject';
+import bcrypt from 'bcryptjs';
 
 /**
  * A registered user of the anonymous voting app.
@@ -19,6 +20,46 @@ export default class User implements DatabasedObject, SecurelyExposable {
     _firstName = '';
     _lastName = '';
     _email = '';
+    _isAdmin = false;
+    _password = '';
+
+    /**  */
+
+    password(): string {
+        return this._password;
+    }
+
+    /** Sets value of password. */
+
+    setPassword(password: string): void {
+        pre(
+            'argument password is of type string',
+            typeof password === 'string'
+        );
+
+        this._password = password;
+
+        post('_password is password', this._password === password);
+    }
+
+    /**  */
+
+    isAdmin(): boolean {
+        return this._isAdmin;
+    }
+
+    /** Sets value of isAdmin. */
+
+    setIsAdmin(isAdmin: boolean): void {
+        pre(
+            'argument isAdmin is of type boolean',
+            typeof isAdmin === 'boolean'
+        );
+
+        this._isAdmin = isAdmin;
+
+        post('_isAdmin is isAdmin', this._isAdmin === isAdmin);
+    }
 
     /**  */
 
@@ -211,6 +252,8 @@ export default class User implements DatabasedObject, SecurelyExposable {
         this.setLastName(userData.lastname);
         this.setUserName(userData.username);
         this.setEmail(userData.email);
+        this.setIsAdmin(userData.isAdmin);
+        this.setPassword(userData.password);
     }
 
     /**
@@ -255,7 +298,8 @@ export default class User implements DatabasedObject, SecurelyExposable {
      */
     publicDataObj(): IUser.PublicData {
         return {
-            id: this.id()
+            id: this.id(),
+            userName: this.userName()
         };
     }
 
@@ -268,7 +312,9 @@ export default class User implements DatabasedObject, SecurelyExposable {
             userName: this.userName(),
             firstName: this.firstName(),
             lastName: this.lastName(),
-            email: this.email()
+            email: this.email(),
+            isAdmin: this.isAdmin(),
+            password: this.password()
         };
     }
 
@@ -278,5 +324,109 @@ export default class User implements DatabasedObject, SecurelyExposable {
      */
     hasV4Uuid(): boolean {
         return this.id().length === 32 || this.id().length === 36;
+    }
+
+    /**
+     * Sets User instance's info from an object
+     * containing the private data of the user.
+     */
+
+    setFromPrivateDataObj(obj: IUser.PrivateData): void {
+        pre('obj.id is of type string', typeof obj.id === 'string');
+        pre('obj.userName is of type string', typeof obj.userName === 'string');
+        pre(
+            'obj.firstName is of type string',
+            typeof obj.firstName === 'string'
+        );
+        pre('obj.lastName is of type string', typeof obj.lastName === 'string');
+        pre('obj.email is of type string', typeof obj.email === 'string');
+
+        this.setId(obj.id);
+        this.setUserName(obj.userName);
+        this.setFirstName(obj.firstName);
+        this.setLastName(obj.lastName);
+        this.setEmail(obj.email);
+    }
+
+    /**
+     * Deletes the user from the database.
+     */
+
+    async delete(): Promise<void> {
+        pre('this.id(  ) is of type string', typeof this.id() === 'string');
+        pre('id is set', this.id().length > 0);
+
+        await this.database().user.delete({
+            where: { id: this.id() }
+        });
+    }
+
+    /**
+     * Object that can be used to create new user in database.
+     */
+
+    newDatabaseObject(): IUser.NewDatabaseObject {
+        return {
+            firstname: this.firstName(),
+            lastname: this.lastName(),
+            email: this.email(),
+            isAdmin: this.isAdmin(),
+            username: this.userName(),
+            password: this.password()
+        };
+    }
+
+    /**
+     * Updates user in database to match all the instance's values.
+     */
+
+    async updateInDatabase(): Promise<void> {
+        await this.database().user.update({
+            where: { id: this.id() },
+            data: this.newDatabaseObject()
+        });
+    }
+
+    /**
+     * Updates user in database according to
+     * given fields and values to update.
+     */
+
+    async updateFromEditRequest(req: IUser.EditRequest): Promise<void> {
+        await this.setFromEditRequest(req);
+
+        await this.updateInDatabase();
+    }
+
+    /**
+     * Sets the User instance's information from
+     * an object that contains new values to update
+     * for the user.
+     */
+
+    async setFromEditRequest(req: IUser.EditRequest): Promise<void> {
+        if (typeof req.email === 'string') {
+            this.setEmail(req.email);
+        }
+
+        if (typeof req.firstName === 'string') {
+            this.setFirstName(req.firstName);
+        }
+
+        if (typeof req.lastName === 'string') {
+            this.setLastName(req.lastName);
+        }
+
+        if (typeof req.userName === 'string') {
+            this.setUserName(req.userName);
+        }
+
+        if (typeof req.password === 'string') {
+            this.setPassword(await bcrypt.hash(req.password, 10));
+        }
+
+        if (typeof req.isAdmin === 'boolean') {
+            this.setIsAdmin(req.isAdmin);
+        }
     }
 }
