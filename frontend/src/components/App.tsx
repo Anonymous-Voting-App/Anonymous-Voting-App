@@ -65,7 +65,7 @@ function App() {
                             <Route path="/admin" element={<AdminView />} />
                             <Route path="/login" element={<Login />} />
                             <Route
-                                path="/polledit"
+                                path="/admin/polledit/:pollId"
                                 element={<PollEditView />}
                             />
                             <Route
@@ -82,10 +82,9 @@ function App() {
                                 }
                             />
                             <Route
-                                path={'/result/' + pollId}
+                                path={'/result/:pollId'}
                                 element={
                                     <PollResult
-                                        pollId={pollId}
                                         showNotification={handleNotification}
                                     />
                                 }

@@ -7,6 +7,10 @@ import ResultCard from './ResultCard';
 const PollResult = (props: any) => {
     const [pollName, setPollName] = useState('');
     const [pollResult, setPollResult] = useState([]);
+    const pollId = window.location.href.substring(
+        window.location.href.lastIndexOf('/') + 1
+    );
+
     useEffect(() => {
         const getResultData = (id: string) => {
             fetchPollResult(id)
@@ -26,7 +30,7 @@ const PollResult = (props: any) => {
                 });
         };
 
-        getResultData(props.pollId);
+        getResultData(pollId);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 

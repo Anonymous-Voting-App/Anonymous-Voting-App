@@ -46,6 +46,10 @@
             gap: 8.5rem;
             margin-bottom: 20px;
             align-items: center;
+            @include for-phone-only {
+                font-size: 2rem;
+                gap: 1rem;
+            }
         }
         .label {
             position: relative; // to set the labe text inline with textfiled
@@ -54,11 +58,35 @@
                 font-weight: 800;
             }
         }
+        .field-mui {
+            .MuiFormControl-root {
+                min-width: 320px;
+            }
+            @include for-phone-only {
+                font-size: 2rem;
+                gap: 2rem;
+                .MuiFormControl-root {
+                    min-width: 4rem;
+                }
+            }
+        }
         .switch-field {
             gap: 3.2rem;
+            @include for-phone-only {
+                font-size: 2rem;
+                gap: 2rem;
+            }
         }
         .id-field {
             gap: 9rem;
+            min-width: 320px;
+            @include for-phone-only {
+                font-size: 2rem;
+                gap: 2rem;
+                .MuiFormControl-root {
+                    min-width: 4rem;
+                }
+            }
         }
     }
     .vote-count-switch {
