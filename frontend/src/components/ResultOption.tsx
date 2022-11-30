@@ -7,8 +7,10 @@ import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 
 const ResultOption = (props: any) => {
     // console.log(props.optionData);
-    const { optionData, highestCount, totalCount, type } = props;
+    const { optionData, highestCount, totalCount, type, voteStatus } = props;
     const showIcon = highestCount === optionData.count ? true : false;
+    const showVote = voteStatus === 'showCount' ? true : false;
+    console.log(showVote);
 
     return (
         <div className="option-wrapper">
@@ -31,9 +33,11 @@ const ResultOption = (props: any) => {
                             <span className="option-percent">
                                 {optionData.percentage}%
                             </span>
-                            <span className="option-count">
-                                ({optionData.count}/{totalCount})
-                            </span>
+                            {showVote ? (
+                                <span className="option-count">
+                                    ({optionData.count}/{totalCount})
+                                </span>
+                            ) : null}
                         </Typography>
                     </div>
                 </div>
@@ -50,9 +54,11 @@ const ResultOption = (props: any) => {
                             <span className="option-percent">
                                 {optionData.percentage}%
                             </span>
-                            <span className="option-count">
-                                ({optionData.count}/{totalCount})
-                            </span>
+                            {showVote ? (
+                                <span className="option-count">
+                                    ({optionData.count}/{totalCount})
+                                </span>
+                            ) : null}
                         </Typography>
                     </div>
                 </div>
@@ -71,9 +77,11 @@ const ResultOption = (props: any) => {
                             <span className="option-percent">
                                 {optionData.percentage}%
                             </span>
-                            <span className="option-count">
-                                ({optionData.count}/{totalCount})
-                            </span>
+                            {showVote ? (
+                                <span className="option-count">
+                                    ({optionData.count}/{totalCount})
+                                </span>
+                            ) : null}
                         </Typography>
                     </div>
                 </div>

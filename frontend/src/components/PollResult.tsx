@@ -10,6 +10,7 @@ const PollResult = (props: any) => {
     const pollId = window.location.href.substring(
         window.location.href.lastIndexOf('/') + 1
     );
+    const [voteStatus, setVoteStatus] = useState('hideVote');
 
     useEffect(() => {
         const getResultData = (id: string) => {
@@ -18,6 +19,7 @@ const PollResult = (props: any) => {
                     console.log(response);
                     setPollName(response.pollName);
                     setPollResult(response.questions);
+                    setVoteStatus(response.voteCount);
                 })
                 .catch((error) => {
                     // console.log(error);
@@ -46,6 +48,7 @@ const PollResult = (props: any) => {
                             <ResultCard
                                 ques={question}
                                 ind={index}
+                                voteStatus={voteStatus}
                             ></ResultCard>
                         </div>
                     ))}

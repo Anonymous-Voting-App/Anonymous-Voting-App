@@ -125,7 +125,11 @@ const formatData = (data: any) => {
     const newList = data.questions.map((item: any) => {
         return setQuesArray(item);
     });
-    return { pollName: data.name, questions: newList };
+    return {
+        pollName: data.name,
+        questions: newList,
+        voteCount: data?.visualFlags[0]
+    };
 };
 
 const setQuesArray = (item: any) => {
