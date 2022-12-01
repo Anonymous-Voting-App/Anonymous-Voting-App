@@ -1,14 +1,10 @@
 import { PollQuesObj } from '../utils/types';
 import getBackendUrl from '../utils/getBackendUrl';
 
-//**token to be dynamically set once login integrated
-const token =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjdjZmUwOTEwLTFkNjUtNDMyMS1hNTg5LTlkYWRjMmY4MzdlYiIsImZpcnN0TmFtZSI6ImphbmUiLCJsYXN0TmFtZSI6ImRvZSIsImVtYWlsIjoiYWRtaW5AbWFpbC5jb20iLCJ1c2VyTmFtZSI6InRlc3RBZG1pbiIsImlhdCI6MTY2OTg4NTk0NiwiZXhwIjoxNjcwMDU4NzQ2LCJzdWIiOiI3Y2ZlMDkxMC0xZDY1LTQzMjEtYTU4OS05ZGFkYzJmODM3ZWIifQ.zpg9IJ8LkW8m4QZfi9jtupk87mbvro6uCb3ltByNGRE';
 // function to modify question type before calling api
 const updatePollBody = (questions: PollQuesObj[]) => {
     const updatedQuestions = questions.map(
         ({ subQuestions, minAnswers, maxAnswers, ...element }) => {
-            console.log(element.visualType);
             let quesObj;
             switch (element.visualType) {
                 case 'radioBtn':
@@ -47,7 +43,7 @@ const updatePollBody = (questions: PollQuesObj[]) => {
             return quesObj;
         }
     );
-    console.log(updatedQuestions);
+
     return updatedQuestions;
 };
 
@@ -72,13 +68,13 @@ export const createPoll = async (
         questions: updatedQuestions,
         visualFlags: [visualFlags]
     };
-    console.log(pollContent);
+
     const response = await fetch(`${getBackendUrl()}/api/poll`, {
         method: 'POST',
         body: JSON.stringify(pollContent),
         headers: {
             'Content-type': 'application/json; charset=UTF-8',
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${localStorage.getItem('token')}`
         }
     });
     if (response.status !== 201) {
@@ -182,7 +178,6 @@ const formatFreeTextOptions = (options: [any]) => {
 };
 
 const formatMultiTypeOptions = (options: [any]) => {
-    console.log(options);
     const formattedOptions = options.map((option) => {
         return {
             title: option.title,
@@ -217,7 +212,7 @@ const formatRatingOptions = (options: [any]) => {
                 percentage: 0
             };
         });
-    // console.log(newArray);
+
     let ratingTypeOptions = newArray.map((arr) => {
         const obj =
             respOptions.findIndex((option) => option.value === arr.title) === -1
@@ -233,7 +228,7 @@ const formatRatingOptions = (options: [any]) => {
             percentage: Number(option.percentage)
         };
     });
-    console.log(ratingTypeOptions);
+
     return ratingTypeOptions.length > 0
         ? ratingTypeOptions.reverse()
         : newArray;
@@ -245,7 +240,6 @@ const formatBooleanOptions = (options: [any]) => {
         { title: false, count: 0, percentage: 0 }
     ];
     const booleanTypeOptions = options.map((option) => {
-        console.log(option);
         return {
             title: option.value === 'true' ? 'Yes' : 'No',
             count: option.count,
@@ -258,7 +252,7 @@ const formatBooleanOptions = (options: [any]) => {
                     : (option.percentage * 100).toFixed(1)
         };
     });
-    console.log(booleanTypeOptions);
+
     return booleanTypeOptions.length > 0 ? booleanTypeOptions : newArray;
 };
 
@@ -267,7 +261,7 @@ export const fetchSearchResult = async (
     searchType: string
 ) => {
     const searchBy = searchType === 'poll' ? 'searchByName' : 'searchByID';
-    const authToken = token;
+    const authToken = localStorage.getItem('token');
     let newResponse;
 
     // const searchBy = 'searchByName';
@@ -298,7 +292,6 @@ export const fetchSearchResult = async (
         throw new Error('Request Failed');
     }
     const dataList = await newResponse.json();
-    console.log(dataList);
 
     return dataList;
 };
@@ -311,15 +304,16 @@ export const deletePoll = async (pollId: string) => {
             headers: {
                 'Content-Type': 'application/json',
                 Accept: 'application/json',
-                Authorization: `Bearer ${token}`
+                Authorization: `Bearer ${localStorage.getItem('token')}`
             }
         }
     );
+
     if (newResponse.status !== 200) {
         throw new Error('Request Failed');
     }
+
     const dataList = await newResponse.json();
-    console.log(dataList);
 
     return dataList;
 };
@@ -330,15 +324,15 @@ export const deleteUser = async (userId: string) => {
         headers: {
             'Content-Type': 'application/json',
             Accept: 'application/json',
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${localStorage.getItem('token')}`
         }
     });
 
     if (newResponse.status !== 200) {
         throw new Error('Request Failed');
     }
+
     const dataList = await newResponse.json();
-    console.log(dataList);
 
     return dataList;
 };
@@ -349,15 +343,15 @@ export const getEditPollData = async (privateId: string) => {
             headers: {
                 'Content-Type': 'application/json',
                 Accept: 'application/json',
-                Authorization: `Bearer ${token}`
+                Authorization: `Bearer ${localStorage.getItem('token')}`
             }
         }
     );
+
     if (newResponse.status !== 200) {
         throw new Error('Request Failed');
     }
     const dataList = await newResponse.json();
-    console.log(dataList);
 
     return dataList;
 };
@@ -379,9 +373,10 @@ export const updateUser = async (
         headers: {
             'Content-Type': 'application/json',
             Accept: 'application/json',
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${localStorage.getItem('token')}`
         }
     });
+
     if (response.status !== 200) {
         throw new Error('Request Failed');
     }
@@ -400,7 +395,7 @@ export const editPoll = async (
         owner: ownerId,
         visualFlags: [showCount]
     };
-    //localhost:8080/api/poll/admin/d14c1c6a-7a98-4684-8fdc-49689c55263c
+
     const response = await fetch(
         `${getBackendUrl()}/api/poll/admin/${privateId}`,
         {
@@ -409,15 +404,15 @@ export const editPoll = async (
             headers: {
                 'Content-Type': 'application/json',
                 Accept: 'application/json',
-                Authorization: `Bearer ${token}`
+                Authorization: `Bearer ${localStorage.getItem('token')}`
             }
         }
     );
+
     if (response.status !== 200) {
         throw new Error('Request Failed');
     }
     const data = await response.json();
-    console.log(data);
 
     return data;
 };
