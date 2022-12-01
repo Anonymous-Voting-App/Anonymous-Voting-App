@@ -9,14 +9,25 @@ import Sidebar from './Sidebar';
 import IconButton from '@mui/material/IconButton';
 import './NavBar.scss';
 import { useNavigate } from 'react-router-dom';
+import { logout } from '../services/loginAndRegisterService';
 
 const NavBar = () => {
     const [sidebarOpen, setSidebarOpen] = useState(true);
 
     const navigate = useNavigate();
 
+    const userIsLoggedIn = () => {
+        const token = localStorage.getItem('token');
+        return typeof token === 'string';
+    };
+
+    const logoutAndNavigateToHome = () => {
+        logout();
+        navigate('/');
+    };
+
     const handleClick = () => {
-        navigate('/login');
+        userIsLoggedIn() ? logoutAndNavigateToHome() : navigate('/login');
     };
 
     return (
@@ -41,7 +52,7 @@ const NavBar = () => {
                 />
 
                 <Typography className="login" onClick={handleClick}>
-                    Login
+                    {userIsLoggedIn() ? 'Logout' : 'Login'}
                 </Typography>
 
                 <PersonIcon className="profile"></PersonIcon>
