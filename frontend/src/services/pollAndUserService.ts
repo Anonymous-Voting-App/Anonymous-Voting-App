@@ -1,11 +1,9 @@
 import { PollQuesObj } from '../utils/types';
 import getBackendUrl from '../utils/getBackendUrl';
 
-//token to be dynamically set once login integrated
+//**token to be dynamically set once login integrated
 const token =
-    // 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImMyMzYyMDdhLWY0OGQtNGFjYS1iMmJlLWE3NWM0OTZkZWUzZCIsImZpcnN0TmFtZSI6IkFkIiwibGFzdE5hbWUiOiJNaW4iLCJlbWFpbCI6Impvb25hcy5oYWxpbmVuQHR1bmkuZmkiLCJ1c2VyTmFtZSI6ImFkbWluIiwiaWF0IjoxNjY5NDY1Nzc0LCJleHAiOjE2Njk2Mzg1NzQsInN1YiI6ImMyMzYyMDdhLWY0OGQtNGFjYS1iMmJlLWE3NWM0OTZkZWUzZCJ9.6-SpV4i3F1tPHgDu5u89o3E6hP9EoB-VV84hJwOPFtM';
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjdjZmUwOTEwLTFkNjUtNDMyMS1hNTg5LTlkYWRjMmY4MzdlYiIsImZpcnN0TmFtZSI6ImphbmUiLCJsYXN0TmFtZSI6ImRvZSIsImVtYWlsIjoiYWRtaW5AbWFpbC5jb20iLCJ1c2VyTmFtZSI6InRlc3RBZG1pbiIsImlhdCI6MTY2OTg4NTk0NiwiZXhwIjoxNjcwMDU4NzQ2LCJzdWIiOiI3Y2ZlMDkxMC0xZDY1LTQzMjEtYTU4OS05ZGFkYzJmODM3ZWIifQ.zpg9IJ8LkW8m4QZfi9jtupk87mbvro6uCb3ltByNGRE';
-
 // function to modify question type before calling api
 const updatePollBody = (questions: PollQuesObj[]) => {
     const updatedQuestions = questions.map(
@@ -47,9 +45,6 @@ const updatePollBody = (questions: PollQuesObj[]) => {
                     break;
             }
             return quesObj;
-            // if (element.type === 'radioBtn' || element.type === 'checkBox')
-            //     return { ...element, visualType: element.type, type: 'multi' };
-            // else return element;
         }
     );
     console.log(updatedQuestions);
@@ -65,24 +60,25 @@ const updatePollBody = (questions: PollQuesObj[]) => {
 export const createPoll = async (
     title: string,
     questions: any,
-    visualFlags: any
+    visualFlags: string
 ) => {
     const updatedQuestions = updatePollBody(questions);
     const pollContent = {
         name: title,
         type: 'string',
         owner: {
-            accountId: '3fa85f64-5717-4562-b3fc-2c963f66afa6' // hardcoded
+            accountId: '7cfe0910-1d65-4321-a589-9dadc2f837eb' // hardcoded
         },
         questions: updatedQuestions,
-        visualFlags: visualFlags
+        visualFlags: [visualFlags]
     };
     console.log(pollContent);
     const response = await fetch(`${getBackendUrl()}/api/poll`, {
         method: 'POST',
         body: JSON.stringify(pollContent),
         headers: {
-            'Content-type': 'application/json; charset=UTF-8'
+            'Content-type': 'application/json; charset=UTF-8',
+            Authorization: `Bearer ${token}`
         }
     });
     if (response.status !== 201) {
@@ -130,7 +126,11 @@ const formatData = (data: any) => {
     const newList = data.questions.map((item: any) => {
         return setQuesArray(item);
     });
-    return { pollName: data.name, questions: newList };
+    return {
+        pollName: data.name,
+        questions: newList,
+        voteCount: data?.visualFlags[0]
+    };
 };
 
 const setQuesArray = (item: any) => {
@@ -268,32 +268,19 @@ export const fetchSearchResult = async (
 ) => {
     const searchBy = searchType === 'poll' ? 'searchByName' : 'searchByID';
     const authToken = token;
-    let newResponse;
 
-    searchType === 'poll'
-        ? // const searchBy = 'searchByName';
-          // searchString = 'polltest101';
-          (newResponse = await fetch(
-              // `${window.location.origin}/dummy2.json`,
-              `${getBackendUrl()}/api/poll/admin/${searchBy}/${searchString}`,
-              {
-                  headers: {
-                      'Content-Type': 'application/json',
-                      Accept: 'application/json',
-                      Authorization: `Bearer ${authToken}`
-                  }
-              }
-          ))
-        : (newResponse = await fetch(
-              `${getBackendUrl()}/api/user/searchByName/${searchString}`,
-              {
-                  headers: {
-                      'Content-Type': 'application/json',
-                      Accept: 'application/json',
-                      Authorization: `Bearer ${authToken}`
-                  }
-              }
-          ));
+    // const searchBy = 'searchByName';
+    // searchString = 'polltest101';
+    const newResponse = await fetch(
+        `${getBackendUrl()}/api/poll/admin/${searchBy}/${searchString}`,
+        {
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                Authorization: `Bearer ${authToken}`
+            }
+        }
+    );
     if (newResponse.status !== 200) {
         throw new Error('Request Failed');
     }
@@ -333,6 +320,26 @@ export const deleteUser = async (userId: string) => {
             Authorization: `Bearer ${token}`
         }
     });
+
+    if (newResponse.status !== 200) {
+        throw new Error('Request Failed');
+    }
+    const dataList = await newResponse.json();
+    console.log(dataList);
+
+    return dataList;
+};
+export const getEditPollData = async (privateId: string) => {
+    const newResponse = await fetch(
+        `${getBackendUrl()}/api/poll/admin/${privateId}`,
+        {
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                Authorization: `Bearer ${token}`
+            }
+        }
+    );
     if (newResponse.status !== 200) {
         throw new Error('Request Failed');
     }
@@ -368,4 +375,36 @@ export const updateUser = async (
 
     const responseJSON = await response.json();
     return responseJSON;
+};
+export const editPoll = async (
+    privateId: string,
+    newName: string,
+    showCount: string,
+    ownerId: string
+) => {
+    const editedPollData = {
+        name: newName,
+        owner: ownerId,
+        visualFlags: [showCount]
+    };
+    //localhost:8080/api/poll/admin/d14c1c6a-7a98-4684-8fdc-49689c55263c
+    const response = await fetch(
+        `${getBackendUrl()}/api/poll/admin/${privateId}`,
+        {
+            method: 'PATCH',
+            body: JSON.stringify(editedPollData),
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                Authorization: `Bearer ${token}`
+            }
+        }
+    );
+    if (response.status !== 200) {
+        throw new Error('Request Failed');
+    }
+    const data = await response.json();
+    console.log(data);
+
+    return data;
 };

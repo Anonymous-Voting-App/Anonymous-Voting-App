@@ -1,5 +1,4 @@
 @import '../styles/colors';
-
 @mixin for-phone-only {
     @media (max-width: 599px) {
         @content;
@@ -22,4 +21,20 @@
         font-size: 30px !important;
         line-height: 0.8;
     }
+}
+
+.link-container {
+    gap: 4rem;
+    display: flex;
+    margin-top: 2.5rem;
+    .pinkLink {
+        color: $lollipop;
+        text-decoration-color: $lollipop;
+        cursor: pointer;
+    }
+}
+
+.messageDiv {
+    background-color: $mint;
+    width: 60%;
 }
