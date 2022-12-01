@@ -268,19 +268,32 @@ export const fetchSearchResult = async (
 ) => {
     const searchBy = searchType === 'poll' ? 'searchByName' : 'searchByID';
     const authToken = token;
+    let newResponse;
 
     // const searchBy = 'searchByName';
     // searchString = 'polltest101';
-    const newResponse = await fetch(
-        `${getBackendUrl()}/api/poll/admin/${searchBy}/${searchString}`,
-        {
-            headers: {
-                'Content-Type': 'application/json',
-                Accept: 'application/json',
-                Authorization: `Bearer ${authToken}`
-            }
-        }
-    );
+    searchType === 'poll'
+        ? (newResponse = await fetch(
+              `${getBackendUrl()}/api/poll/admin/${searchBy}/${searchString}`,
+              {
+                  headers: {
+                      'Content-Type': 'application/json',
+                      Accept: 'application/json',
+                      Authorization: `Bearer ${authToken}`
+                  }
+              }
+          ))
+        : (newResponse = await fetch(
+              `${getBackendUrl()}/api/user/searchByName/${searchString}`,
+              {
+                  headers: {
+                      'Content-Type': 'application/json',
+                      Accept: 'application/json',
+                      Authorization: `Bearer ${authToken}`
+                  }
+              }
+          ));
+
     if (newResponse.status !== 200) {
         throw new Error('Request Failed');
     }
