@@ -18,7 +18,7 @@ import BasicSnackbar from './BasicSnackbar';
 
 // const TEST_USERS = ['Martti', 'user123'];
 
-const PollAnswering = () => {
+const AdminView = () => {
     const [searchBy, setSearchBy] = useState('');
     const [searchText, setSearchText] = useState('');
     const [showPollList, setShowPollList] = useState(false);
@@ -230,4 +230,4 @@ const PollAnswering = () => {
     );
 };
 
-export default PollAnswering;
+export default AdminView;
