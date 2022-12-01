@@ -7,6 +7,7 @@ import {
     Select,
     MenuItem,
     SelectChangeEvent,
+<<<<<<< HEAD
     TextField
 } from '@mui/material';
 import { KeyboardArrowDown } from '@mui/icons-material';
@@ -15,10 +16,23 @@ import { fetchSearchResult } from '../services/pollAndUserService';
 import AdminViewPoll from './AdminViewPoll';
 import AdminViewUser from './AdminViewUser';
 import BasicSnackbar from './BasicSnackbar';
+=======
+    TextField,
+    Link
+} from '@mui/material';
+import { KeyboardArrowDown } from '@mui/icons-material';
+import './AdminView.scss';
+import { fetchSearchResult } from '../services/pollService';
+import AdminViewPoll from './AdminViewPoll';
+import AdminViewUser from './AdminViewUser';
+import BasicSnackbar from './BasicSnackbar';
+import { useNavigate } from 'react-router-dom';
+>>>>>>> 74ca78dd7ecd5b1231398ea745805d288c0071fd
 
 // const TEST_USERS = ['Martti', 'user123'];
 
 const PollAnswering = () => {
+<<<<<<< HEAD
     const [searchBy, setSearchBy] = useState('');
     const [searchText, setSearchText] = useState('');
     const [showPollList, setShowPollList] = useState(false);
@@ -34,6 +48,25 @@ const PollAnswering = () => {
         severity: ''
     });
 
+=======
+    const navigate = useNavigate();
+
+    const [searchBy, setSearchBy] = useState('');
+    const [searchText, setSearchText] = useState('');
+    const [showPollList, setShowPollList] = useState(false);
+    const [showUserList, setShowUserList] = useState(false);
+    const [showErrorMsg, setShowErrorMsg] = useState(false);
+    const [pollList, setPollList] = useState<any>([]);
+    const [userList, setUserList] = useState<any>([]);
+    const [open, setOpen] = useState(false);
+    const [resultCount, setResultCount] = useState(0);
+    // const [showSearchResults, setShowSearchResults] = useState(false);
+    const [notificationObj, setNotificationObj] = useState({
+        message: '',
+        severity: ''
+    });
+
+>>>>>>> 74ca78dd7ecd5b1231398ea745805d288c0071fd
     /**
      * Function to show toast notification on delete poll
      * @param status
@@ -105,6 +138,40 @@ const PollAnswering = () => {
                 });
             }
         }
+<<<<<<< HEAD
+=======
+    };
+
+    /**
+     * calling the search api based on search text and searchBy type
+     * @param text - search text
+     * @param searchType - poll/user
+     * @returns
+     */
+    const fetchData = (text: string, searchType: string) => {
+        const searchResult = fetchSearchResult(text, searchType)
+            .then((response: { data: string | any[] }) => {
+                console.log(response.data);
+                if (response.data.length > 0) {
+                    setShowErrorMsg(false);
+                    return response.data;
+                }
+                setShowErrorMsg(true);
+                return [];
+            })
+            .catch((error: any) => {
+                console.log('No data');
+                setShowErrorMsg(true);
+                setOpen(true);
+                setNotificationObj({
+                    ...notificationObj,
+                    message: 'Sorry no data found',
+                    severity: 'error'
+                });
+                return [];
+            });
+        return searchResult;
+>>>>>>> 74ca78dd7ecd5b1231398ea745805d288c0071fd
     };
 
     /**
@@ -138,6 +205,13 @@ const PollAnswering = () => {
         return searchResult;
     };
 
+<<<<<<< HEAD
+=======
+    const handleEdit = (user: string) => {
+        navigate(`edit`, { state: { username: user } });
+    };
+
+>>>>>>> 74ca78dd7ecd5b1231398ea745805d288c0071fd
     return (
         <Container>
             <Typography className="title" variant="h4">
@@ -204,6 +278,7 @@ const PollAnswering = () => {
                               );
                           })
                         : null}
+<<<<<<< HEAD
                     {showUserList
                         ? userList.map((user: any) => {
                               return (
@@ -218,6 +293,40 @@ const PollAnswering = () => {
                         : null}
                 </div>
             )}
+=======
+                    {showUserList ? <AdminViewUser></AdminViewUser> : null}
+                </div>
+            )}
+            <div className="listItems">
+                {showUserList
+                    ? userList.map((user: any) => {
+                          return (
+                              <div key={user} className="listItem">
+                                  <Typography>{user}</Typography>
+                                  <Link
+                                      className="pinkLink"
+                                      onClick={() => handleEdit(user)}
+                                  >
+                                      Edit
+                                  </Link>
+                                  <Link
+                                      className="pinkLink"
+                                      onClick={() => handleResult(user)}
+                                  >
+                                      View Results
+                                  </Link>
+                                  <Link className="pinkLink" href="#">
+                                      View links
+                                  </Link>
+                                  <Link className="deleteLink" href="#">
+                                      Delete
+                                  </Link>
+                              </div>
+                          );
+                      })
+                    : null}
+            </div>
+>>>>>>> 74ca78dd7ecd5b1231398ea745805d288c0071fd
             <BasicSnackbar
                 open={open}
                 onClose={handleClose}
