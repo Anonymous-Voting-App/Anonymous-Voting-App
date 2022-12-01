@@ -39,6 +39,19 @@
     gap: 48px;
 }
 
+.thumbsContainer {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    gap: 48px;
+}
+
+.starContainer {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+}
+
 .questionNumber {
     justify-content: center;
     padding-top: 30px;
@@ -56,6 +69,20 @@
     font-weight: bold;
     text-transform: none;
     background-color: $melon;
+    border: 2px solid $main-color;
+    gap: 10px;
+    @include for-phone-only {
+        font-size: 2.5rem;
+    }
+}
+.yesnoButton {
+    margin-top: 52px;
+    border-radius: 20px;
+    width: 16.25rem;
+    color: $main-color;
+    font-weight: bold;
+    text-transform: none;
+    background-color: $sand;
     border: 2px solid $main-color;
     gap: 10px;
     @include for-phone-only {

@@ -20,9 +20,9 @@ import Question from './Question';
 
 const PollAnswering = (props: any) => {
     const [showPickOne, setshowPickOne] = useState(true);
-    const [showMultiChoice, setshowMultiChoice] = useState(false);
+    const [showMultiChoice, setshowMultiChoice] = useState(true);
     const [showStartRating, setsshowStartRating] = useState(true);
-    const [showFreeText, setsshowFreeText] = useState(false);
+    const [showFreeText, setsshowFreeText] = useState(true);
     const [showYesNo, setsshowYesNo] = useState(true);
     const [showThumbsUpDown, setsshowThumbsUpDown] = useState(true);
 
@@ -99,6 +99,11 @@ const PollAnswering = (props: any) => {
                                     control={<Radio />}
                                     label="Burger"
                                 />
+                                <FormControlLabel
+                                    value="option3"
+                                    control={<Radio />}
+                                    label="Pasta"
+                                />
                             </RadioGroup>
                         </FormControl>
                     </div>
@@ -122,7 +127,7 @@ const PollAnswering = (props: any) => {
                             display="inline"
                             id="total_num"
                         >
-                            4
+                            6
                         </Typography>
                         <Typography
                             className="questionNumberText"
@@ -186,7 +191,7 @@ const PollAnswering = (props: any) => {
                             display="inline"
                             id="total_num"
                         >
-                            4
+                            6
                         </Typography>
                         <Typography className="" display="inline">
                             {' '}
@@ -206,7 +211,10 @@ const PollAnswering = (props: any) => {
                     </Typography>
                     <div className="answerContainer">
                         <FormControl>
-                            <Rating name="rating-group" readOnly />
+                            <Rating
+                                name="rating-group"
+                                sx={{ fontSize: 100 }}
+                            />
                         </FormControl>
                     </div>
                     <div className="questionNumber">
@@ -226,7 +234,7 @@ const PollAnswering = (props: any) => {
                             display="inline"
                             id="total_num"
                         >
-                            4
+                            6
                         </Typography>
                         <Typography className="" display="inline">
                             {' '}
@@ -270,7 +278,7 @@ const PollAnswering = (props: any) => {
                             display="inline"
                             id="total_num"
                         >
-                            4
+                            6
                         </Typography>
                         <Typography className="" display="inline">
                             {' '}
@@ -288,11 +296,9 @@ const PollAnswering = (props: any) => {
                     <Typography className="questionTitle">
                         Do you use this vehicle: Car
                     </Typography>
-                    <div className="answerContainer">
-                        <FormControl>
-                            <Button>Yes</Button>
-                            <Button>No</Button>
-                        </FormControl>
+                    <div className="buttonsContainer">
+                        <Button className="yesnoButton">Yes</Button>
+                        <Button className="yesnoButton">No</Button>
                     </div>
                     <div className="questionNumber">
                         <Typography
@@ -300,7 +306,7 @@ const PollAnswering = (props: any) => {
                             display="inline"
                             id="question_num"
                         >
-                            4
+                            5
                         </Typography>
                         <Typography className="" display="inline">
                             {' '}
@@ -311,7 +317,7 @@ const PollAnswering = (props: any) => {
                             display="inline"
                             id="total_num"
                         >
-                            4
+                            6
                         </Typography>
                         <Typography className="" display="inline">
                             {' '}
@@ -331,7 +337,7 @@ const PollAnswering = (props: any) => {
                     </Typography>
                     <div className="answerContainer">
                         <FormControl>
-                            <div>
+                            <div className="thumbsContainer">
                                 <ThumbUpIcon
                                     sx={{ fontSize: 100 }}
                                 ></ThumbUpIcon>
@@ -347,7 +353,7 @@ const PollAnswering = (props: any) => {
                             display="inline"
                             id="question_num"
                         >
-                            4
+                            6
                         </Typography>
                         <Typography className="" display="inline">
                             {' '}
@@ -358,7 +364,7 @@ const PollAnswering = (props: any) => {
                             display="inline"
                             id="total_num"
                         >
-                            4
+                            6
                         </Typography>
                         <Typography className="" display="inline">
                             {' '}
