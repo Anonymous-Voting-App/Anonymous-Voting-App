@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import './AdminView.scss';
-import { fetchSearchResult } from '../services/pollService';
+import { fetchSearchResult } from '../services/pollAndUserService';
 import AdminViewPoll from './AdminViewPoll';
 import AdminViewUser from './AdminViewUser';
 import BasicSnackbar from './BasicSnackbar';
@@ -25,6 +25,7 @@ const PollAnswering = () => {
     const [showUserList, setShowUserList] = useState(false);
     const [showErrorMsg, setShowErrorMsg] = useState(false);
     const [pollList, setPollList] = useState<any>([]);
+    const [userList, setUserList] = useState<any>([]);
     const [open, setOpen] = useState(false);
     const [resultCount, setResultCount] = useState(0);
     // const [showSearchResults, setShowSearchResults] = useState(false);
@@ -90,9 +91,22 @@ const PollAnswering = () => {
                 showSnackBar(status);
             }
         } else {
-            setShowUserList(true);
-            setShowPollList(false);
-            fetchData(searchText, 'user');
+            const data = await fetchData(searchText, 'user');
+            console.log(userList);
+            if (data.length > 0) {
+                setShowUserList(true);
+                setShowPollList(false);
+                setUserList(data);
+                setResultCount(data.length);
+            } else {
+                setShowErrorMsg(true);
+                setOpen(true);
+                setNotificationObj({
+                    ...notificationObj,
+                    message: 'Sorry no data found',
+                    severity: 'error'
+                });
+            }
         }
     };
 
@@ -104,7 +118,7 @@ const PollAnswering = () => {
      */
     const fetchData = (text: string, searchType: string) => {
         const searchResult = fetchSearchResult(text, searchType)
-            .then((response) => {
+            .then((response: { data: string | any[] }) => {
                 console.log(response.data);
                 if (response.data.length > 0) {
                     setShowErrorMsg(false);
@@ -192,35 +206,20 @@ const PollAnswering = () => {
                               );
                           })
                         : null}
-                    {showUserList ? <AdminViewUser></AdminViewUser> : null}
+                    {showUserList
+                        ? userList.map((user: any) => {
+                              return (
+                                  <div key={user.id}>
+                                      <AdminViewUser
+                                          userData={user}
+                                          showNotification={handleNotification}
+                                      ></AdminViewUser>
+                                  </div>
+                              );
+                          })
+                        : null}
                 </div>
             )}
-            {/* {showSearchResults ? (
-                <div className="listItems">
-                    {TEST_USERS.map((user) => {
-                        return (
-                            <Box key={user} className="listItem">
-                                <Typography>{user}</Typography>
-                                <Link className="pinkLink" href="#">
-                                    Edit
-                                </Link>
-                                <Link
-                                    className="pinkLink"
-                                    onClick={() => handleResult(user)}
-                                >
-                                    View Results
-                                </Link>
-                                <Link className="pinkLink" href="#">
-                                    View links
-                                </Link>
-                                <Link className="deleteLink" href="#">
-                                    Delete
-                                </Link>
-                            </Box>
-                        );
-                    })}
-                </div>
-            ) : null} */}
             <BasicSnackbar
                 open={open}
                 onClose={handleClose}
