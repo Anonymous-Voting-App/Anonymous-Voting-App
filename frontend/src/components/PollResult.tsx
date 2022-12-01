@@ -36,10 +36,9 @@ const PollResult = (props: any) => {
                 });
             });
     };
-    const handleCopyLink = async (event: any) => {
-        console.log('working');
+    const handleResultLink = async (event: any) => {
         const pollAnsweringUrl = `${window.location.origin}/result/${pollId}`;
-        await navigator.clipboard.writeText(pollAnsweringUrl); //**currently copying link of result page - to be replaced with answering url
+        await navigator.clipboard.writeText(pollAnsweringUrl); //**currently copying link of result page -  answering url has to be added when answering component is implemented
         setShowMessage(true);
         // //timer for link copied message
         setTimeout(() => {
@@ -53,13 +52,22 @@ const PollResult = (props: any) => {
             <Typography className="poll-name" variant="h4">
                 {pollName}
             </Typography>
-            <Link
-                href="#"
-                className="pinkLink"
-                onClick={(e) => handleCopyLink(e)}
-            >
-                Copy Answering link
-            </Link>
+            <div className="link-container">
+                <Link
+                    href="#"
+                    className="pinkLink"
+                    onClick={(e) => handleResultLink(e)}
+                >
+                    Copy Result link
+                </Link>
+                <Link
+                    href="#"
+                    className="pinkLink"
+                    onClick={(e) => handleResultLink(e)}
+                >
+                    Copy Answering link
+                </Link>
+            </div>
             {showMessage ? <div className="messageDiv">Link copied</div> : null}
             {pollResult.length > 0 ? (
                 <>

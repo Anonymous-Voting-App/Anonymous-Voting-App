@@ -3,7 +3,7 @@ import getBackendUrl from '../utils/getBackendUrl';
 
 //**token to be dynamically set once login integrated
 const token =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImMyMzYyMDdhLWY0OGQtNGFjYS1iMmJlLWE3NWM0OTZkZWUzZCIsImZpcnN0TmFtZSI6IkFkIiwibGFzdE5hbWUiOiJNaW4iLCJlbWFpbCI6Impvb25hcy5oYWxpbmVuQHR1bmkuZmkiLCJ1c2VyTmFtZSI6ImFkbWluIiwiaWF0IjoxNjY5NzEwMzQyLCJleHAiOjE2Njk4ODMxNDIsInN1YiI6ImMyMzYyMDdhLWY0OGQtNGFjYS1iMmJlLWE3NWM0OTZkZWUzZCJ9.BIu1ZFuEqdV2_3sY5_VJI5eVXvMFzlvKJ84coCgn7vg';
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjdjZmUwOTEwLTFkNjUtNDMyMS1hNTg5LTlkYWRjMmY4MzdlYiIsImZpcnN0TmFtZSI6ImphbmUiLCJsYXN0TmFtZSI6ImRvZSIsImVtYWlsIjoiYWRtaW5AbWFpbC5jb20iLCJ1c2VyTmFtZSI6InRlc3RBZG1pbiIsImlhdCI6MTY2OTg4NTk0NiwiZXhwIjoxNjcwMDU4NzQ2LCJzdWIiOiI3Y2ZlMDkxMC0xZDY1LTQzMjEtYTU4OS05ZGFkYzJmODM3ZWIifQ.zpg9IJ8LkW8m4QZfi9jtupk87mbvro6uCb3ltByNGRE';
 // function to modify question type before calling api
 const updatePollBody = (questions: PollQuesObj[]) => {
     const updatedQuestions = questions.map(
@@ -67,7 +67,7 @@ export const createPoll = async (
         name: title,
         type: 'string',
         owner: {
-            accountId: '3fa85f64-5717-4562-b3fc-2c963f66afa6' // hardcoded
+            accountId: '7cfe0910-1d65-4321-a589-9dadc2f837eb' // hardcoded
         },
         questions: updatedQuestions,
         visualFlags: [visualFlags]
@@ -77,7 +77,8 @@ export const createPoll = async (
         method: 'POST',
         body: JSON.stringify(pollContent),
         headers: {
-            'Content-type': 'application/json; charset=UTF-8'
+            'Content-type': 'application/json; charset=UTF-8',
+            Authorization: `Bearer ${token}`
         }
     });
     if (response.status !== 201) {
