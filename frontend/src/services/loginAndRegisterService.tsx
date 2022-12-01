@@ -33,8 +33,8 @@ export const register = async (
     const userContent = {
         username: username,
         password: password,
-        firstName: firstName,
-        lastName: lastName,
+        firstname: firstName,
+        lastname: lastName,
         email: email
     };
     const response = await fetch(`${getBackendUrl()}/api/user/signup`, {
