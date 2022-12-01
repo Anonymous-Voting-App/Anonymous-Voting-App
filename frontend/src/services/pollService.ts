@@ -310,7 +310,7 @@ export const deletePoll = async (pollId: string) => {
     return dataList;
 };
 
-export const editPoll = async (privateId: string) => {
+export const getEditPollData = async (privateId: string) => {
     const newResponse = await fetch(
         `${getBackendUrl()}/api/poll/admin/${privateId}`,
         {
@@ -328,4 +328,35 @@ export const editPoll = async (privateId: string) => {
     console.log(dataList);
 
     return dataList;
+};
+
+export const editPoll = async (
+    privateId: string,
+    newName: string,
+    showCount: string
+) => {
+    const editedPollData = {
+        name: newName,
+        visualFlags: [showCount]
+    };
+    //localhost:8080/api/poll/admin/d14c1c6a-7a98-4684-8fdc-49689c55263c
+    const response = await fetch(
+        `${getBackendUrl()}/api/poll/admin/${privateId}`,
+        {
+            method: 'PATCH',
+            body: JSON.stringify(editedPollData),
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                Authorization: `Bearer ${token}`
+            }
+        }
+    );
+    if (response.status !== 200) {
+        throw new Error('Request Failed');
+    }
+    const data = await response.json();
+    console.log(data);
+
+    return data;
 };

@@ -10,7 +10,6 @@ const ResultOption = (props: any) => {
     const { optionData, highestCount, totalCount, type, voteStatus } = props;
     const showIcon = highestCount === optionData.count ? true : false;
     const showVote = voteStatus === 'showCount' ? true : false;
-    console.log(showVote);
 
     return (
         <div className="option-wrapper">

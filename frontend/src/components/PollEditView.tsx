@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Typography, TextField, Button, Switch } from '@mui/material';
 import './PollEditView.scss';
-import { editPoll } from '../services/pollService';
+import { editPoll, getEditPollData } from '../services/pollService';
 import BasicSnackbar from './BasicSnackbar';
+import { useNavigate } from 'react-router-dom';
 
 const PollEditView = () => {
-    const privateId = window.location.href.substring(
-        window.location.href.lastIndexOf('/') + 1
-    );
     const [pollname, setPollName] = useState('');
     const [voteToggle, setVoteToggle] = useState(false);
     const [pollId, setPollId] = useState('');
@@ -16,14 +14,21 @@ const PollEditView = () => {
         message: '',
         severity: ''
     });
-    /**
-     * Function to show toast notification on fetching/editing poll
-     * @param status
-     */
-    const handleNotification = (status: {
-        severity: string;
-        message: string;
-    }) => {
+    const navigate = useNavigate();
+    const privateId = window.location.href.substring(
+        window.location.href.lastIndexOf('/') + 1
+    );
+
+    useEffect(() => {
+        getPollData(privateId);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    const showSnackBar = (status: { severity: string; message: string }) => {
         setOpen(true);
         setNotificationObj({
             ...notificationObj,
@@ -32,15 +37,6 @@ const PollEditView = () => {
         });
     };
 
-    const handleClose = () => {
-        setOpen(false);
-    };
-
-    useEffect(() => {
-        getPollData(privateId);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
     const handlePollNameChange = (newName: string) => {
         setPollName(newName);
     };
@@ -48,8 +44,33 @@ const PollEditView = () => {
     const handleVoteCount = (event: React.ChangeEvent<HTMLInputElement>) => {
         setVoteToggle(event.target.checked);
     };
+
+    const handleUpdate = () => {
+        const voteToggleStatus =
+            voteToggle === true ? 'showCount' : 'hideCount';
+        editPoll(privateId, pollname, voteToggleStatus)
+            .then((response) => {
+                console.log(response);
+                const status = {
+                    message: 'Data updated successfully',
+                    severity: 'success'
+                };
+                showSnackBar(status);
+                setTimeout(() => {
+                    navigate('/admin');
+                }, 2000);
+            })
+            .catch((error) => {
+                const status = {
+                    message: 'Sorry update failed',
+                    severity: 'error'
+                };
+                showSnackBar(status);
+            });
+    };
+
     const getPollData = (id: string) => {
-        editPoll(id)
+        getEditPollData(id)
             .then((response) => {
                 console.log(response);
                 setPollName(response.name);
@@ -60,11 +81,11 @@ const PollEditView = () => {
             })
             .catch((error) => {
                 // console.log(error);
-                setNotificationObj({
-                    ...notificationObj,
-                    message: 'Sorry no data found',
+                const status = {
+                    message: 'Sorry an error occured while fetching data',
                     severity: 'error'
-                });
+                };
+                showSnackBar(status);
             });
     };
 
@@ -120,7 +141,11 @@ const PollEditView = () => {
                     </span>
                 </div>
             </div>
-            <Button className="searchButton" variant="outlined">
+            <Button
+                onClick={handleUpdate}
+                className="searchButton"
+                variant="outlined"
+            >
                 Update
             </Button>
             <BasicSnackbar
