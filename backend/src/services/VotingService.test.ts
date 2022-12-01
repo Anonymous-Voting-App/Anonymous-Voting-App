@@ -59,38 +59,11 @@ describe('VotingService', () => {
                 new QuestionFactory(prismaMock)
             );
 
-            const poll = await service.createPoll({
-                name: 'name',
-                type: 'type',
-                questions: [
-                    {
-                        title: 'question-title',
-                        description: 'question-description',
-                        type: 'question-type'
-                    }
-                ],
-                owner: {
-                    id: 'd1b44abe-b336-497d-8148-11166b7c2489',
-                    ip: '',
-                    cookie: '',
-                    accountId: ''
-                }
-            });
+            const user = new User(prismaMock);
+            user.setId('d1b44abe-b336-497d-8148-11166b7c2489');
 
-            checkPoll(poll, true);
-        });
-
-        test('User not found', async () => {
-            UserManager.prototype.getUser = jest
-                .fn()
-                .mockResolvedValueOnce(null);
-            const service = new VotingService(
-                prismaMock,
-                new QuestionFactory(prismaMock)
-            );
-
-            try {
-                await service.createPoll({
+            const poll = await service.createPoll(
+                {
                     name: 'name',
                     type: 'type',
                     questions: [
@@ -99,23 +72,12 @@ describe('VotingService', () => {
                             description: 'question-description',
                             type: 'question-type'
                         }
-                    ],
-                    owner: {
-                        id: 'd1b44abe-b336-497d-8148-11166b7c2489',
-                        ip: '',
-                        cookie: '',
-                        accountId: ''
-                    }
-                });
+                    ]
+                },
+                user
+            );
 
-                expect(true).toBeFalsy();
-            } catch (e: unknown) {
-                if (e instanceof BadRequestError) {
-                    expect(e.message).toBe('User not found.');
-                } else {
-                    expect(true).toBeFalsy();
-                }
-            }
+            checkPoll(poll, true);
         });
     });
 
@@ -154,18 +116,21 @@ describe('VotingService', () => {
                 }
             ];
 
+            const user = new User(prismaMock);
+            user.setFingerprint(createMockUser());
+
             await service.answerPoll(
                 {
                     publicId: '1',
                     answers: answersData
                 },
-                createMockUser()
+                user
             );
 
             expect(Poll.prototype.answer).toHaveBeenCalledTimes(1);
             expect(Poll.prototype.answer).toHaveBeenCalledWith(
                 answersData,
-                createMockUser()
+                user.fingerprint()
             );
         });
 
@@ -174,6 +139,9 @@ describe('VotingService', () => {
                 prismaMock,
                 new QuestionFactory(prismaMock)
             );
+
+            const user = new User(prismaMock);
+            user.setFingerprint(createMockUser());
 
             try {
                 await service.answerPoll(
@@ -188,7 +156,7 @@ describe('VotingService', () => {
                             }
                         ]
                     },
-                    createMockUser()
+                    user
                 );
             } catch (e: unknown) {
                 expect(e instanceof Error).toBe(true);

@@ -8,7 +8,7 @@ import {
     spawn
 } from 'child_process';
 
-jest.setTimeout(20000);
+jest.setTimeout(60000);
 
 describe.skip('integration tests for poll api', () => {
     // The tests first create a poll and then this created
@@ -22,23 +22,45 @@ describe.skip('integration tests for poll api', () => {
     // Depending on how fast your computer is you may need to increase these
     // to give the server process enough time.
     // - Joonas Halinen 31.10.2022
-    const bootWait = 10000;
+    const bootWait = 5000;
     const shutdownWait = 5000;
+    // Whether to redirect the child server process's stdout and stderr to
+    // console.
+    // - Joonas Halinen 29.11.2022
+    const showProcessLogs = true;
 
-    beforeEach(async () => {
+    beforeAll(async () => {
+        console.log('starting server');
         serverProcess = spawn(
             /^win/.test(process.platform) ? 'npm.cmd' : 'npm',
             ['run', 'start']
         );
 
+        if (showProcessLogs) {
+            serverProcess.stdout.on('data', (chunk) => {
+                console.log(chunk.toString());
+            });
+
+            serverProcess.stderr.on('data', (chunk) => {
+                console.log(chunk.toString());
+            });
+        }
+
         await new Promise((resolve) => {
-            setTimeout(() => {
-                resolve(null);
-            }, bootWait);
+            let timeout: NodeJS.Timeout;
+            serverProcess.stdout.on('data', (chunk) => {
+                if (!timeout && chunk.toString().includes('8080')) {
+                    timeout = setTimeout(() => {
+                        console.log('server started');
+                        resolve(null);
+                    }, bootWait);
+                }
+            });
         });
     });
 
-    afterEach(async () => {
+    afterAll(async () => {
+        console.log('closing server');
         serverProcess.kill();
 
         await new Promise((resolve) => {
@@ -48,9 +70,10 @@ describe.skip('integration tests for poll api', () => {
         });
     });
 
-    describe('create poll', () => {
-        test('create poll successfully', (resolve) => {
-            let command = `curl -i -X POST -H "Content-Type: application/json" -d "{
+    test('create poll successfully', (resolve) => {
+        loginAsCreator().then((token) => {
+            let command = `curl -i -X POST -H "Authorization: Bearer ${token}" 
+                -H "Content-Type: application/json" -d "{
                 \\"name\\": \\"testPoll1\\", 
                 \\"type\\": \\"testType\\", 
                 \\"questions\\": [ 
@@ -124,56 +147,53 @@ describe.skip('integration tests for poll api', () => {
                 createdPoll = poll;
 
                 resolve();
+                console.log('ended create poll test');
             });
         });
     });
 
-    describe.skip('answer poll', () => {
-        test('answer poll successfully', (resolve) => {
-            const command = answerPollCommand();
+    test('answer poll successfully', (resolve) => {
+        const command = answerPollCommand();
 
-            exec(command, handleAnswerResponse.bind(null, resolve));
+        exec(command, handleAnswerResponse.bind(null, resolve));
+    });
+
+    // Disabled since we don't do any double-vote blocking
+    // on the backend for now.
+    // - Joonas Halinen 21.11.2022
+    test.skip('fail trying to answer poll second time', (resolve) => {
+        const command = answerPollCommand();
+
+        exec(command, (err, stdout) => {
+            const resultJson = extractJson(stdout);
+
+            console.log(resultJson);
+
+            const result = JSON.parse(resultJson);
+
+            expect(result.code).toBe(403);
+
+            resolve();
         });
+    });
 
-        // Disabled since we don't do any double-vote blocking
-        // on the backend for now.
-        // - Joonas Halinen 21.11.2022
-        test.skip('fail trying to answer poll second time', (resolve) => {
-            const command = answerPollCommand();
+    test('get poll with public id', (resolve) => {
+        exec(
+            `curl -i -X GET http://localhost:8080/api/poll/${createdPoll.publicId}`,
+            (err, stdout) => {
+                if (err) {
+                    throw err;
+                }
 
-            exec(command, (err, stdout) => {
                 const resultJson = extractJson(stdout);
 
                 console.log(resultJson);
 
-                const result = JSON.parse(resultJson);
-
-                expect(result.code).toBe(403);
+                checkUneditedPublicPoll(JSON.parse(resultJson));
 
                 resolve();
-            });
-        });
-    });
-
-    describe.skip('get public poll', () => {
-        test('get poll with public id', (resolve) => {
-            exec(
-                `curl -i -X GET http://localhost:8080/api/poll/${createdPoll.publicId}`,
-                (err, stdout) => {
-                    if (err) {
-                        throw err;
-                    }
-
-                    const resultJson = extractJson(stdout);
-
-                    console.log(resultJson);
-
-                    checkUneditedPublicPoll(JSON.parse(resultJson));
-
-                    resolve();
-                }
-            );
-        });
+            }
+        );
     });
 
     // Disabled because we don't use this api call
@@ -198,141 +218,169 @@ describe.skip('integration tests for poll api', () => {
         });
     }); */
 
-    describe.skip('get public poll results', () => {
-        test('get poll results with public id', (resolve) => {
-            exec(
-                `curl -i -X GET http://localhost:8080/api/poll/${createdPoll.publicId}/results`,
-                (err, stdout) => {
-                    if (err) {
-                        throw err;
-                    }
-
-                    const resultJson = extractJson(stdout);
-
-                    console.log(resultJson);
-
-                    checkResults(JSON.parse(resultJson));
-
-                    resolve();
+    test('get poll results with public id', (resolve) => {
+        exec(
+            `curl -i -X GET http://localhost:8080/api/poll/${createdPoll.publicId}/results`,
+            (err, stdout) => {
+                if (err) {
+                    throw err;
                 }
-            );
-        });
+
+                const resultJson = extractJson(stdout);
+
+                console.log(resultJson);
+
+                checkResults(JSON.parse(resultJson));
+
+                resolve();
+            }
+        );
     });
 
-    describe('edit poll', () => {
-        test('edit poll as admin', (resolve) => {
-            loginAsAdmin().then((token) => {
-                let command = `
-                    curl -i -X PATCH -H "Authorization: Bearer ${token}"
-                    -H "Content-Type: application/json" -d "{
-                    \\"name\\": \\"changed-name\\", 
-                    \\"owner\\": \\"c236207a-f48d-4aca-b2be-a75c496dee3d\\",
-                    \\"visualFlags\\": [\\"changed-flag\\"] 
-                }" http://localhost:8080/api/poll/admin/${createdPoll.privateId}`;
+    test('get private polls as creator', (resolve) => {
+        loginAsCreator().then((token) => {
+            let command = `curl -i -X GET -H "Authorization: Bearer ${token}" 
+                             http://localhost:8080/api/poll/`;
+            command = formatMultiLineCommandForConsole(command);
+            console.log(command);
 
-                command = formatMultiLineCommandForConsole(command);
+            exec(command, (err, stdout) => {
+                if (err) {
+                    throw err;
+                }
 
-                console.log(command);
+                const resultJson = extractJson(stdout);
 
-                exec(command, (err, stdout) => {
-                    if (err) {
-                        throw new Error('Error: ' + err);
-                    }
+                console.log(resultJson);
 
-                    const resultJson = extractJson(stdout);
-                    const result = JSON.parse(resultJson);
+                const data = JSON.parse(resultJson);
 
-                    expect(result).toEqual({ success: true });
+                expect(data.data.length > 1).toBe(true);
 
-                    resolve();
-                });
+                // Assuming the last poll is the latest.
+                // May not be always true.
+                // -Joonas Halinen 29.11.2022
+                checkUneditedPrivatePoll(data.data[data.data.length - 1], true);
+
+                resolve();
             });
         });
     });
 
-    describe('get private poll', () => {
-        test('get private poll info as admin', (resolve) => {
-            loginAsAdmin().then((token) => {
-                let command = `curl -i -X GET -H "Authorization: Bearer ${token}" 
-                                 http://localhost:8080/api/poll/admin/${createdPoll.privateId}`;
-                command = formatMultiLineCommandForConsole(command);
-                console.log(command);
+    test('edit poll as admin', (resolve) => {
+        loginAsAdmin().then((token) => {
+            let command = `
+                curl -i -X PATCH -H "Authorization: Bearer ${token}"
+                -H "Content-Type: application/json" -d "{
+                \\"name\\": \\"changed-name\\", 
+                \\"owner\\": \\"c236207a-f48d-4aca-b2be-a75c496dee3d\\",
+                \\"visualFlags\\": [\\"changed-flag\\"] 
+            }" http://localhost:8080/api/poll/admin/${createdPoll.privateId}`;
 
-                exec(command, (err, stdout) => {
-                    if (err) {
-                        throw err;
-                    }
+            command = formatMultiLineCommandForConsole(command);
 
-                    const resultJson = extractJson(stdout);
+            console.log(command);
 
-                    console.log(resultJson);
+            exec(command, (err, stdout) => {
+                if (err) {
+                    throw new Error('Error: ' + err);
+                }
 
-                    checkEditedPrivatePoll(JSON.parse(resultJson));
+                const resultJson = extractJson(stdout);
+                const result = JSON.parse(resultJson);
 
-                    resolve();
-                });
+                expect(result).toEqual({ success: true });
+
+                resolve();
             });
         });
     });
 
-    describe.skip('search private polls by name', () => {
-        test('search as admin', (resolve) => {
-            loginAsAdmin().then((token) => {
-                let command = `curl -i -X GET -H "Authorization: Bearer ${token}" 
-                                 http://localhost:8080/api/poll/admin/searchByName/test`;
-                command = formatMultiLineCommandForConsole(command);
-                console.log(command);
+    test('get private poll info as admin', (resolve) => {
+        loginAsAdmin().then((token) => {
+            let command = `curl -i -X GET -H "Authorization: Bearer ${token}" 
+                             http://localhost:8080/api/poll/admin/${createdPoll.privateId}`;
+            command = formatMultiLineCommandForConsole(command);
+            console.log(command);
 
-                exec(command, (err, stdout) => {
-                    if (err) {
-                        throw err;
-                    }
+            exec(command, (err, stdout) => {
+                if (err) {
+                    throw err;
+                }
 
-                    const resultJson = extractJson(stdout);
+                const resultJson = extractJson(stdout);
 
-                    console.log(resultJson);
+                console.log(resultJson);
 
-                    checkSearchedPolls(JSON.parse(resultJson).data, 'test');
+                checkEditedPrivatePoll(JSON.parse(resultJson));
 
-                    resolve();
-                });
+                resolve();
             });
         });
     });
 
-    describe.skip('delete poll', () => {
-        test('delete poll as admin', (resolve) => {
-            loginAsAdmin().then((token) => {
-                let command = `
-                    curl -i -X DELETE -H "Authorization: Bearer ${token}" 
-                    http://localhost:8080/api/poll/admin/${createdPoll.privateId}`;
+    test('search as admin', (resolve) => {
+        loginAsAdmin().then((token) => {
+            let command = `curl -i -X GET -H "Authorization: Bearer ${token}" 
+                             http://localhost:8080/api/poll/admin/searchByName/test`;
+            command = formatMultiLineCommandForConsole(command);
+            console.log(command);
 
-                command = formatMultiLineCommandForConsole(command);
+            exec(command, (err, stdout) => {
+                if (err) {
+                    throw err;
+                }
 
-                console.log(command);
+                const resultJson = extractJson(stdout);
 
-                exec(command, (err, stdout) => {
-                    if (err) {
-                        throw new Error('Error: ' + err);
-                    }
+                console.log(resultJson);
 
-                    const resultJson = extractJson(stdout);
-                    const result = JSON.parse(resultJson);
+                checkSearchedPolls(JSON.parse(resultJson).data, 'test');
 
-                    expect(result).toEqual({ success: true });
-
-                    resolve();
-                });
+                resolve();
             });
         });
     });
+
+    test('delete poll as admin', (resolve) => {
+        loginAsAdmin().then((token) => {
+            let command = `
+                curl -i -X DELETE -H "Authorization: Bearer ${token}" 
+                http://localhost:8080/api/poll/admin/${createdPoll.privateId}`;
+
+            command = formatMultiLineCommandForConsole(command);
+
+            console.log(command);
+
+            exec(command, (err, stdout) => {
+                if (err) {
+                    throw new Error('Error: ' + err);
+                }
+
+                const resultJson = extractJson(stdout);
+                const result = JSON.parse(resultJson);
+
+                expect(result).toEqual({ success: true });
+
+                resolve();
+            });
+        });
+    });
+
+    async function loginAsCreator() {
+        return loginAs('test-poll-creator', '123456');
+    }
 
     async function loginAsAdmin() {
+        return loginAs('admin', '123456');
+    }
+
+    async function loginAs(userName: string, password: string) {
         return new Promise<string>((resolve, reject) => {
             let command = `
                 curl -i -X POST -H "Content-Type: application/json" -d "{
-                \\"username\\": \\"admin\\", 
-                \\"password\\": \\"123456\\"
+                \\"username\\": \\"${userName}\\", 
+                \\"password\\": \\"${password}\\"
             }" http://localhost:8080/api/user/login`;
 
             command = formatMultiLineCommandForConsole(command);
@@ -346,6 +394,8 @@ describe.skip('integration tests for poll api', () => {
 
                 const resultJson = extractJson(stdout);
                 const result = JSON.parse(resultJson);
+
+                console.log(resultJson);
 
                 resolve(result.token);
             });
@@ -422,9 +472,6 @@ describe.skip('integration tests for poll api', () => {
         const result = JSON.parse(resultJson);
 
         expect(typeof result === 'object').toBe(true);
-        expect(typeof result.fingerprint === 'object').toBe(true);
-        expect(result.fingerprint.ip).toBe('127.0.0.1');
-        expect(result.fingerprint.idCookie.length > 0).toBe(true);
         expect(result.success).toBe(true);
 
         resolve();
@@ -442,6 +489,11 @@ describe.skip('integration tests for poll api', () => {
 
             console.log('Found poll: ' + poll.name + ', ' + poll.id);
             expect(poll.name.includes(searchText)).toBe(true);
+            expect(typeof poll.owner).toBe('object');
+            expect(
+                (poll.owner as { userName: string }).userName.length > 0
+            ).toBe(true);
+            expect((poll.owner as { id: string }).id.length > 0).toBe(true);
         }
     }
 
@@ -581,7 +633,6 @@ describe.skip('integration tests for poll api', () => {
         expect(answer.id.length > 0).toBe(true);
         expect(answer.questionId.length > 0).toBe(true);
         expect(answer.value).toBe('');
-        expect(typeof answer.answerer).toBe('object');
 
         checkSubAnswer(answer.subAnswers[0]);
     }
@@ -590,17 +641,24 @@ describe.skip('integration tests for poll api', () => {
         expect(subAnswer.id.length > 0).toBe(true);
         expect(subAnswer.questionId.length > 0).toBe(true);
         expect(subAnswer.value).toBe('true');
-        expect(typeof subAnswer.answerer).toBe('object');
     }
 
-    function checkUneditedPrivatePoll(poll: IPolling.PollData) {
-        checkUneditedPublicPoll(poll);
+    function checkUneditedPrivatePoll(
+        poll: IPolling.PollData,
+        omitQuestions = false
+    ) {
+        expect(poll.owner).toEqual({
+            id: '28617090-09df-4869-b3a0-cec3ae324aed',
+            userName: 'test-poll-creator'
+        });
+        checkUneditedPublicPoll(poll, omitQuestions);
     }
 
     function checkEditedPrivatePoll(poll: IPolling.PollData) {
         checkEditedPublicPoll(poll);
         expect(poll.owner).toEqual({
-            id: 'c236207a-f48d-4aca-b2be-a75c496dee3d'
+            id: 'c236207a-f48d-4aca-b2be-a75c496dee3d',
+            userName: 'admin'
         });
     }
 
@@ -610,10 +668,15 @@ describe.skip('integration tests for poll api', () => {
         checkPublicPoll(poll);
     }
 
-    function checkUneditedPublicPoll(poll: IPolling.PollData) {
+    function checkUneditedPublicPoll(
+        poll: IPolling.PollData,
+        omitQuestions = false
+    ) {
         expect(poll.name).toBe('testPoll1');
         expect(poll.visualFlags).toEqual(['test1', 'test2']);
-        checkPublicPoll(poll);
+        if (!omitQuestions) {
+            checkPublicPoll(poll);
+        }
     }
 
     function checkPublicPoll(poll: IPolling.PollData) {

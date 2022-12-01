@@ -95,7 +95,7 @@ describe('authenticationHandler', () => {
             };
         });
 
-        test('Should return forbidden if user not set', async () => {
+        test('Should return unauthorized if user not set', async () => {
             mockRequest.User = undefined;
 
             await authenticationHandler.requireUser()(
@@ -104,7 +104,7 @@ describe('authenticationHandler', () => {
                 mockNext
             );
 
-            expect(mockedResponses.forbidden).toBeCalledTimes(1);
+            expect(mockedResponses.unauthorized).toBeCalledTimes(1);
             expect(mockRequest.User).toBeUndefined();
             expect(mockRequest.UserIsAdmin).toBeUndefined();
         });
@@ -148,7 +148,7 @@ describe('authenticationHandler', () => {
             };
         });
 
-        test('Should return forbidden if user not set', async () => {
+        test('Should return unauthorized if user not set', async () => {
             mockRequest.User = undefined;
 
             await authenticationHandler.requireAdmin()(
@@ -157,12 +157,12 @@ describe('authenticationHandler', () => {
                 mockNext
             );
 
-            expect(mockedResponses.forbidden).toBeCalledTimes(1);
+            expect(mockedResponses.unauthorized).toBeCalledTimes(1);
             expect(mockRequest.User).toBeUndefined();
             expect(mockRequest.UserIsAdmin).toBeUndefined();
         });
 
-        test('Should return unauthorized if user is not admin', async () => {
+        test('Should return forbidden if user is not admin', async () => {
             mockedIsAdmin.mockResolvedValueOnce(false);
 
             await authenticationHandler.requireAdmin()(
@@ -171,7 +171,7 @@ describe('authenticationHandler', () => {
                 mockNext
             );
 
-            expect(mockedResponses.unauthorized).toBeCalledTimes(1);
+            expect(mockedResponses.forbidden).toBeCalledTimes(1);
             expect(mockRequest.User).toEqual(data);
             expect(mockRequest.UserIsAdmin).toEqual(false);
         });

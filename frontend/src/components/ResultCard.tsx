@@ -60,6 +60,7 @@ const ResultCard = (props: any) => {
                             totalCount={props.ques.totalCount}
                             highestCount={highestCount.count}
                             type={props.ques.type}
+                            voteStatus={props.voteStatus}
                             optionData={
                                 quesType === 'Free text' && index > 1
                                     ? ''

@@ -1,7 +1,17 @@
 import { Router } from 'express';
 import { body } from 'express-validator';
 import { validationResultHandler } from '../../middlewares/validationResultHandler';
-import { createAccount, login } from '../../controllers/userController';
+import {
+    authenticate,
+    requireAdmin
+} from '../../middlewares/authenticationHandler';
+import {
+    createAccount,
+    login,
+    deleteUser,
+    editUser,
+    searchUsersByName
+} from '../../controllers/userController';
 export const router = Router();
 
 /**
@@ -43,6 +53,7 @@ router.post(
     validationResultHandler(),
     createAccount
 );
+
 router.post(
     '/login',
     body('username').not().isEmpty().withMessage('Username can not be empty'),
@@ -50,3 +61,14 @@ router.post(
     validationResultHandler(),
     login
 );
+
+router.get(
+    '/searchByName/:searchText',
+    authenticate(),
+    requireAdmin(),
+    searchUsersByName
+);
+
+router.delete('/:id', authenticate(), requireAdmin(), deleteUser);
+
+router.patch('/:id', authenticate(), requireAdmin(), editUser);
