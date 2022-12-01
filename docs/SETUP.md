@@ -20,7 +20,7 @@ Set these variables inside a `.env`-file in `backend`-folder.
 
 ##### Database
 
-The backend needs a PostgreSQL database to work correctly. Enter the full connection string, including `postgres://` at the beginning, after `DATABASE_URL=` in the `.env`-file.
+The backend needs a PostgreSQL database to work correctly. Enter the full connection string, including `postgres://` at the beginning, after `DATABASE_URL=` in the `.env`-file. One example of connection string could be `postgresql://user:password@db_address_or_ip:port/database?schema=public`.
 
 ##### JWT secret
 
@@ -28,7 +28,7 @@ The backend needs a secret for JWT to work correctly. Enter a secret after `JWT_
 
 ##### CORS origin
 
-The backend needs a CORS origin to work correctly. Enter the URL of the frontend after `CORS_ALLOW_ORIGIN=` in the `.env`-file.
+The backend needs a CORS origin to work correctly. Enter the URL of the frontend after `CORS_ALLOW_ORIGIN=` in the `.env`-file. The URL should include both protocol and port e.g. `http://localhost:3000` or `https://knowit-anonymous-voting-app.aws.cybercom.dev`.
 
 ### Frontend
 
@@ -76,18 +76,18 @@ Remember to change the DNS settings of the domain used to direct the user to the
 
 #### Variables (AWS backend)
 
-| Name                         | Definition                                                             | Default    |
-| ---------------------------- | ---------------------------------------------------------------------- | ---------- |
-| name                         | Which name to use for the app                                          | ava        |
-| region                       | AWS region to use                                                      | eu-north-1 |
-| profile                      | AWS profile to use                                                     | ava-mfa    |
-| certificate_arn              | The ARN for the SSL certificate to use with the load balancer          |            |
-| db_url                       | The connection string for the database to be used with the application |            |
-| cors_allow_origin            | The URL to set as Access-Control-Allow-Origin header                   |            |
-| container_repository_address | Address of the container repository used                               |            |
-| container_image_tag          | The tag of the container image to be used                              |            |
-| vpc                          | The VPC to use                                                         |            |
-| subnets                      | The subnets to use                                                     |            |
+| Name                         | Definition                                                                                                  | Default    |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------------- | ---------- |
+| name                         | Which name to use for the app                                                                               | ava        |
+| region                       | AWS region to use                                                                                           | eu-north-1 |
+| profile                      | AWS profile to use                                                                                          | ava-mfa    |
+| certificate_arn              | The ARN for the SSL certificate to use with the load balancer                                               |            |
+| db_url                       | The connection string for the database to be used with the application (see local deployment for more info) |            |
+| cors_allow_origin            | The URL to set as Access-Control-Allow-Origin header (see local deployment for more info)                   |            |
+| container_repository_address | Address of the container repository used                                                                    |            |
+| container_image_tag          | The tag of the container image to be used                                                                   |            |
+| vpc                          | The VPC to use                                                                                              |            |
+| subnets                      | The subnets to use                                                                                          |            |
 
 ### AWS Frontend
 
@@ -106,3 +106,8 @@ Remember to change the DNS settings of the domain used to direct the user to the
 | profile                          | AWS profile to use                              | ava-mfa    |
 | cloudfront_alias                 | Alias to use for CloudFront                     |            |
 | cloudfront_alias_certificate_arn | ARN of the certificate for the CloudFront alias |            |
+
+## AWS Architecture diagram
+
+This diagram can also be found from docs/aws-diagram.drawio
+![Anonymous Voting App](https://user-images.githubusercontent.com/47356222/205173517-db588448-4ca3-4801-92a1-020602a7b0f5.png)
