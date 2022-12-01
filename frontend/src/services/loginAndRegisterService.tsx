@@ -21,6 +21,12 @@ export const login = async (username: string, password: string) => {
     return data;
 };
 
+export const logout = () => {
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    localStorage.removeItem('exp');
+};
+
 export const register = async (
     username: string,
     password: string,
