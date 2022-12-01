@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Typography } from '@mui/material';
 import './PollResult.scss';
-import { fetchPollResult } from '../services/pollService';
+import { fetchPollResult } from '../services/pollAndUserService';
 import ResultCard from './ResultCard';
 
 const PollResult = (props: any) => {

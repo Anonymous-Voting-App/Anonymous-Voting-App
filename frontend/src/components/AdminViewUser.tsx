@@ -1,56 +1,61 @@
 import React from 'react';
-import { useLocation } from 'react-router-dom';
-import {
-    Typography,
-    Container,
-    FormControlLabel,
-    Switch,
-    TextField
-} from '@mui/material';
-import './AdminViewUser.scss';
+import { Typography, Link, Box } from '@mui/material';
+import './AdminViewPoll.scss';
+import { deleteUser } from '../services/pollAndUserService';
+import { useNavigate } from 'react-router-dom';
 
-const AdminViewUser = (props: any) => {
-    const location = useLocation();
+const AdminViewPoll = (props: any) => {
+    const navigate = useNavigate();
 
-    const handleAdminToggle = () => {
-        console.log('toggled');
+    const handleEdit = (user: any) => {
+        navigate(`edit`, {
+            state: {
+                user: user.userName,
+                id: user.id,
+                isAdmin: user.isAdmin
+            }
+        });
+    };
+
+    const handleDelete = (userId: string) => {
+        // deletePoll(pollId).
+        deleteUser(userId).then((response) => {
+            console.log(response.data);
+            if (response.success) {
+                console.log('called');
+                props.showNotification({
+                    severity: 'success',
+                    message: 'User deleted successfully'
+                });
+            } else {
+                props.showNotification({
+                    severity: 'error',
+                    message: 'Error occured while deleting user'
+                });
+            }
+        });
     };
 
     return (
-        <Container>
-            <Typography className="title" variant="h4">
-                Profile
-            </Typography>
-            <div className="profileContents">
-                <div className="row">
-                    <Typography className="subtitle">Username:</Typography>
-                    <TextField value={location.state.username}>{}</TextField>
-                </div>
-                <div className="userIdRow">
-                    <Typography className="subtitle">User ID:</Typography>
-                    <Typography>12345</Typography>
-                </div>
-                <div className="row">
-                    <FormControlLabel
-                        className="adminToggle"
-                        control={
-                            <Switch
-                                sx={{ ml: 7 }}
-                                onChange={handleAdminToggle}
-                            />
-                        }
-                        sx={{ ml: 0 }}
-                        label={<Typography fontWeight={700}>Admin:</Typography>}
-                        labelPlacement="start"
-                    />
-                </div>
-                <div className="row">
-                    <Typography className="subtitle">Password:</Typography>
-                    <TextField></TextField>
-                </div>
-            </div>
-        </Container>
+        <div className="wrapper-div">
+            <Box key={props.userData} className="listItem">
+                <Typography>{props.userData.userName}</Typography>
+                <Link
+                    className="pinkLink"
+                    onClick={() => handleEdit(props.userData)}
+                >
+                    Edit
+                </Link>
+                <Link
+                    className="deleteLink"
+                    onClick={() => handleDelete(props.userData.id)}
+                    href="#"
+                >
+                    Delete user
+                </Link>
+            </Box>
+        </div>
     );
 };
 
-export default AdminViewUser;
+export default AdminViewPoll;

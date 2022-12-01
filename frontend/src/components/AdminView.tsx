@@ -7,22 +7,18 @@ import {
     Select,
     MenuItem,
     SelectChangeEvent,
-    TextField,
-    Link
+    TextField
 } from '@mui/material';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import './AdminView.scss';
-import { fetchSearchResult } from '../services/pollService';
+import { fetchSearchResult } from '../services/pollAndUserService';
 import AdminViewPoll from './AdminViewPoll';
 import AdminViewUser from './AdminViewUser';
 import BasicSnackbar from './BasicSnackbar';
-import { useNavigate } from 'react-router-dom';
 
 // const TEST_USERS = ['Martti', 'user123'];
 
 const PollAnswering = () => {
-    const navigate = useNavigate();
-
     const [searchBy, setSearchBy] = useState('');
     const [searchText, setSearchText] = useState('');
     const [showPollList, setShowPollList] = useState(false);
@@ -142,15 +138,6 @@ const PollAnswering = () => {
         return searchResult;
     };
 
-    const handleResult = (user: string) => {
-        // navigate('/result', {replace: true});
-        navigate(`result`);
-    };
-
-    const handleEdit = (user: string) => {
-        navigate(`edit`, { state: { username: user } });
-    };
-
     return (
         <Container>
             <Typography className="title" variant="h4">
@@ -217,38 +204,20 @@ const PollAnswering = () => {
                               );
                           })
                         : null}
-                    {showUserList ? <AdminViewUser></AdminViewUser> : null}
+                    {showUserList
+                        ? userList.map((user: any) => {
+                              return (
+                                  <div key={user.id}>
+                                      <AdminViewUser
+                                          userData={user}
+                                          showNotification={handleNotification}
+                                      ></AdminViewUser>
+                                  </div>
+                              );
+                          })
+                        : null}
                 </div>
             )}
-            <div className="listItems">
-                {showUserList
-                    ? userList.map((user: any) => {
-                          return (
-                              <div key={user} className="listItem">
-                                  <Typography>{user}</Typography>
-                                  <Link
-                                      className="pinkLink"
-                                      onClick={() => handleEdit(user)}
-                                  >
-                                      Edit
-                                  </Link>
-                                  <Link
-                                      className="pinkLink"
-                                      onClick={() => handleResult(user)}
-                                  >
-                                      View Results
-                                  </Link>
-                                  <Link className="pinkLink" href="#">
-                                      View links
-                                  </Link>
-                                  <Link className="deleteLink" href="#">
-                                      Delete
-                                  </Link>
-                              </div>
-                          );
-                      })
-                    : null}
-            </div>
             <BasicSnackbar
                 open={open}
                 onClose={handleClose}

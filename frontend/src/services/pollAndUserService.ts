@@ -323,3 +323,39 @@ export const deletePoll = async (pollId: string) => {
 
     return dataList;
 };
+
+export const deleteUser = async (userId: string) => {
+    const newResponse = await fetch(`${getBackendUrl()}/api/user/${userId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+            Authorization: `Bearer ${token}`
+        }
+    });
+    if (newResponse.status !== 200) {
+        throw new Error('Request Failed');
+    }
+    const dataList = await newResponse.json();
+    console.log(dataList);
+
+    return dataList;
+};
+
+export const updateUser = async (userId: string, parameter: any) => {
+    const response = await fetch(`${getBackendUrl()}/api/user/${userId}`, {
+        method: 'PATCH',
+        body: JSON.stringify(parameter),
+        headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+            Authorization: `Bearer ${token}`
+        }
+    });
+    if (response.status !== 200) {
+        throw new Error('Request Failed');
+    }
+
+    const responseJSON = await response.json();
+    return responseJSON;
+};

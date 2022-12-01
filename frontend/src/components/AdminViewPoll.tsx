@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Typography, Link, Box } from '@mui/material';
 import './AdminViewPoll.scss';
-import { deletePoll } from '../services/pollService';
+import { deletePoll } from '../services/pollAndUserService';
 
 const AdminViewPoll = (props: any) => {
     const [showMessage, setShowMessage] = useState(false);
