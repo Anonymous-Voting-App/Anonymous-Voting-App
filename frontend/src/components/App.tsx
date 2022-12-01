@@ -11,6 +11,7 @@ import AdminView from './AdminView';
 import PollResult from './PollResult';
 import { StyledEngineProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import AdminViewUserProfile from './AdminViewUserProfile';
 import PollEditView from './PollEditView';
 
 function App() {
@@ -80,6 +81,10 @@ function App() {
                                         showNotification={handleNotification}
                                     />
                                 }
+                            />
+                            <Route
+                                path="admin/edit"
+                                element={<AdminViewUserProfile username={''} />}
                             />
                             <Route
                                 path={'/result/:pollId'}

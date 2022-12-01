@@ -1,0 +1,192 @@
+@import '../styles/colors';
+@mixin for-phone-only {
+    @media (max-width: 599px) {
+        @content;
+    }
+}
+
+.profile-edit-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    .title {
+        font-weight: 600;
+        margin-top: 100px;
+        margin-bottom: 100px;
+    }
+    .field-mui {
+        .MuiInputBase-root {
+            border-bottom: 1px solid $main-color;
+            &.MuiInput-underline:after {
+                border-bottom: black;
+            }
+        }
+    }
+    .profileContents {
+        margin-top: 60px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        .label-field-container {
+            display: flex;
+            gap: 8.5rem;
+            margin-bottom: 20px;
+            align-items: center;
+            @include for-phone-only {
+                font-size: 2rem;
+                gap: 1rem;
+            }
+        }
+        .label {
+            position: relative; // to set the labe text inline with textfiled
+            top: 5px;
+            .MuiTypography-root {
+                font-weight: 800;
+            }
+        }
+        .field-mui {
+            .MuiFormControl-root {
+                min-width: 320px;
+            }
+            @include for-phone-only {
+                font-size: 2rem;
+                gap: 2rem;
+                .MuiFormControl-root {
+                    min-width: 4rem;
+                }
+            }
+        }
+        .switch-field {
+            gap: 9.5rem;
+            @include for-phone-only {
+                font-size: 2rem;
+                gap: 2rem;
+            }
+        }
+        .id-field {
+            gap: 9.8rem;
+            min-width: 320px;
+            @include for-phone-only {
+                font-size: 2rem;
+                gap: 2rem;
+                .MuiFormControl-root {
+                    min-width: 4rem;
+                }
+            }
+        }
+        .password-field {
+            gap: 6rem;
+            @include for-phone-only {
+                font-size: 2rem;
+                gap: 1rem;
+                .MuiFormControl-root {
+                    min-width: 4rem;
+                }
+            }
+        }
+    }
+    .vote-count-switch {
+        .MuiSwitch-switchBase {
+            color: $black;
+            position: absolute;
+            size: large;
+            top: 2px;
+            left: 3px;
+        }
+        .MuiSwitch-thumb {
+            height: 15px;
+            width: 15px;
+        }
+        .Mui-checked + .MuiSwitch-track {
+            border: 1px solid $black;
+            background-color: $lollipop;
+            opacity: 10;
+        }
+        .MuiSwitch-track {
+            border: 1px solid $black;
+            background-color: $toggle-background-color;
+            opacity: 10;
+        }
+        .Mui-checked.css-5ryogn-MuiButtonBase-root-MuiSwitch-switchBase {
+            color: $black;
+            .MuiSwitch-thumb {
+                height: 15px;
+                width: 15px;
+                outline: $black;
+            }
+        }
+    }
+    .searchButton,
+    .searchButton:hover {
+        margin-top: 4.875rem;
+        width: 260px;
+        height: 40px;
+        border-radius: 20px;
+        text-transform: none;
+        background-color: $main-color;
+        color: $background-color;
+    }
+}
+
+// @import '../styles/colors';
+// @mixin for-phone-only {
+//     @media (max-width: 599px) {
+//         @content;
+//     }
+// }
+// .title {
+//     font-weight: 600;
+//     margin-top: 100px;
+//     margin-bottom: 100px;
+// }
+// .subtitle {
+//     font-weight: 700;
+// }
+// .profileContents {
+//     display: flex;
+//     flex-direction: column;
+//     gap: 32px;
+// }
+// .row {
+//     display: flex;
+//     align-items: left;
+//     justify-content: space-between;
+//     gap: 40px;
+// }
+// .userIdRow {
+//     display: flex;
+//     align-items: left;
+//     gap: 60px;
+// }
+// .pinkLink {
+//     color: $lollipop;
+//     text-decoration-color: $lollipop;
+//     cursor: pointer;
+// }
+// .adminToggle {
+//     display: flex;
+//     padding: 0 !important;
+//     font-weight: 700;
+//     .MuiSwitch-switchBase {
+//         color: $black;
+//         position: absolute;
+//         size: large;
+//         top: 2px;
+//         left: 3px;
+//     }
+//     .MuiSwitch-thumb {
+//         height: 15px;
+//         width: 15px;
+//     }
+//     .Mui-checked + .MuiSwitch-track {
+//         border: 1px solid $black;
+//         background-color: $lollipop;
+//         opacity: 10;
+//     }
+//     .MuiSwitch-track {
+//         border: 1px solid $black;
+//         background-color: $toggle-background-color;
+//         opacity: 10;
+//     }
+// }

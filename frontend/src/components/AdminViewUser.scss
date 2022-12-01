@@ -1,0 +1,29 @@
+@import '../styles/colors';
+@mixin for-phone-only {
+    @media (max-width: 599px) {
+        @content;
+    }
+}
+
+.listItem {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    padding-bottom: 20px;
+}
+
+.pinkLink {
+    color: $lollipop;
+    text-decoration-color: $lollipop;
+    cursor: pointer;
+}
+
+.deleteLink {
+    color: $cancel-background-color;
+    text-decoration-color: none;
+    cursor: pointer;
+}
+
+.messageDiv {
+    background-color: $mint;
+}

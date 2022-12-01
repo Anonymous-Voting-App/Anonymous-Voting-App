@@ -268,19 +268,32 @@ export const fetchSearchResult = async (
 ) => {
     const searchBy = searchType === 'poll' ? 'searchByName' : 'searchByID';
     const authToken = token;
+    let newResponse;
 
     // const searchBy = 'searchByName';
     // searchString = 'polltest101';
-    const newResponse = await fetch(
-        `${getBackendUrl()}/api/poll/admin/${searchBy}/${searchString}`,
-        {
-            headers: {
-                'Content-Type': 'application/json',
-                Accept: 'application/json',
-                Authorization: `Bearer ${authToken}`
-            }
-        }
-    );
+    searchType === 'poll'
+        ? (newResponse = await fetch(
+              `${getBackendUrl()}/api/poll/admin/${searchBy}/${searchString}`,
+              {
+                  headers: {
+                      'Content-Type': 'application/json',
+                      Accept: 'application/json',
+                      Authorization: `Bearer ${authToken}`
+                  }
+              }
+          ))
+        : (newResponse = await fetch(
+              `${getBackendUrl()}/api/user/searchByName/${searchString}`,
+              {
+                  headers: {
+                      'Content-Type': 'application/json',
+                      Accept: 'application/json',
+                      Authorization: `Bearer ${authToken}`
+                  }
+              }
+          ));
+
     if (newResponse.status !== 200) {
         throw new Error('Request Failed');
     }
@@ -311,6 +324,24 @@ export const deletePoll = async (pollId: string) => {
     return dataList;
 };
 
+export const deleteUser = async (userId: string) => {
+    const newResponse = await fetch(`${getBackendUrl()}/api/user/${userId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+            Authorization: `Bearer ${token}`
+        }
+    });
+
+    if (newResponse.status !== 200) {
+        throw new Error('Request Failed');
+    }
+    const dataList = await newResponse.json();
+    console.log(dataList);
+
+    return dataList;
+};
 export const getEditPollData = async (privateId: string) => {
     const newResponse = await fetch(
         `${getBackendUrl()}/api/poll/admin/${privateId}`,
@@ -331,6 +362,33 @@ export const getEditPollData = async (privateId: string) => {
     return dataList;
 };
 
+export const updateUser = async (
+    userId: string,
+    username: string,
+    adminToggle: boolean,
+    newPassword: string
+) => {
+    const editedUserData = {
+        name: username,
+        isAdmin: adminToggle,
+        password: newPassword
+    };
+    const response = await fetch(`${getBackendUrl()}/api/user/${userId}`, {
+        method: 'PATCH',
+        body: JSON.stringify(editedUserData),
+        headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+            Authorization: `Bearer ${token}`
+        }
+    });
+    if (response.status !== 200) {
+        throw new Error('Request Failed');
+    }
+
+    const responseJSON = await response.json();
+    return responseJSON;
+};
 export const editPoll = async (
     privateId: string,
     newName: string,
