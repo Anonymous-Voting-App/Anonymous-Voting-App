@@ -62,16 +62,14 @@ function Registration() {
 
     const handleRegister = () => {
         register(username, password, firstName, lastName, email)
-            .then((response) => {
-                console.log(response);
+            .then(() => {
                 navigate('/login');
                 showNotification({
                     severity: 'success',
                     message: 'Register successful'
                 });
             })
-            .catch((error) => {
-                console.log(error);
+            .catch(() => {
                 showNotification({
                     severity: 'error',
                     message: 'Register unsuccessful'

@@ -18,8 +18,6 @@ export const login = async (username: string, password: string) => {
     }
 
     const data = await response.json();
-    console.log(data);
-
     return data;
 };
 
@@ -45,12 +43,11 @@ export const register = async (
         }
     });
 
-    if (response.status !== 200) {
+    if (response.status !== 201) {
         throw new Error('Request Failed');
     }
 
     const data = await response.json();
-    console.log(data);
 
     return data;
 };

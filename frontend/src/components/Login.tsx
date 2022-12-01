@@ -40,15 +40,15 @@ function Login(props: any) {
     const handleLogin = () => {
         login(username, password)
             .then((response) => {
-                console.log(response);
+                localStorage.setItem('token', response.token);
+                localStorage.setItem('user', JSON.stringify(response.user));
                 navigate('/');
                 showNotification({
                     severity: 'success',
                     message: 'Login successful'
                 });
             })
-            .catch((error) => {
-                console.log(error);
+            .catch(() => {
                 showNotification({
                     severity: 'error',
                     message: 'Invalid username or password'
