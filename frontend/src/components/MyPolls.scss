@@ -1,0 +1,68 @@
+@import '../styles/colors';
+@mixin for-phone-only {
+    @media (max-width: 599px) {
+        @content;
+    }
+}
+
+.page-title {
+    font-weight: 600;
+    margin-top: 173px;
+}
+
+.polls-container {
+    margin-top: 83px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.base-button {
+    width: 260px;
+    height: 40px;
+    border-radius: 20px;
+    text-transform: none;
+    border: 1px solid $main-color;
+}
+
+.search-field {
+    input {
+        text-align: center;
+    }
+    .MuiOutlinedInput-root {
+        @extend .base-button;
+    }
+    .MuiOutlinedInput-notchedOutline {
+        border: none;
+    }
+}
+
+.search-button,
+.search-button:hover {
+    border-radius: 20px;
+    width: 16.25rem;
+    color: $background-color;
+    background-color: $main-color;
+    text-transform: none;
+    border: 2px solid $main-color;
+    @include for-phone-only {
+        font-size: 2.5rem;
+    }
+}
+
+.search-button:disabled {
+    color: rgba(0, 0, 0, 0.26);
+    box-shadow: none;
+    border: none;
+    background-color: rgba(0, 0, 0, 0.12);
+}
+
+.search-content {
+    padding-top: 60px;
+}
+
+.count-data {
+    margin-bottom: 20px;
+    font-size: 12px;
+}
