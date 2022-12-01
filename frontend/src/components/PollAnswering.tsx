@@ -8,7 +8,6 @@ import {
     FormControlLabel,
     RadioGroup,
     Radio,
-    checkboxClasses,
     Checkbox,
     TextField
 } from '@mui/material';
@@ -16,7 +15,7 @@ import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import { ArrowBack, ArrowForward } from '@mui/icons-material';
 import './PollAnswering.scss';
-import Question from './Question';
+//import Question from './Question';
 
 const PollAnswering = (props: any) => {
     const [showPickOne, setshowPickOne] = useState(true);
@@ -26,50 +25,42 @@ const PollAnswering = (props: any) => {
     const [showYesNo, setsshowYesNo] = useState(true);
     const [showThumbsUpDown, setsshowThumbsUpDown] = useState(true);
 
-    const [QuestionType, setQuestionType] = useState('pickOne');
+    //const [QuestionType, setQuestionType] = useState('pickOne');
 
-    const [questions, setQuestions] = useState([
-        {
-            title: '',
-            description: '',
-            type: '',
-            minAnswers: 1,
-            maxAnswers: 1,
-            subQuestions: [{ title: '', description: '', type: '' }]
-        }
-    ]);
+    //const [questions, setQuestions] = useState([
+    //    {
+    //        title: '',
+    //        description: '',
+    //        type: '',
+    //        minAnswers: 1,
+    //        maxAnswers: 1,
+    //        subQuestions: [{ title: '', description: '', type: '' }]
+    //    }
+    //]);
 
     const handleNextClick = () => {
-        if (QuestionType === 'pickOne') {
-            setshowMultiChoice(true);
-            setshowPickOne(false);
-            setQuestionType('multiChoise');
-            (
-                document.getElementById('submitButton') as HTMLInputElement
-            ).disabled = false;
-        } else if (QuestionType === 'multiChoise') {
-            setsshowFreeText(true);
-            setshowMultiChoice(false);
-            setQuestionType('freeText');
-        }
+        setshowPickOne(true);
+        setshowMultiChoice(false);
+        setsshowStartRating(false);
+        setsshowFreeText(false);
+        setsshowYesNo(false);
+        setsshowThumbsUpDown(false);
+
+        NextQuestion();
 
         (document.getElementById('submitButton') as HTMLInputElement).disabled =
             false;
     };
 
     const handlePreviousClick = () => {
-        if (QuestionType === 'freeText') {
-            setshowMultiChoice(true);
-            setsshowFreeText(false);
-            setQuestionType('multiChoise');
-        } else if (QuestionType === 'multiChoise') {
-            setshowPickOne(true);
-            setshowMultiChoice(false);
-            setQuestionType('pickOne');
-            (
-                document.getElementById('submitButton') as HTMLInputElement
-            ).disabled = true;
-        }
+        setshowPickOne(true);
+        setshowMultiChoice(true);
+        setsshowStartRating(true);
+        setsshowFreeText(true);
+        setsshowYesNo(true);
+        setsshowThumbsUpDown(true);
+        (document.getElementById('submitButton') as HTMLInputElement).disabled =
+            true;
     };
 
     const NextQuestion = () => {
