@@ -31,3 +31,11 @@ export interface ResultOptionObj {
     title: string | number;
     percentage: number;
 }
+
+export interface CurrentUser {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    userName: string;
+}

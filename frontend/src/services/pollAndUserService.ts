@@ -1,6 +1,7 @@
 import { PollQuesObj } from '../utils/types';
 import getBackendUrl from '../utils/getBackendUrl';
 import { getAuthorizationToken } from '../utils/getAuthorizationToken';
+import { getCurrentUser } from '../utils/getCurrentUser';
 
 // function to modify question type before calling api
 const updatePollBody = (questions: PollQuesObj[]) => {
@@ -64,7 +65,7 @@ export const createPoll = async (
         name: title,
         type: 'string',
         owner: {
-            accountId: '7cfe0910-1d65-4321-a589-9dadc2f837eb' // hardcoded
+            accountId: getCurrentUser()?.id
         },
         questions: updatedQuestions,
         visualFlags: [visualFlags]
