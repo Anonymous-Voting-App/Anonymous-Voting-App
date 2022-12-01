@@ -1,5 +1,6 @@
 import { PollQuesObj } from '../utils/types';
 import getBackendUrl from '../utils/getBackendUrl';
+import { getAuthorizationToken } from '../utils/getAuthorizationToken';
 
 // function to modify question type before calling api
 const updatePollBody = (questions: PollQuesObj[]) => {
@@ -74,7 +75,7 @@ export const createPoll = async (
         body: JSON.stringify(pollContent),
         headers: {
             'Content-type': 'application/json; charset=UTF-8',
-            Authorization: `Bearer ${localStorage.getItem('token')}`
+            Authorization: getAuthorizationToken()
         }
     });
     if (response.status !== 201) {
@@ -261,7 +262,7 @@ export const fetchSearchResult = async (
     searchType: string
 ) => {
     const searchBy = searchType === 'poll' ? 'searchByName' : 'searchByID';
-    const authToken = localStorage.getItem('token');
+    const authToken = getAuthorizationToken();
     let newResponse;
 
     // const searchBy = 'searchByName';
@@ -304,7 +305,7 @@ export const deletePoll = async (pollId: string) => {
             headers: {
                 'Content-Type': 'application/json',
                 Accept: 'application/json',
-                Authorization: `Bearer ${localStorage.getItem('token')}`
+                Authorization: `Bearer ${getAuthorizationToken()}`
             }
         }
     );
@@ -324,7 +325,7 @@ export const deleteUser = async (userId: string) => {
         headers: {
             'Content-Type': 'application/json',
             Accept: 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('token')}`
+            Authorization: `Bearer ${getAuthorizationToken()}`
         }
     });
 
@@ -343,7 +344,7 @@ export const getEditPollData = async (privateId: string) => {
             headers: {
                 'Content-Type': 'application/json',
                 Accept: 'application/json',
-                Authorization: `Bearer ${localStorage.getItem('token')}`
+                Authorization: `Bearer ${getAuthorizationToken()}`
             }
         }
     );
@@ -373,7 +374,7 @@ export const updateUser = async (
         headers: {
             'Content-Type': 'application/json',
             Accept: 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('token')}`
+            Authorization: `Bearer ${getAuthorizationToken()}`
         }
     });
 
@@ -404,7 +405,7 @@ export const editPoll = async (
             headers: {
                 'Content-Type': 'application/json',
                 Accept: 'application/json',
-                Authorization: `Bearer ${localStorage.getItem('token')}`
+                Authorization: `Bearer ${getAuthorizationToken()}`
             }
         }
     );
