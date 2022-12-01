@@ -4,16 +4,22 @@ import './LoginAndRegister.scss';
 import { register } from '../services/loginAndRegisterService';
 import Field from './Field';
 import { useNavigate } from 'react-router-dom';
+import BasicSnackbar from './BasicSnackbar';
 
 function Registration() {
     const navigate = useNavigate();
 
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [password2, setPassword2] = useState('');
+    const [passwordAgain, setPasswordAgain] = useState('');
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
+    const [open, setOpen] = useState(false);
+    const [notificationObj, setNotificationObj] = useState({
+        message: '',
+        severity: ''
+    });
 
     const InputHandler = (value: string, index: number) => {
         switch (index) {
@@ -24,7 +30,7 @@ function Registration() {
                 setPassword(value);
                 break;
             case 2:
-                setPassword2(value);
+                setPasswordAgain(value);
                 break;
             case 3:
                 setFirstName(value);
@@ -38,10 +44,35 @@ function Registration() {
         }
     };
 
-    const handleRegister = () => {
-        register(username, password, firstName, lastName, email);
+    const showNotification = (status: {
+        severity: string;
+        message: string;
+    }) => {
+        setOpen(true);
+        setNotificationObj({
+            ...notificationObj,
+            message: status.message,
+            severity: status.severity
+        });
+    };
 
-        navigate('/login');
+    const closeNotification = () => {
+        setOpen(false);
+    };
+
+    const handleRegister = () => {
+        register(username, password, firstName, lastName, email)
+            .then((response) => {
+                console.log(response);
+                navigate('/login');
+            })
+            .catch((error) => {
+                console.log(error);
+                showNotification({
+                    severity: 'error',
+                    message: 'Register unsuccessful'
+                });
+            });
     };
 
     return (
@@ -68,7 +99,7 @@ function Registration() {
                     <Field
                         page="register"
                         text="Password again"
-                        input={password2}
+                        input={passwordAgain}
                         onInput={InputHandler}
                         ind={2}
                     ></Field>
@@ -109,6 +140,12 @@ function Registration() {
             >
                 Register
             </Button>
+            <BasicSnackbar
+                open={open}
+                onClose={closeNotification}
+                severity={notificationObj.severity}
+                message={notificationObj.message}
+            />
         </div>
     );
 }

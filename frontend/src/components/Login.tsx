@@ -4,23 +4,52 @@ import { login } from '../services/loginAndRegisterService';
 import { useState } from 'react';
 import { Typography, Button, Link } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import BasicSnackbar from './BasicSnackbar';
 
 function Login(props: any) {
     const navigate = useNavigate();
 
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [open, setOpen] = useState(false);
+    const [notificationObj, setNotificationObj] = useState({
+        message: '',
+        severity: ''
+    });
 
     const InputHandler = (value: string, index: number) => {
         index === 0 ? setUsername(value) : setPassword(value);
     };
 
-    const handleLogin = () => {
-        login(username, password).then((response) => {
-            console.log(response);
+    const showNotification = (status: {
+        severity: string;
+        message: string;
+    }) => {
+        setOpen(true);
+        setNotificationObj({
+            ...notificationObj,
+            message: status.message,
+            severity: status.severity
         });
+    };
 
-        navigate('/');
+    const closeNotification = () => {
+        setOpen(false);
+    };
+
+    const handleLogin = () => {
+        login(username, password)
+            .then((response) => {
+                console.log(response);
+                navigate('/');
+            })
+            .catch((error) => {
+                console.log(error);
+                showNotification({
+                    severity: 'error',
+                    message: 'Invalid username or password'
+                });
+            });
     };
 
     const handleRegisterClick = () => {
@@ -69,6 +98,12 @@ function Login(props: any) {
                     Register
                 </Link>
             </div>
+            <BasicSnackbar
+                open={open}
+                onClose={closeNotification}
+                severity={notificationObj.severity}
+                message={notificationObj.message}
+            />
         </div>
     );
 }

@@ -1,8 +1,13 @@
 import getBackendUrl from '../utils/getBackendUrl';
 
 export const login = async (username: string, password: string) => {
+    const userContent = {
+        username: username,
+        password: password
+    };
     const response = await fetch(`${getBackendUrl()}/api/user/login`, {
         method: 'POST',
+        body: JSON.stringify(userContent),
         headers: {
             'Content-type': 'application/json'
         }
