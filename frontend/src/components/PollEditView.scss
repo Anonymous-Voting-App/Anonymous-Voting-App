@@ -14,18 +14,22 @@
         margin-top: 173px;
         display: flex;
         justify-content: center;
-        .MuiTypography-root {
-            font-weight: 600;
-            @include for-phone-only {
-                font-size: 2rem;
+        .MuiInputBase-input {
+            text-align: center;
+        }
+        .MuiInputLabel-shrink {
+            position: absolute;
+            left: 1rem;
+        }
+        .MuiInputBase-root {
+            border-bottom: 1px solid $main-color;
+            &.MuiInput-underline:after {
+                border-bottom: black;
             }
         }
-        .MuiSvgIcon-root {
-            transform: rotate(90deg);
-            font-size: 3rem !important;
-            @include for-phone-only {
-                font-size: 2rem !important;
-            }
+        .MuiFormLabel-root {
+            width: 100%;
+            color: $placeholder-text-color;
         }
     }
     .field-mui {
@@ -78,7 +82,7 @@
             }
         }
         .id-field {
-            gap: 9rem;
+            gap: 7.6rem;
             min-width: 320px;
             @include for-phone-only {
                 font-size: 2rem;

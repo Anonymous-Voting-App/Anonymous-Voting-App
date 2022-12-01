@@ -8,7 +8,8 @@ import { useNavigate } from 'react-router-dom';
 const PollEditView = () => {
     const [pollname, setPollName] = useState('');
     const [voteToggle, setVoteToggle] = useState(false);
-    const [pollId, setPollId] = useState('');
+    const [ownerName, setOnwnerName] = useState('');
+    const [ownerId, setOnwnerId] = useState('');
     const [open, setOpen] = useState(false);
     const [notificationObj, setNotificationObj] = useState({
         message: '',
@@ -41,6 +42,10 @@ const PollEditView = () => {
         setPollName(newName);
     };
 
+    const handleOnwerIdChange = (newId: string) => {
+        setOnwnerId(newId);
+    };
+
     const handleVoteCount = (event: React.ChangeEvent<HTMLInputElement>) => {
         setVoteToggle(event.target.checked);
     };
@@ -48,7 +53,7 @@ const PollEditView = () => {
     const handleUpdate = () => {
         const voteToggleStatus =
             voteToggle === true ? 'showCount' : 'hideCount';
-        editPoll(privateId, pollname, voteToggleStatus)
+        editPoll(privateId, pollname, voteToggleStatus, ownerId)
             .then((response) => {
                 console.log(response);
                 const status = {
@@ -74,7 +79,8 @@ const PollEditView = () => {
             .then((response) => {
                 console.log(response);
                 setPollName(response.name);
-                setPollId(response.publicId);
+                setOnwnerName(response.owner.userName);
+                setOnwnerId(response.owner.id);
                 let toggle =
                     response.visualFlags[0] === 'showCount' ? true : false;
                 setVoteToggle(toggle);
@@ -91,8 +97,17 @@ const PollEditView = () => {
 
     return (
         <div className="poll-edit-view-wrapper">
-            <div className="page-header">
-                <Typography variant="h4"> {pollname} </Typography>
+            <div className="page-header field-mui">
+                <TextField
+                    label="Poll name"
+                    autoComplete="off"
+                    id="pollname"
+                    variant="standard"
+                    value={pollname}
+                    onChange={(event) =>
+                        handlePollNameChange(event.target.value)
+                    }
+                />
             </div>
             <div className="edit-info">
                 <div className="label-field-container">
@@ -105,25 +120,25 @@ const PollEditView = () => {
                             autoComplete="off"
                             id="name"
                             variant="standard"
-                            value={pollname}
-                            onChange={(event) =>
-                                handlePollNameChange(event.target.value)
-                            }
+                            value={ownerName}
+                            disabled
                         />
                     </span>
                 </div>
                 <div className="label-field-container id-field">
                     <span className="label">
-                        <Typography>Poll ID: </Typography>
+                        <Typography>Onwer ID: </Typography>
                     </span>
                     <span className="field field-mui">
                         {' '}
                         <TextField
-                            value={pollId}
+                            value={ownerId}
                             autoComplete="off"
                             id="name"
                             variant="standard"
-                            disabled
+                            onChange={(event) =>
+                                handleOnwerIdChange(event.target.value)
+                            }
                         />
                     </span>
                 </div>

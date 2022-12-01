@@ -334,10 +334,12 @@ export const getEditPollData = async (privateId: string) => {
 export const editPoll = async (
     privateId: string,
     newName: string,
-    showCount: string
+    showCount: string,
+    ownerId: string
 ) => {
     const editedPollData = {
         name: newName,
+        owner: ownerId,
         visualFlags: [showCount]
     };
     //localhost:8080/api/poll/admin/d14c1c6a-7a98-4684-8fdc-49689c55263c
