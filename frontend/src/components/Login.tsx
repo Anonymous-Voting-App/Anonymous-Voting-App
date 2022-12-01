@@ -17,8 +17,8 @@ function Login(props: any) {
         severity: ''
     });
 
-    const InputHandler = (value: string, index: number) => {
-        index === 0 ? setUsername(value) : setPassword(value);
+    const InputHandler = (value: string, index: string) => {
+        index === '0' ? setUsername(value) : setPassword(value);
     };
 
     const showNotification = (status: {
@@ -67,14 +67,14 @@ function Login(props: any) {
                     text="Username"
                     input={username}
                     onInput={InputHandler}
-                    ind={0}
+                    ind={String(0)}
                 ></Field>
                 <Field
                     page="login"
                     text="Password"
                     input={password}
                     onInput={InputHandler}
-                    ind={1}
+                    ind={String(1)}
                 ></Field>
 
                 <Button

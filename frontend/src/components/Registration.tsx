@@ -21,24 +21,24 @@ function Registration() {
         severity: ''
     });
 
-    const InputHandler = (value: string, index: number) => {
+    const InputHandler = (value: string, index: string) => {
         switch (index) {
-            case 0:
+            case '0':
                 setUsername(value);
                 break;
-            case 1:
+            case '1':
                 setPassword(value);
                 break;
-            case 2:
+            case '2':
                 setPasswordAgain(value);
                 break;
-            case 3:
+            case '3':
                 setFirstName(value);
                 break;
-            case 4:
+            case '4':
                 setLastName(value);
                 break;
-            case 5:
+            case '5':
                 setEmail(value);
                 break;
         }
@@ -87,21 +87,21 @@ function Registration() {
                         text="Username"
                         input={username}
                         onInput={InputHandler}
-                        ind={0}
+                        ind={String(0)}
                     ></Field>
                     <Field
                         page="register"
                         text="Password"
                         input={password}
                         onInput={InputHandler}
-                        ind={1}
+                        ind={String(1)}
                     ></Field>
                     <Field
                         page="register"
                         text="Password again"
                         input={passwordAgain}
                         onInput={InputHandler}
-                        ind={2}
+                        ind={String(2)}
                     ></Field>
                 </div>
             </Paper>
@@ -113,21 +113,21 @@ function Registration() {
                         text="First name"
                         input={firstName}
                         onInput={InputHandler}
-                        ind={3}
+                        ind={String(3)}
                     ></Field>
                     <Field
                         page="register"
                         text="Last name"
                         input={lastName}
                         onInput={InputHandler}
-                        ind={4}
+                        ind={String(4)}
                     ></Field>
                     <Field
                         page="register"
                         text="Email"
                         input={email}
                         onInput={InputHandler}
-                        ind={5}
+                        ind={String(5)}
                     ></Field>
                 </div>
             </Paper>
