@@ -65,6 +65,10 @@ function Registration() {
             .then((response) => {
                 console.log(response);
                 navigate('/login');
+                showNotification({
+                    severity: 'success',
+                    message: 'Register successful'
+                });
             })
             .catch((error) => {
                 console.log(error);

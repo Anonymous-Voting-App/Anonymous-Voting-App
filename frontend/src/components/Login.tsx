@@ -42,6 +42,10 @@ function Login(props: any) {
             .then((response) => {
                 console.log(response);
                 navigate('/');
+                showNotification({
+                    severity: 'success',
+                    message: 'Login successful'
+                });
             })
             .catch((error) => {
                 console.log(error);
