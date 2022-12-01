@@ -4,7 +4,7 @@ import getBackendUrl from '../utils/getBackendUrl';
 //token to be dynamically set once login integrated
 const token =
     // 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImMyMzYyMDdhLWY0OGQtNGFjYS1iMmJlLWE3NWM0OTZkZWUzZCIsImZpcnN0TmFtZSI6IkFkIiwibGFzdE5hbWUiOiJNaW4iLCJlbWFpbCI6Impvb25hcy5oYWxpbmVuQHR1bmkuZmkiLCJ1c2VyTmFtZSI6ImFkbWluIiwiaWF0IjoxNjY5NDY1Nzc0LCJleHAiOjE2Njk2Mzg1NzQsInN1YiI6ImMyMzYyMDdhLWY0OGQtNGFjYS1iMmJlLWE3NWM0OTZkZWUzZCJ9.6-SpV4i3F1tPHgDu5u89o3E6hP9EoB-VV84hJwOPFtM';
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImMyMzYyMDdhLWY0OGQtNGFjYS1iMmJlLWE3NWM0OTZkZWUzZCIsImZpcnN0TmFtZSI6IkFkIiwibGFzdE5hbWUiOiJNaW4iLCJlbWFpbCI6Impvb25hcy5oYWxpbmVuQHR1bmkuZmkiLCJ1c2VyTmFtZSI6ImFkbWluIiwiaWF0IjoxNjY5NzkyNDIyLCJleHAiOjE2Njk5NjUyMjIsInN1YiI6ImMyMzYyMDdhLWY0OGQtNGFjYS1iMmJlLWE3NWM0OTZkZWUzZCJ9._z1cFh41P9WAGy8-K967UDVGA9jyFX8SmdvbYTi8w6w';
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjdjZmUwOTEwLTFkNjUtNDMyMS1hNTg5LTlkYWRjMmY4MzdlYiIsImZpcnN0TmFtZSI6ImphbmUiLCJsYXN0TmFtZSI6ImRvZSIsImVtYWlsIjoiYWRtaW5AbWFpbC5jb20iLCJ1c2VyTmFtZSI6InRlc3RBZG1pbiIsImlhdCI6MTY2OTg4NTk0NiwiZXhwIjoxNjcwMDU4NzQ2LCJzdWIiOiI3Y2ZlMDkxMC0xZDY1LTQzMjEtYTU4OS05ZGFkYzJmODM3ZWIifQ.zpg9IJ8LkW8m4QZfi9jtupk87mbvro6uCb3ltByNGRE';
 
 // function to modify question type before calling api
 const updatePollBody = (questions: PollQuesObj[]) => {
@@ -342,10 +342,20 @@ export const deleteUser = async (userId: string) => {
     return dataList;
 };
 
-export const updateUser = async (userId: string, parameter: any) => {
+export const updateUser = async (
+    userId: string,
+    username: string,
+    adminToggle: boolean,
+    newPassword: string
+) => {
+    const editedUserData = {
+        name: username,
+        isAdmin: adminToggle,
+        password: newPassword
+    };
     const response = await fetch(`${getBackendUrl()}/api/user/${userId}`, {
         method: 'PATCH',
-        body: JSON.stringify(parameter),
+        body: JSON.stringify(editedUserData),
         headers: {
             'Content-Type': 'application/json',
             Accept: 'application/json',
