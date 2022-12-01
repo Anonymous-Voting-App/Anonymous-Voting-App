@@ -18,9 +18,23 @@ export const login = async (username: string, password: string) => {
     return data;
 };
 
-export const register = async () => {
-    const response = await fetch(`${getBackendUrl()}/api/user/register`, {
+export const register = async (
+    username: string,
+    password: string,
+    firstName: string,
+    lastName: string,
+    email: string
+) => {
+    const userContent = {
+        username: username,
+        password: password,
+        firstName: firstName,
+        lastName: lastName,
+        email: email
+    };
+    const response = await fetch(`${getBackendUrl()}/api/user/signup`, {
         method: 'POST',
+        body: JSON.stringify(userContent),
         headers: {
             'Content-type': 'application/json'
         }

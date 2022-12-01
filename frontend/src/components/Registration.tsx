@@ -39,7 +39,7 @@ function Registration() {
     };
 
     const handleRegister = () => {
-        register();
+        register(username, password, firstName, lastName, email);
 
         navigate('/login');
     };
