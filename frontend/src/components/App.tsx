@@ -11,11 +11,7 @@ import AdminView from './AdminView';
 import PollResult from './PollResult';
 import { StyledEngineProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-<<<<<<< HEAD
 import AdminViewUserProfile from './AdminViewUserProfile';
-=======
-import AdminViewUser from './AdminViewUser';
->>>>>>> 74ca78dd7ecd5b1231398ea745805d288c0071fd
 
 function App() {
     const [open, setOpen] = useState(false);
@@ -83,11 +79,7 @@ function App() {
                             />
                             <Route
                                 path="admin/edit"
-<<<<<<< HEAD
                                 element={<AdminViewUserProfile username={''} />}
-=======
-                                element={<AdminViewUser username={''} />}
->>>>>>> 74ca78dd7ecd5b1231398ea745805d288c0071fd
                             />
                         </Routes>
                         <BasicSnackbar

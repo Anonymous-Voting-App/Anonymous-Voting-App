@@ -1,49 +1,15 @@
 @import '../styles/colors';
-<<<<<<< HEAD
-=======
-
->>>>>>> 74ca78dd7ecd5b1231398ea745805d288c0071fd
 @mixin for-phone-only {
     @media (max-width: 599px) {
         @content;
     }
 }
 
-<<<<<<< HEAD
 .listItem {
     display: flex;
     gap: 10px;
     justify-content: center;
     padding-bottom: 20px;
-=======
-.title {
-    font-weight: 600;
-    margin-top: 100px;
-    margin-bottom: 100px;
-}
-
-.subtitle {
-    font-weight: 700;
-}
-
-.profileContents {
-    display: flex;
-    flex-direction: column;
-    gap: 32px;
-}
-
-.row {
-    display: flex;
-    align-items: left;
-    justify-content: space-between;
-    gap: 40px;
-}
-
-.userIdRow {
-    display: flex;
-    align-items: left;
-    gap: 60px;
->>>>>>> 74ca78dd7ecd5b1231398ea745805d288c0071fd
 }
 
 .pinkLink {
@@ -52,7 +18,6 @@
     cursor: pointer;
 }
 
-<<<<<<< HEAD
 .deleteLink {
     color: $cancel-background-color;
     text-decoration-color: none;
@@ -61,34 +26,4 @@
 
 .messageDiv {
     background-color: $mint;
-=======
-.adminToggle {
-    display: flex;
-    padding: 0 !important;
-    font-weight: 700;
-
-    .MuiSwitch-switchBase {
-        color: $black;
-        position: absolute;
-        size: large;
-        top: 2px;
-        left: 3px;
-    }
-    .MuiSwitch-thumb {
-        height: 15px;
-        width: 15px;
-    }
-
-    .Mui-checked + .MuiSwitch-track {
-        border: 1px solid $black;
-        background-color: $lollipop;
-        opacity: 10;
-    }
-
-    .MuiSwitch-track {
-        border: 1px solid $black;
-        background-color: $toggle-background-color;
-        opacity: 10;
-    }
->>>>>>> 74ca78dd7ecd5b1231398ea745805d288c0071fd
 }
