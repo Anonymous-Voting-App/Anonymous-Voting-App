@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography } from '@mui/material';
+import { Container, Link, Typography } from '@mui/material';
 import './PollResult.scss';
 import { fetchPollResult } from '../services/pollService';
 import ResultCard from './ResultCard';
@@ -7,34 +7,68 @@ import ResultCard from './ResultCard';
 const PollResult = (props: any) => {
     const [pollName, setPollName] = useState('');
     const [pollResult, setPollResult] = useState([]);
-    useEffect(() => {
-        const getResultData = (id: string) => {
-            fetchPollResult(id)
-                .then((response) => {
-                    console.log(response);
-                    setPollName(response.pollName);
-                    setPollResult(response.questions);
-                })
-                .catch((error) => {
-                    // console.log(error);
-                    setPollName('Oops!! No data fetched');
-                    props.showNotification({
-                        severity: 'error',
-                        message:
-                            'Sorry, An error encountered while fetching your poll result'
-                    });
-                });
-        };
+    const pollId = window.location.href.substring(
+        window.location.href.lastIndexOf('/') + 1
+    );
+    const [voteStatus, setVoteStatus] = useState('hideVote');
+    const [showMessage, setShowMessage] = useState(false);
 
-        getResultData(props.pollId);
+    useEffect(() => {
+        getResultData(pollId);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    const getResultData = (id: string) => {
+        fetchPollResult(id)
+            .then((response) => {
+                console.log(response);
+                setPollName(response.pollName);
+                setPollResult(response.questions);
+                setVoteStatus(response.voteCount);
+            })
+            .catch((error) => {
+                // console.log(error);
+                setPollName('Oops!! No data fetched');
+                props.showNotification({
+                    severity: 'error',
+                    message:
+                        'Sorry, An error encountered while fetching your poll result'
+                });
+            });
+    };
+    const handleResultLink = async (event: any) => {
+        const pollAnsweringUrl = `${window.location.origin}/result/${pollId}`;
+        await navigator.clipboard.writeText(pollAnsweringUrl); //**currently copying link of result page -  answering url has to be added when answering component is implemented
+        setShowMessage(true);
+        // //timer for link copied message
+        setTimeout(() => {
+            setShowMessage(false);
+        }, 500);
+        event.stopPropagation();
+    };
 
     return (
         <Container>
             <Typography className="poll-name" variant="h4">
                 {pollName}
             </Typography>
+            <div className="link-container">
+                <Link
+                    href="#"
+                    className="pinkLink"
+                    onClick={(e) => handleResultLink(e)}
+                >
+                    Copy Result link
+                </Link>
+                <Link
+                    href="#"
+                    className="pinkLink"
+                    onClick={(e) => handleResultLink(e)}
+                >
+                    Copy Answering link
+                </Link>
+            </div>
+            {showMessage ? <div className="messageDiv">Link copied</div> : null}
             {pollResult.length > 0 ? (
                 <>
                     {pollResult.map((question, index) => (
@@ -42,6 +76,7 @@ const PollResult = (props: any) => {
                             <ResultCard
                                 ques={question}
                                 ind={index}
+                                voteStatus={voteStatus}
                             ></ResultCard>
                         </div>
                     ))}

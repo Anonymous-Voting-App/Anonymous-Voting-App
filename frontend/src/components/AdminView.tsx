@@ -41,13 +41,17 @@ const PollAnswering = () => {
         severity: string;
         message: string;
     }) => {
+        showSnackBar(status);
+        handleSearchClick();
+    };
+
+    const showSnackBar = (status: { severity: string; message: string }) => {
         setOpen(true);
         setNotificationObj({
             ...notificationObj,
             message: status.message,
             severity: status.severity
         });
-        handleSearchClick();
     };
 
     const handleClose = () => {
@@ -79,12 +83,11 @@ const PollAnswering = () => {
                 setResultCount(data.length);
             } else {
                 setShowErrorMsg(true);
-                setOpen(true);
-                setNotificationObj({
-                    ...notificationObj,
+                const status = {
                     message: 'Sorry no data found',
                     severity: 'error'
-                });
+                };
+                showSnackBar(status);
             }
         } else {
             setShowUserList(true);
@@ -111,14 +114,13 @@ const PollAnswering = () => {
                 return [];
             })
             .catch((error) => {
-                console.log('No data');
+                console.log(error, 'No data');
                 setShowErrorMsg(true);
-                setOpen(true);
-                setNotificationObj({
-                    ...notificationObj,
+                const status = {
                     message: 'Sorry no data found',
                     severity: 'error'
-                });
+                };
+                showSnackBar(status);
                 return [];
             });
         return searchResult;

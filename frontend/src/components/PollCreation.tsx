@@ -15,7 +15,6 @@ import { useNavigate } from 'react-router-dom';
 
 function PollCreation(props: any) {
     const navigate = useNavigate();
-
     const [showQuesContainer, setShowQuesContainer] = useState(false);
     const [questions, setQuestions] = useState<PollQuesObj[]>([
         {
@@ -27,7 +26,6 @@ function PollCreation(props: any) {
             subQuestions: [{ title: '', description: '', type: '' }]
         }
     ]);
-
     const [pollName, setPollName] = useState('');
     const [showCount, setShowCount] = useState(false);
     const [emptyFlag, setEmptyFlag] = useState(true);
@@ -82,7 +80,6 @@ function PollCreation(props: any) {
      */
     const addQuestion = () => {
         setShowQuesContainer(true);
-        // console.log(questions,'after questions added')
         //    condition check to handle empty question type,
         //    if empty dont increment array
         const isEmpty = emptyFieldCheck();
@@ -124,7 +121,6 @@ function PollCreation(props: any) {
             }
             return question;
         });
-        // console.log(newQuestions, 'QUESTIONLIST');
         setQuestions(newQuestions);
     };
 
@@ -160,7 +156,6 @@ function PollCreation(props: any) {
             }
             return question;
         });
-        // console.log(newQuestionList);
         setQuestions(newQuestionList);
     };
 
@@ -194,10 +189,9 @@ function PollCreation(props: any) {
      */
     const submitHandler = () => {
         console.log(questions, pollName, showCount);
-
-        createPoll(pollName, questions, [])
+        const countData = showCount ? 'showCount' : 'hideCount';
+        createPoll(pollName, questions, countData)
             .then((response) => {
-                console.log(response.publicId);
                 // 1576d894-2571-4281-933d-431d246bb460
                 props.setPollId(response.publicId); // TO BE REMOVED WHEN ADMIN POLLS IMPLEMENTED
                 props.showNotification({
