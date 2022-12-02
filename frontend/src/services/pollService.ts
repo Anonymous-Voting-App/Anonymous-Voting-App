@@ -92,6 +92,27 @@ export const createPoll = async (
  * @param pollId
  * @returns
  */
+export const fetchPoll = async (pollId: string) => {
+    const newResponse = await fetch(`${getBackendUrl()}/api/poll/${pollId}`, {
+        headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json'
+        }
+    });
+    if (newResponse.status !== 200) {
+        throw new Error('Request Failed');
+    }
+    const dataList = await newResponse.json();
+    const formattedData = formatData(dataList);
+
+    return formattedData;
+};
+
+/**
+ * Function for fetching poll result
+ * @param pollId
+ * @returns
+ */
 export const fetchPollResult = async (pollId: string) => {
     // pollId = '1576d894-2571-4281-933d-431d246bb460';
     // a6fb06b2-7146-42c0-820b-346a9d1e0539
