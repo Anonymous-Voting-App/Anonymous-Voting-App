@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Typography, TextField, Button, Switch } from '@mui/material';
 import './PollEditView.scss';
-import { editPoll, getEditPollData } from '../services/pollAndUserService';
+import { editPoll, getEditPollData } from '../services/pollService';
 import BasicSnackbar from './BasicSnackbar';
 import { useNavigate } from 'react-router-dom';
 

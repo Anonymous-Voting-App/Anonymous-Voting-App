@@ -11,7 +11,8 @@ import {
 } from '@mui/material';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import './AdminView.scss';
-import { fetchSearchResult } from '../services/pollAndUserService';
+import { fetchSearchPoll } from '../services/pollService';
+import { fetchSearchUser } from '../services/userService';
 import AdminViewPoll from './AdminViewPoll';
 import AdminViewUser from './AdminViewUser';
 import BasicSnackbar from './BasicSnackbar';
@@ -117,7 +118,11 @@ const AdminView = () => {
      * @returns
      */
     const fetchData = (text: string, searchType: string) => {
-        const searchResult = fetchSearchResult(text, searchType)
+        const searchResult = (
+            searchType === 'poll'
+                ? fetchSearchPoll(text)
+                : fetchSearchUser(text)
+        )
             .then((response: { data: string | any[] }) => {
                 console.log(response.data);
                 if (response.data.length > 0) {

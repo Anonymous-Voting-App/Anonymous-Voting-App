@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Typography, Link, Box } from '@mui/material';
 import './AdminViewPoll.scss';
-import { deletePoll } from '../services/pollAndUserService';
+import { deletePoll } from '../services/pollService';
 import { useNavigate } from 'react-router-dom';
 
 const AdminViewPoll = (props: any) => {

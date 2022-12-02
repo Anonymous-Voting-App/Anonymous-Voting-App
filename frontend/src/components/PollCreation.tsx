@@ -9,7 +9,7 @@ import React, { useState, useEffect } from 'react';
 import { ArrowRightAlt, AddCircleOutline } from '@mui/icons-material';
 import './PollCreation.scss';
 import Question from './Question';
-import { createPoll } from '../services/pollAndUserService';
+import { createPoll } from '../services/pollService';
 import { PollQuesObj } from '../utils/types';
 import { useNavigate } from 'react-router-dom';
 
