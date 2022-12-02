@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Link, Typography } from '@mui/material';
 import './PollResult.scss';
-import { fetchPollResult } from '../services/pollService';
+import { fetchPollResult } from '../services/pollAndUserService';
 import ResultCard from './ResultCard';
+import { useParams } from 'react-router-dom';
 
 const PollResult = (props: any) => {
     const [pollName, setPollName] = useState('');
     const [pollResult, setPollResult] = useState([]);
-    const pollId = window.location.href.substring(
-        window.location.href.lastIndexOf('/') + 1
-    );
+    const { pollId } = useParams();
     const [voteStatus, setVoteStatus] = useState('hideVote');
     const [showMessage, setShowMessage] = useState(false);
 
@@ -18,7 +17,11 @@ const PollResult = (props: any) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const getResultData = (id: string) => {
+    const getResultData = (id: string | undefined) => {
+        if (!id) {
+            return;
+        }
+
         fetchPollResult(id)
             .then((response) => {
                 console.log(response);
@@ -26,8 +29,7 @@ const PollResult = (props: any) => {
                 setPollResult(response.questions);
                 setVoteStatus(response.voteCount);
             })
-            .catch((error) => {
-                // console.log(error);
+            .catch(() => {
                 setPollName('Oops!! No data fetched');
                 props.showNotification({
                     severity: 'error',

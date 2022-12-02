@@ -16,6 +16,9 @@
     "servers": [
         {
             "url": "https://d2l9c7s1roosdj.cloudfront.net/"
+        },
+        {
+            "url": "http://localhost:8080/"
         }
     ],
     "tags": [
