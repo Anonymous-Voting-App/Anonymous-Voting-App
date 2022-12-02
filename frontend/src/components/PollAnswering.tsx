@@ -19,13 +19,16 @@ import './PollAnswering.scss';
 
 const PollAnswering = (props: any) => {
     const [showPickOne, setshowPickOne] = useState(true);
-    const [showMultiChoice, setshowMultiChoice] = useState(true);
-    const [showStartRating, setsshowStartRating] = useState(true);
-    const [showFreeText, setsshowFreeText] = useState(true);
-    const [showYesNo, setsshowYesNo] = useState(true);
-    const [showThumbsUpDown, setsshowThumbsUpDown] = useState(true);
+    const [showMultiChoice, setshowMultiChoice] = useState(false);
+    const [showStartRating, setsshowStartRating] = useState(false);
+    const [showFreeText, setsshowFreeText] = useState(false);
+    const [showYesNo, setsshowYesNo] = useState(false);
+    const [showThumbsUpDown, setsshowThumbsUpDown] = useState(false);
 
-    //const [QuestionType, setQuestionType] = useState('pickOne');
+    const [showNext, setsshowNext] = useState(true);
+    const [showSubmit, setshowSubmit] = useState(false);
+
+    const [QuestionType, setQuestionType] = useState('pickOne');
 
     //const [questions, setQuestions] = useState([
     //    {
@@ -39,28 +42,67 @@ const PollAnswering = (props: any) => {
     //]);
 
     const handleNextClick = () => {
-        setshowPickOne(true);
-        setshowMultiChoice(false);
-        setsshowStartRating(false);
-        setsshowFreeText(false);
-        setsshowYesNo(false);
-        setsshowThumbsUpDown(false);
+        if (QuestionType === 'pickOne') {
+            setshowMultiChoice(true);
+            setshowPickOne(false);
+            setQuestionType('multiChoise');
+            (
+                document.getElementById('submitButton') as HTMLInputElement
+            ).disabled = false;
+        } else if (QuestionType === 'multiChoise') {
+            setsshowStartRating(true);
+            setshowMultiChoice(false);
+            setQuestionType('starRating');
+        } else if (QuestionType === 'starRating') {
+            setsshowStartRating(false);
+            setsshowFreeText(true);
+            setQuestionType('freeText');
+        } else if (QuestionType === 'freeText') {
+            setsshowFreeText(false);
+            setsshowYesNo(true);
+            setQuestionType('YesNo');
+        } else if (QuestionType === 'YesNo') {
+            setsshowYesNo(false);
+            setsshowThumbsUpDown(true);
+            setQuestionType('Thumbs');
+            setsshowNext(false);
+            setshowSubmit(true);
+        }
 
         NextQuestion();
-
-        (document.getElementById('submitButton') as HTMLInputElement).disabled =
-            false;
     };
 
     const handlePreviousClick = () => {
-        setshowPickOne(true);
-        setshowMultiChoice(true);
-        setsshowStartRating(true);
-        setsshowFreeText(true);
-        setsshowYesNo(true);
-        setsshowThumbsUpDown(true);
-        (document.getElementById('submitButton') as HTMLInputElement).disabled =
-            true;
+        if (QuestionType === 'multiChoise') {
+            setshowMultiChoice(false);
+            setshowPickOne(true);
+            setQuestionType('pickOne');
+            (
+                document.getElementById('submitButton') as HTMLInputElement
+            ).disabled = true;
+        } else if (QuestionType === 'starRating') {
+            setsshowStartRating(false);
+            setshowMultiChoice(true);
+            setQuestionType('multiChoise');
+        } else if (QuestionType === 'freeText') {
+            setsshowFreeText(false);
+            setsshowStartRating(true);
+            setQuestionType('starRating');
+        } else if (QuestionType === 'YesNo') {
+            setsshowYesNo(false);
+            setsshowFreeText(true);
+            setQuestionType('freeText');
+        } else if (QuestionType === 'Thumbs') {
+            setsshowThumbsUpDown(false);
+            setsshowYesNo(true);
+            setQuestionType('YesNo');
+            setsshowNext(true);
+            setshowSubmit(false);
+        }
+    };
+
+    const handleSubmit = () => {
+        window.location.reload();
     };
 
     const NextQuestion = () => {
@@ -375,14 +417,27 @@ const PollAnswering = (props: any) => {
                     <ArrowBack />
                     Previous question
                 </Button>
-                <Button
-                    className="nextQuestionButton"
-                    variant="outlined"
-                    onClick={handleNextClick}
-                >
-                    Next question
-                    <ArrowForward />
-                </Button>
+                {showNext ? (
+                    <Button
+                        className="nextQuestionButton"
+                        variant="outlined"
+                        onClick={handleNextClick}
+                        id="NextButton"
+                    >
+                        Next question
+                        <ArrowForward />
+                    </Button>
+                ) : null}
+                {showSubmit ? (
+                    <Button
+                        className="nextQuestionButton"
+                        variant="outlined"
+                        onClick={handleSubmit}
+                        id="NextButton"
+                    >
+                        Submit
+                    </Button>
+                ) : null}
             </div>
         </Container>
     );
