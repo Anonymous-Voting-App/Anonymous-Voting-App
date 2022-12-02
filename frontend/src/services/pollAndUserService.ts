@@ -77,7 +77,7 @@ export const createPoll = async (
         body: JSON.stringify(pollContent),
         headers: {
             'Content-type': 'application/json; charset=UTF-8',
-            Authorization: getAuthorizationToken()
+            Authorization: `Bearer ${getAuthorizationToken()}`
         }
     });
     if (response.status !== 201) {

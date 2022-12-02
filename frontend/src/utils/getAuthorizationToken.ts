@@ -5,5 +5,5 @@
  */
 export const getAuthorizationToken = () => {
     const token = localStorage.getItem('token');
-    return token !== null ? `Bearer ${token}` : '';
+    return token !== null ? token : '';
 };
