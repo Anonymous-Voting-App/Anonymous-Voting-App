@@ -92,6 +92,27 @@ export const createPoll = async (
  * @param pollId
  * @returns
  */
+export const fetchPoll = async (pollId: string) => {
+    const newResponse = await fetch(`${getBackendUrl()}/api/poll/${pollId}`, {
+        headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json'
+        }
+    });
+    if (newResponse.status !== 200) {
+        throw new Error('Request Failed');
+    }
+    const dataList = await newResponse.json();
+    const formattedData = formatData(dataList);
+
+    return formattedData;
+};
+
+/**
+ * Function for fetching poll result
+ * @param pollId
+ * @returns
+ */
 export const fetchPollResult = async (pollId: string) => {
     // pollId = '1576d894-2571-4281-933d-431d246bb460';
     // a6fb06b2-7146-42c0-820b-346a9d1e0539
@@ -259,37 +280,19 @@ const formatBooleanOptions = (options: [any]) => {
     return booleanTypeOptions.length > 0 ? booleanTypeOptions : newArray;
 };
 
-export const fetchSearchResult = async (
-    searchString: string,
-    searchType: string
-) => {
-    const searchBy = searchType === 'poll' ? 'searchByName' : 'searchByID';
+export const fetchSearchPoll = async (searchString: string) => {
     const authToken = getAuthorizationToken();
-    let newResponse;
 
-    // const searchBy = 'searchByName';
-    // searchString = 'polltest101';
-    searchType === 'poll'
-        ? (newResponse = await fetch(
-              `${getBackendUrl()}/api/poll/admin/${searchBy}/${searchString}`,
-              {
-                  headers: {
-                      'Content-Type': 'application/json',
-                      Accept: 'application/json',
-                      Authorization: `Bearer ${authToken}`
-                  }
-              }
-          ))
-        : (newResponse = await fetch(
-              `${getBackendUrl()}/api/user/searchByName/${searchString}`,
-              {
-                  headers: {
-                      'Content-Type': 'application/json',
-                      Accept: 'application/json',
-                      Authorization: `Bearer ${authToken}`
-                  }
-              }
-          ));
+    const newResponse = await fetch(
+        `${getBackendUrl()}/api/poll/admin/searchByName/${searchString}`,
+        {
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                Authorization: `Bearer ${authToken}`
+            }
+        }
+    );
 
     if (newResponse.status !== 200) {
         throw new Error('Request Failed');
@@ -321,24 +324,6 @@ export const deletePoll = async (pollId: string) => {
     return dataList;
 };
 
-export const deleteUser = async (userId: string) => {
-    const newResponse = await fetch(`${getBackendUrl()}/api/user/${userId}`, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-            Authorization: `Bearer ${getAuthorizationToken()}`
-        }
-    });
-
-    if (newResponse.status !== 200) {
-        throw new Error('Request Failed');
-    }
-
-    const dataList = await newResponse.json();
-
-    return dataList;
-};
 export const getEditPollData = async (privateId: string) => {
     const newResponse = await fetch(
         `${getBackendUrl()}/api/poll/admin/${privateId}`,
@@ -359,40 +344,6 @@ export const getEditPollData = async (privateId: string) => {
     return dataList;
 };
 
-export const updateUser = async (
-    userId: string,
-    username: string,
-    adminToggle: boolean,
-    newPassword: string
-) => {
-    const editedUserData =
-        newPassword === '' || newPassword.length < 6
-            ? {
-                  name: username,
-                  isAdmin: adminToggle
-              }
-            : {
-                  name: username,
-                  isAdmin: adminToggle,
-                  password: newPassword
-              };
-    const response = await fetch(`${getBackendUrl()}/api/user/${userId}`, {
-        method: 'PATCH',
-        body: JSON.stringify(editedUserData),
-        headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-            Authorization: `Bearer ${getAuthorizationToken()}`
-        }
-    });
-
-    if (response.status !== 200) {
-        throw new Error('Request Failed');
-    }
-
-    const responseJSON = await response.json();
-    return responseJSON;
-};
 export const editPoll = async (
     privateId: string,
     newName: string,

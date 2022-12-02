@@ -8,7 +8,7 @@ import {
     Button
 } from '@mui/material';
 import './AdminViewUserProfile.scss';
-import { updateUser } from '../services/pollAndUserService';
+import { updateUser } from '../services/userService';
 import BasicSnackbar from './BasicSnackbar';
 
 const AdminViewUser = (props: any) => {
