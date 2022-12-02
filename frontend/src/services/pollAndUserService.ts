@@ -61,12 +61,7 @@ export const createPoll = async (
     visualFlags: string
 ) => {
     const updatedQuestions = updatePollBody(questions);
-    const ownerData = localStorage.getItem('user');
-    let ownerId: string = '';
-    if (ownerData !== null) {
-        ownerId = JSON.parse(ownerData).id;
-    }
-    console.log(ownerId);
+
     const pollContent = {
         name: title,
         type: 'string',
