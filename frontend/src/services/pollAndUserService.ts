@@ -61,6 +61,12 @@ export const createPoll = async (
     visualFlags: string
 ) => {
     const updatedQuestions = updatePollBody(questions);
+    const ownerData = localStorage.getItem('user');
+    let ownerId: string = '';
+    if (ownerData !== null) {
+        ownerId = JSON.parse(ownerData).id;
+    }
+    console.log(ownerId);
     const pollContent = {
         name: title,
         type: 'string',
@@ -364,11 +370,17 @@ export const updateUser = async (
     adminToggle: boolean,
     newPassword: string
 ) => {
-    const editedUserData = {
-        name: username,
-        isAdmin: adminToggle,
-        password: newPassword
-    };
+    const editedUserData =
+        newPassword === '' || newPassword.length < 6
+            ? {
+                  name: username,
+                  isAdmin: adminToggle
+              }
+            : {
+                  name: username,
+                  isAdmin: adminToggle,
+                  password: newPassword
+              };
     const response = await fetch(`${getBackendUrl()}/api/user/${userId}`, {
         method: 'PATCH',
         body: JSON.stringify(editedUserData),
