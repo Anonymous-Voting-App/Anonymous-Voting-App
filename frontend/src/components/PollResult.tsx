@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Link, Typography } from '@mui/material';
 import './PollResult.scss';
-import { fetchPollResult } from '../services/pollAndUserService';
+import { fetchPollResult } from '../services/pollService';
 import ResultCard from './ResultCard';
 import { useParams } from 'react-router-dom';
 
