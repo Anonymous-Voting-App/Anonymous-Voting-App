@@ -421,3 +421,20 @@ export const editPoll = async (
 
     return data;
 };
+
+export const fetchAllPolls = async () => {
+    const newResponse = await fetch(`${getBackendUrl()}/api/poll`, {
+        headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+            Authorization: `Bearer ${token}`
+        }
+    });
+    if (newResponse.status !== 200) {
+        throw new Error('Request Failed');
+    }
+    const dataList = await newResponse.json();
+    console.log(dataList);
+
+    return dataList;
+};
