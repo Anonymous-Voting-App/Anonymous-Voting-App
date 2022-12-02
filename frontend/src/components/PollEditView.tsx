@@ -54,8 +54,7 @@ const PollEditView = () => {
         const voteToggleStatus =
             voteToggle === true ? 'showCount' : 'hideCount';
         editPoll(privateId, pollname, voteToggleStatus, ownerId)
-            .then((response) => {
-                console.log(response);
+            .then(() => {
                 const status = {
                     message: 'Data updated successfully',
                     severity: 'success'
@@ -65,7 +64,7 @@ const PollEditView = () => {
                     navigate('/admin');
                 }, 2000);
             })
-            .catch((error) => {
+            .catch(() => {
                 const status = {
                     message: 'Sorry update failed',
                     severity: 'error'
@@ -77,7 +76,6 @@ const PollEditView = () => {
     const getPollData = (id: string) => {
         getEditPollData(id)
             .then((response) => {
-                console.log(response);
                 setPollName(response.name);
                 setOnwnerName(response.owner.userName);
                 setOnwnerId(response.owner.id);
@@ -86,7 +84,6 @@ const PollEditView = () => {
                 setVoteToggle(toggle);
             })
             .catch((error) => {
-                // console.log(error);
                 const status = {
                     message: 'Sorry an error occured while fetching data',
                     severity: 'error'

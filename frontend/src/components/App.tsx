@@ -34,7 +34,6 @@ function App() {
             message: status.message,
             severity: status.severity
         });
-        console.log(status, 'notification data');
     };
 
     const handleClose = () => {

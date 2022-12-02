@@ -30,9 +30,7 @@ const AdminViewPoll = (props: any) => {
         // deletePoll(pollId).
         deletePoll(pollId)
             .then((response) => {
-                console.log(response.data);
                 if (response.success) {
-                    console.log('called');
                     props.showNotification({
                         severity: 'success',
                         message: 'Poll deleted successfully'
@@ -45,7 +43,6 @@ const AdminViewPoll = (props: any) => {
                 }
             })
             .catch((error) => {
-                console.log('console.log');
                 props.showNotification({
                     severity: 'error',
                     message: 'Error occured while deleting poll'
