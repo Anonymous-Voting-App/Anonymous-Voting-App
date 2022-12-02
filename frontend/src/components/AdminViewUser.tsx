@@ -20,9 +20,7 @@ const AdminViewPoll = (props: any) => {
     const handleDelete = (userId: string) => {
         // deletePoll(pollId).
         deleteUser(userId).then((response) => {
-            console.log(response.data);
             if (response.success) {
-                console.log('called');
                 props.showNotification({
                     severity: 'success',
                     message: 'User deleted successfully'

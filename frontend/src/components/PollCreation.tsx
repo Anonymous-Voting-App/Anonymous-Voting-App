@@ -188,7 +188,6 @@ function PollCreation(props: any) {
      * Function to handle the submit event
      */
     const submitHandler = () => {
-        console.log(questions, pollName, showCount);
         const countData = showCount ? 'showCount' : 'hideCount';
         createPoll(pollName, questions, countData)
             .then((response) => {
@@ -200,8 +199,7 @@ function PollCreation(props: any) {
                 });
                 navigate(`result/${response.publicId}`);
             })
-            .catch((error) => {
-                console.log(error);
+            .catch(() => {
                 props.showNotification({
                     severity: 'error',
                     message:

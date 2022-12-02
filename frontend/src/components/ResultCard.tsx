@@ -8,7 +8,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 const ResultCard = (props: any) => {
     const options: ResultOptionObj[] = props.ques.options;
-    // console.log(options)
+
     const fileType =
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
     const fileExtension = '.xlsx';
