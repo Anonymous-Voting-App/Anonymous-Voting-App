@@ -60,7 +60,6 @@ function Question(props: any) {
      * @param value
      */
     const onTypeChange = (value: string) => {
-        console.log(value);
         props.typeChangehandler(value, props.ind);
         if (value === 'radioBtn' || value === 'checkBox') {
             setShowOptionBtn(true);
@@ -118,7 +117,7 @@ function Question(props: any) {
 
     const removeQuestion = () => {
         props.questionRemovalHandler(props.ind);
-        // console.log(props, 'props after ques removal');
+
         setQuesOptions(props.ques.subQuestions);
         setShrink({ ...shrink, option: true });
         setNotched({ ...notched, option: true });

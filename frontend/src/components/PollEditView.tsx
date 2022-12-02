@@ -65,7 +65,7 @@ const PollEditView = () => {
                     navigate('/admin');
                 }, 2000);
             })
-            .catch((error) => {
+            .catch(() => {
                 const status = {
                     message: 'Sorry update failed',
                     severity: 'error'
@@ -77,7 +77,6 @@ const PollEditView = () => {
     const getPollData = (id: string) => {
         getEditPollData(id)
             .then((response) => {
-                console.log(response);
                 setPollName(response.name);
                 setOnwnerName(response.owner.userName);
                 setOnwnerId(response.owner.id);
@@ -85,8 +84,7 @@ const PollEditView = () => {
                     response.visualFlags[0] === 'showCount' ? true : false;
                 setVoteToggle(toggle);
             })
-            .catch((error) => {
-                // console.log(error);
+            .catch(() => {
                 const status = {
                     message: 'Sorry an error occured while fetching data',
                     severity: 'error'

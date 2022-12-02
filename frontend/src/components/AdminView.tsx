@@ -76,7 +76,7 @@ const AdminView = () => {
         // setShowSearchResults(true);
         if (searchBy === 'Poll name/ID') {
             const data = await fetchData(searchText, 'poll');
-            console.log(pollList);
+
             if (data.length > 0) {
                 setShowUserList(false);
                 setShowPollList(true);
@@ -92,7 +92,7 @@ const AdminView = () => {
             }
         } else {
             const data = await fetchData(searchText, 'user');
-            console.log(userList);
+
             if (data.length > 0) {
                 setShowUserList(true);
                 setShowPollList(false);
@@ -119,7 +119,6 @@ const AdminView = () => {
     const fetchData = (text: string, searchType: string) => {
         const searchResult = fetchSearchResult(text, searchType)
             .then((response: { data: string | any[] }) => {
-                console.log(response.data);
                 if (response.data.length > 0) {
                     setShowErrorMsg(false);
                     return response.data;
@@ -128,7 +127,6 @@ const AdminView = () => {
                 return [];
             })
             .catch((error) => {
-                console.log(error, 'No data');
                 setShowErrorMsg(true);
                 const status = {
                     message: 'Sorry no data found',

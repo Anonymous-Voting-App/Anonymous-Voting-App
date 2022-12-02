@@ -39,7 +39,6 @@ const AdminViewUser = (props: any) => {
         });
     };
     const handleUpdate = () => {
-        console.log(username, adminToggle, newPassword);
         updateUser(location.state.id, username, adminToggle, newPassword)
             .then((response) => {
                 const status = {
@@ -50,9 +49,8 @@ const AdminViewUser = (props: any) => {
                 setTimeout(() => {
                     navigate('/admin');
                 }, 2000);
-                console.log(response);
             })
-            .catch((error) => {
+            .catch(() => {
                 const status = {
                     message: 'Sorry update failed',
                     severity: 'error'
