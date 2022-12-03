@@ -24,7 +24,6 @@ const PollResult = (props: any) => {
 
         fetchPollResult(id)
             .then((response) => {
-                console.log(response);
                 setPollName(response.pollName);
                 setPollResult(response.questions);
                 setVoteStatus(response.voteCount);
