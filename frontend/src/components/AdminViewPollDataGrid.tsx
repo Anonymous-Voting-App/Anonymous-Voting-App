@@ -1,43 +1,41 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 import { Link } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { deletePoll } from '../services/pollService';
 import './AdminViewPollDataGrid.scss';
 const AdminViewPollDataGrid = (props: any) => {
-    console.log(props);
-    const [clickedRow, setClickedRow] = React.useState();
     const [pageSize, setPageSize] = React.useState<number>(5);
-    const [showMessage, setShowMessage] = useState(false);
 
     const navigate = useNavigate();
 
-    const handleResultView = (event: any, pollId: string) => {
+    const showSnackBar = (status: { severity: string; message: string }) => {
+        props.showNotification({
+            severity: status.severity,
+            message: status.message
+        });
+    };
+
+    const handleResultView = (pollId: string) => {
         navigate(`/result/${pollId}`);
     };
 
-    const handleEditView = (event: any, privateId: string) => {
-        console.log(privateId);
+    const handleEditView = (privateId: string) => {
         // PrivateID : bc1a638d-8c2b-4403-8f53-3b22e30e8b1e
         navigate(`/admin/polledit/${privateId}`);
     };
 
-    const onDelete = (event: any, row: any) => {
-        event.stopPropagation();
-        setClickedRow(row);
-    };
-
-    const handleDelete = (event: any, pollId: string) => {
+    const handleDelete = (pollId: string) => {
         // deletePoll(pollId).
         deletePoll(pollId)
             .then((response) => {
                 if (response.success) {
-                    props.showNotification({
+                    showSnackBar({
                         severity: 'success',
                         message: 'Poll deleted successfully'
                     });
                 } else {
-                    props.showNotification({
+                    showSnackBar({
                         severity: 'error',
                         message: 'Error occured while deleting poll'
                     });
@@ -54,11 +52,11 @@ const AdminViewPollDataGrid = (props: any) => {
     const handleCopyLink = async (event: any, pollId: string) => {
         const pollAnsweringUrl = `${window.location.origin}/result/${pollId}`;
         await navigator.clipboard.writeText(pollAnsweringUrl); //**currently copying result page link - to be replaced with answering url
-        setShowMessage(true);
-        //timer for link copied message
-        setTimeout(() => {
-            setShowMessage(false);
-        }, 400);
+        showSnackBar({
+            severity: 'success',
+            message: 'Link copied'
+        });
+
         event.stopPropagation();
     };
 
@@ -76,14 +74,14 @@ const AdminViewPollDataGrid = (props: any) => {
                         <Link
                             className="pinkLink"
                             onClick={(e) =>
-                                handleEditView(e, params.row.privateId)
+                                handleEditView(params.row.privateId)
                             }
                         >
                             Edit poll
                         </Link>
                         <Link
                             className="pinkLink"
-                            onClick={(e) => handleResultView(e, params.row.id)}
+                            onClick={(e) => handleResultView(params.row.id)}
                         >
                             View results
                         </Link>
@@ -95,7 +93,7 @@ const AdminViewPollDataGrid = (props: any) => {
                         </Link>
                         <Link
                             className="deleteLink"
-                            onClick={(e) => handleDelete(e, params.row.id)}
+                            onClick={(e) => handleDelete(params.row.id)}
                         >
                             Delete
                         </Link>

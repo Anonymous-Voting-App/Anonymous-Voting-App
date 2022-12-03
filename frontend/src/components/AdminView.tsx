@@ -13,7 +13,7 @@ import { KeyboardArrowDown } from '@mui/icons-material';
 import './AdminView.scss';
 import { fetchSearchPoll } from '../services/pollService';
 import { fetchSearchUser } from '../services/userService';
-import AdminViewPoll from './AdminViewPoll';
+// import AdminViewPoll from './AdminViewPoll';
 import AdminViewUser from './AdminViewUser';
 import BasicSnackbar from './BasicSnackbar';
 import AdminViewPollDataGrid from './AdminViewPollDataGrid';
@@ -211,6 +211,7 @@ const AdminView = () => {
                         // })
                         <AdminViewPollDataGrid
                             data={pollList}
+                            showNotification={handleNotification}
                         ></AdminViewPollDataGrid>
                     ) : null}
                     {showUserList
