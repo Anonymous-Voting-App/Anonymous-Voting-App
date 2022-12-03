@@ -16,6 +16,7 @@ function Login(props: any) {
         message: '',
         severity: ''
     });
+    const disableLogin = username.length === 0 || password.length < 6;
 
     const InputHandler = (value: string, index: string) => {
         index === '0' ? setUsername(value) : setPassword(value);
@@ -38,6 +39,8 @@ function Login(props: any) {
     };
 
     const handleLogin = () => {
+        // This is here to prevent sending of unnecessary
+        // guaranteed to fail calls to the API
         if (disableLogin) {
             return;
         }
@@ -64,9 +67,8 @@ function Login(props: any) {
         navigate('/register');
     };
 
-    const disableLogin = username.length === 0 || password.length < 6;
-
     useEffect(() => {
+        // Listen for 'Enter'-key
         const keyDownHandler = (event: any) => {
             if (event.key === 'Enter') {
                 event.preventDefault();
