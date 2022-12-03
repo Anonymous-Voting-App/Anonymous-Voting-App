@@ -1,7 +1,7 @@
 import Field from './Field';
 import './LoginAndRegister.scss';
 import { login } from '../services/loginAndRegisterService';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Typography, Button, Link } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import BasicSnackbar from './BasicSnackbar';
@@ -38,6 +38,10 @@ function Login(props: any) {
     };
 
     const handleLogin = () => {
+        if (disableLogin) {
+            return;
+        }
+
         login(username, password)
             .then((response: any) => {
                 localStorage.setItem('token', response.token);
@@ -59,6 +63,23 @@ function Login(props: any) {
     const handleRegisterClick = () => {
         navigate('/register');
     };
+
+    const disableLogin = username.length === 0 || password.length < 6;
+
+    useEffect(() => {
+        const keyDownHandler = (event: any) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                handleLogin();
+            }
+        };
+
+        document.addEventListener('keydown', keyDownHandler);
+
+        return () => {
+            document.removeEventListener('keydown', keyDownHandler);
+        };
+    });
 
     return (
         <div className="main-wrapper">
@@ -85,6 +106,7 @@ function Login(props: any) {
                     className="login-btn"
                     sx={{ mt: '4.5rem', width: 200 }}
                     variant="outlined"
+                    disabled={disableLogin}
                     onClick={handleLogin}
                 >
                     Login
