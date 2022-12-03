@@ -16,7 +16,7 @@ const PollEditView = () => {
         severity: ''
     });
     const navigate = useNavigate();
-    const { privateId } = useParams();
+    const privateId = useParams().pollId;
     console.log(privateId);
 
     useEffect(() => {

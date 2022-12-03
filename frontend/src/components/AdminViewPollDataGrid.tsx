@@ -41,8 +41,8 @@ const AdminViewPollDataGrid = (props: any) => {
                     });
                 }
             })
-            .catch((error) => {
-                props.showNotification({
+            .catch(() => {
+                showSnackBar({
                     severity: 'error',
                     message: 'Error occured while deleting poll'
                 });
@@ -93,7 +93,7 @@ const AdminViewPollDataGrid = (props: any) => {
                         </Link>
                         <Link
                             className="deleteLink"
-                            onClick={(e) => handleDelete(params.row.id)}
+                            onClick={(e) => handleDelete(params.row.privateId)}
                         >
                             Delete
                         </Link>
