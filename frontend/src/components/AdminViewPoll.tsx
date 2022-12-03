@@ -42,7 +42,7 @@ const AdminViewPoll = (props: any) => {
                     });
                 }
             })
-            .catch((error) => {
+            .catch(() => {
                 props.showNotification({
                     severity: 'error',
                     message: 'Error occured while deleting poll'
