@@ -101,7 +101,7 @@ jobs:
         name: Deploy frontend to staging environment
         needs: frontend-test
         runs-on: ubuntu-latest
-        environment: Staging
+        environment: Staging - Frontend
         permissions:
             id-token: write
             contents: read
@@ -240,7 +240,7 @@ jobs:
         name: Deploy backend to staging environment
         needs: backend-build-staging
         runs-on: ubuntu-latest
-        environment: Staging
+        environment: Staging - Backend
         permissions:
             id-token: write
             contents: read
@@ -293,7 +293,6 @@ jobs:
         name: Migrate changes to staging database
         needs: backend-build-staging
         runs-on: ubuntu-latest
-        environment: Staging
 
         defaults:
             run:

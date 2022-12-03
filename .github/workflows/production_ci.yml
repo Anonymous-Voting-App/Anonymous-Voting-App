@@ -100,7 +100,7 @@ jobs:
         name: Deploy frontend to production environment
         needs: frontend-test
         runs-on: ubuntu-latest
-        environment: Production
+        environment: Production - Frontend
         permissions:
             id-token: write
             contents: read
@@ -240,7 +240,7 @@ jobs:
         name: Deploy backend to production environment
         needs: backend-build-production
         runs-on: ubuntu-latest
-        environment: Production
+        environment: Production - Backend
         permissions:
             id-token: write
             contents: read
@@ -293,7 +293,6 @@ jobs:
         name: Migrate changes to production database
         needs: backend-build-production
         runs-on: ubuntu-latest
-        environment: Production
 
         defaults:
             run:
