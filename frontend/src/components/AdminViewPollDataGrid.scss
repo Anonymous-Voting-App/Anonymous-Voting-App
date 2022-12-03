@@ -1,0 +1,25 @@
+@import '../styles/colors';
+.dataGridWrapper {
+    height: 100%;
+    width: 50rem;
+}
+
+.actions-wrapper {
+    display: flex;
+    flex-direction: row;
+    gap: 1.75rem;
+    .pinkLink {
+        color: $lollipop;
+        text-decoration-color: $lollipop;
+        cursor: pointer;
+    }
+    .deleteLink {
+        color: $cancel-background-color;
+        text-decoration-color: none;
+        cursor: pointer;
+    }
+}
+
+.MuiDataGrid-columnHeaders {
+    background-color: $sand;
+}

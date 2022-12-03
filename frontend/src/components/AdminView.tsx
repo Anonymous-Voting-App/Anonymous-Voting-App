@@ -16,6 +16,7 @@ import { fetchSearchUser } from '../services/userService';
 import AdminViewPoll from './AdminViewPoll';
 import AdminViewUser from './AdminViewUser';
 import BasicSnackbar from './BasicSnackbar';
+import AdminViewPollDataGrid from './AdminViewPollDataGrid';
 
 // const TEST_USERS = ['Martti', 'user123'];
 
@@ -75,7 +76,7 @@ const AdminView = () => {
      */
     const handleSearchClick = async () => {
         // setShowSearchResults(true);
-        if (searchBy === 'Poll name/ID') {
+        if (searchBy === 'Poll name') {
             const data = await fetchData(searchText, 'poll');
 
             if (data.length > 0) {
@@ -164,8 +165,8 @@ const AdminView = () => {
                         value={searchBy}
                         onChange={handleTypeChange}
                     >
-                        <MenuItem value="Poll name/ID">Poll name/ID</MenuItem>
-                        <MenuItem value="User name/ID">User name/ID</MenuItem>
+                        <MenuItem value="Poll name">Poll name</MenuItem>
+                        <MenuItem value="User name">User name</MenuItem>
                     </Select>
                 </FormControl>
                 <TextField
@@ -197,18 +198,21 @@ const AdminView = () => {
                         </div>
                     ) : null}
 
-                    {showPollList
-                        ? pollList.map((poll: any) => {
-                              return (
-                                  <div key={poll.id}>
-                                      <AdminViewPoll
-                                          pollData={poll}
-                                          showNotification={handleNotification}
-                                      ></AdminViewPoll>
-                                  </div>
-                              );
-                          })
-                        : null}
+                    {showPollList ? (
+                        // pollList.map((poll: any) => {
+                        //     return (
+                        //         <div key={poll.id}>
+                        //             <AdminViewPoll
+                        //                 pollData={poll}
+                        //                 showNotification={handleNotification}
+                        //             ></AdminViewPoll>
+                        //         </div>
+                        //     );
+                        // })
+                        <AdminViewPollDataGrid
+                            data={pollList}
+                        ></AdminViewPollDataGrid>
+                    ) : null}
                     {showUserList
                         ? userList.map((user: any) => {
                               return (

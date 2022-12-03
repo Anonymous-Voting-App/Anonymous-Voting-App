@@ -17,6 +17,7 @@ const PollEditView = () => {
     });
     const navigate = useNavigate();
     const { privateId } = useParams();
+    console.log(privateId);
 
     useEffect(() => {
         getPollData(privateId ?? '');
