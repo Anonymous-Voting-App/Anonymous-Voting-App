@@ -68,17 +68,6 @@ const PollAnswering = (props: any) => {
     const [questionType, setQuestionType] = useState('Pick One');
     const [currentQuestion, setCurrentQuestion] = useState('1');
 
-    //const [questions, setQuestions] = useState([
-    //    {
-    //        title: '',
-    //        description: '',
-    //        type: '',
-    //        minAnswers: 1,
-    //        maxAnswers: 1,
-    //        subQuestions: [{ title: '', description: '', type: '' }]
-    //    }
-    //]);
-
     const handleNextClick = () => {
         NextQuestion();
     };
@@ -106,10 +95,10 @@ const PollAnswering = (props: any) => {
                     {showPickOne ? (
                         <div className="">
                             <Typography className="questionType" variant="h4">
-                                {questionType}
+                                {props.ques.type}
                             </Typography>
                             <Typography className="questionTitle">
-                                {question}
+                                {props.ques.title}
                             </Typography>
                             <div className="answerContainer">
                                 <FormControl>
@@ -138,7 +127,7 @@ const PollAnswering = (props: any) => {
                                     display="inline"
                                     id="question_num"
                                 >
-                                    {currentQuestion}
+                                    num
                                 </Typography>
                                 <Typography
                                     className="questionNumberText"
@@ -152,7 +141,7 @@ const PollAnswering = (props: any) => {
                                     display="inline"
                                     id="total_num"
                                 >
-                                    {pollSize}
+                                    num
                                 </Typography>
                                 <Typography
                                     className="questionNumberText"
@@ -168,10 +157,10 @@ const PollAnswering = (props: any) => {
                     {showMultiChoice ? (
                         <div className="">
                             <Typography className="questionType" variant="h4">
-                                {questionType}
+                                {props.ques.type}
                             </Typography>
                             <Typography className="questionTitle">
-                                {question}
+                                {props.ques.title}
                             </Typography>
                             <div className="answerContainer">
                                 <FormControl>
@@ -205,7 +194,7 @@ const PollAnswering = (props: any) => {
                                     display="inline"
                                     id="question_num"
                                 >
-                                    {currentQuestion}
+                                    num
                                 </Typography>
                                 <Typography className="" display="inline">
                                     {' '}
@@ -216,7 +205,7 @@ const PollAnswering = (props: any) => {
                                     display="inline"
                                     id="total_num"
                                 >
-                                    {pollSize}
+                                    num
                                 </Typography>
                                 <Typography className="" display="inline">
                                     {' '}
@@ -229,10 +218,10 @@ const PollAnswering = (props: any) => {
                     {showStartRating ? (
                         <div className="">
                             <Typography className="questionType" variant="h4">
-                                {questionType}
+                                {props.ques.type}
                             </Typography>
                             <Typography className="questionTitle">
-                                {question}
+                                {props.ques.title}
                             </Typography>
                             <div className="answerContainer">
                                 <FormControl>
@@ -248,7 +237,7 @@ const PollAnswering = (props: any) => {
                                     display="inline"
                                     id="question_num"
                                 >
-                                    {currentQuestion}
+                                    num
                                 </Typography>
                                 <Typography className="" display="inline">
                                     {' '}
@@ -259,7 +248,7 @@ const PollAnswering = (props: any) => {
                                     display="inline"
                                     id="total_num"
                                 >
-                                    {pollSize}
+                                    num
                                 </Typography>
                                 <Typography className="" display="inline">
                                     {' '}
@@ -272,10 +261,10 @@ const PollAnswering = (props: any) => {
                     {showFreeText ? (
                         <div className="">
                             <Typography className="questionType" variant="h4">
-                                {questionType}
+                                {props.ques.type}
                             </Typography>
                             <Typography className="questionTitle">
-                                {question}
+                                {props.ques.title}
                             </Typography>
                             <div className="answerContainer">
                                 <FormControl>
@@ -292,7 +281,7 @@ const PollAnswering = (props: any) => {
                                     display="inline"
                                     id="question_num"
                                 >
-                                    {currentQuestion}
+                                    num
                                 </Typography>
                                 <Typography className="" display="inline">
                                     {' '}
@@ -303,7 +292,7 @@ const PollAnswering = (props: any) => {
                                     display="inline"
                                     id="total_num"
                                 >
-                                    {pollSize}
+                                    num
                                 </Typography>
                                 <Typography className="" display="inline">
                                     {' '}
@@ -316,10 +305,10 @@ const PollAnswering = (props: any) => {
                     {showYesNo ? (
                         <div className="">
                             <Typography className="questionType" variant="h4">
-                                {questionType}
+                                {props.ques.type}
                             </Typography>
                             <Typography className="questionTitle">
-                                {question}
+                                {props.ques.title}
                             </Typography>
                             <div className="buttonsContainer">
                                 <Button className="yesnoButton">Yes</Button>
@@ -331,7 +320,7 @@ const PollAnswering = (props: any) => {
                                     display="inline"
                                     id="question_num"
                                 >
-                                    {currentQuestion}
+                                    num
                                 </Typography>
                                 <Typography className="" display="inline">
                                     {' '}
@@ -342,7 +331,7 @@ const PollAnswering = (props: any) => {
                                     display="inline"
                                     id="total_num"
                                 >
-                                    {pollSize}
+                                    num
                                 </Typography>
                                 <Typography className="" display="inline">
                                     {' '}
@@ -355,10 +344,10 @@ const PollAnswering = (props: any) => {
                     {showThumbsUpDown ? (
                         <div className="">
                             <Typography className="questionType" variant="h4">
-                                {questionType}
+                                {props.ques.type}
                             </Typography>
                             <Typography className="questionTitle">
-                                {question}
+                                {props.ques.title}
                             </Typography>
                             <div className="answerContainer">
                                 <FormControl>
@@ -378,7 +367,7 @@ const PollAnswering = (props: any) => {
                                     display="inline"
                                     id="question_num"
                                 >
-                                    {currentQuestion}
+                                    num
                                 </Typography>
                                 <Typography className="" display="inline">
                                     {' '}
@@ -389,7 +378,7 @@ const PollAnswering = (props: any) => {
                                     display="inline"
                                     id="total_num"
                                 >
-                                    {pollSize}
+                                    num
                                 </Typography>
                                 <Typography className="" display="inline">
                                     {' '}
