@@ -55,12 +55,31 @@ const PollAnswering = (props: any) => {
         console.log('fetchPoll');
     };
 
+    const setQuesType = (type: string) => {
+        switch (type) {
+            case 'checkBox':
+                return 'Multi-choice';
+            case 'radioBtn':
+                return 'Pick one';
+            case 'star':
+                return 'Star rating';
+            case 'free':
+                return 'Free text';
+            case 'yesNo':
+                return 'Yes/No';
+            case 'upDown':
+                return 'Thumbs Up/Down';
+            default:
+                return 'Pick One';
+        }
+    };
+
     const [showPickOne, setshowPickOne] = useState(true);
     const [showMultiChoice, setshowMultiChoice] = useState(false);
     const [showStartRating, setsshowStartRating] = useState(false);
     const [showFreeText, setsshowFreeText] = useState(false);
     const [showYesNo, setsshowYesNo] = useState(false);
-    const [showThumbsUpDown, setsshowThumbsUpDown] = useState(true);
+    const [showThumbsUpDown, setsshowThumbsUpDown] = useState(false);
 
     const [showNext, setsshowNext] = useState(true);
     const [showSubmit, setshowSubmit] = useState(false);
@@ -90,15 +109,15 @@ const PollAnswering = (props: any) => {
 
     return (
         <Container>
-            {pollQuestions.map((question, index) => (
+            {pollQuestions.map((question: any, index: any) => (
                 <div key={index}>
                     {showPickOne ? (
                         <div className="">
                             <Typography className="questionType" variant="h4">
-                                {props.ques.type}
+                                {setQuesType(question.type)}
                             </Typography>
                             <Typography className="questionTitle">
-                                {props.ques.title}
+                                {question.title}
                             </Typography>
                             <div className="answerContainer">
                                 <FormControl>
@@ -106,17 +125,17 @@ const PollAnswering = (props: any) => {
                                         <FormControlLabel
                                             value="option1"
                                             control={<Radio />}
-                                            label="Pizza"
+                                            label={question.option}
                                         />
                                         <FormControlLabel
                                             value="option2"
                                             control={<Radio />}
-                                            label="Burger"
+                                            label={question.option}
                                         />
                                         <FormControlLabel
                                             value="option3"
                                             control={<Radio />}
-                                            label="Pasta"
+                                            label={question.option}
                                         />
                                     </RadioGroup>
                                 </FormControl>
@@ -141,7 +160,7 @@ const PollAnswering = (props: any) => {
                                     display="inline"
                                     id="total_num"
                                 >
-                                    num
+                                    {question.count}
                                 </Typography>
                                 <Typography
                                     className="questionNumberText"
@@ -157,10 +176,10 @@ const PollAnswering = (props: any) => {
                     {showMultiChoice ? (
                         <div className="">
                             <Typography className="questionType" variant="h4">
-                                {props.ques.type}
+                                {question.type}
                             </Typography>
                             <Typography className="questionTitle">
-                                {props.ques.title}
+                                {question.title}
                             </Typography>
                             <div className="answerContainer">
                                 <FormControl>
@@ -218,10 +237,10 @@ const PollAnswering = (props: any) => {
                     {showStartRating ? (
                         <div className="">
                             <Typography className="questionType" variant="h4">
-                                {props.ques.type}
+                                {question.type}
                             </Typography>
                             <Typography className="questionTitle">
-                                {props.ques.title}
+                                {question.title}
                             </Typography>
                             <div className="answerContainer">
                                 <FormControl>
@@ -261,10 +280,10 @@ const PollAnswering = (props: any) => {
                     {showFreeText ? (
                         <div className="">
                             <Typography className="questionType" variant="h4">
-                                {props.ques.type}
+                                {question.type}
                             </Typography>
                             <Typography className="questionTitle">
-                                {props.ques.title}
+                                {question.title}
                             </Typography>
                             <div className="answerContainer">
                                 <FormControl>
@@ -305,10 +324,10 @@ const PollAnswering = (props: any) => {
                     {showYesNo ? (
                         <div className="">
                             <Typography className="questionType" variant="h4">
-                                {props.ques.type}
+                                {question.type}
                             </Typography>
                             <Typography className="questionTitle">
-                                {props.ques.title}
+                                {question.title}
                             </Typography>
                             <div className="buttonsContainer">
                                 <Button className="yesnoButton">Yes</Button>
@@ -344,10 +363,10 @@ const PollAnswering = (props: any) => {
                     {showThumbsUpDown ? (
                         <div className="">
                             <Typography className="questionType" variant="h4">
-                                {props.ques.type}
+                                {question.type}
                             </Typography>
                             <Typography className="questionTitle">
-                                {props.ques.title}
+                                {question.title}
                             </Typography>
                             <div className="answerContainer">
                                 <FormControl>
