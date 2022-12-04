@@ -1,0 +1,103 @@
+@import '../styles/colors';
+
+@mixin for-phone-only {
+    @media (max-width: 599px) {
+        @content;
+    }
+}
+
+.MuiContainer-root {
+    margin-top: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.questionType {
+    margin-top: -7px;
+    padding-top: 80px;
+    font-weight: 600;
+}
+
+.questionTitle {
+    padding-top: 80px;
+    font-size: 40px;
+}
+
+.answerContainer {
+    margin-top: 30px;
+}
+
+.questionPage {
+    padding-top: 105px;
+}
+
+.buttonsContainer {
+    display: flex;
+    justify-content: center;
+    gap: 48px;
+}
+
+.thumbsContainer {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    gap: 48px;
+}
+
+.starContainer {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+}
+
+.questionNumber {
+    justify-content: center;
+    padding-top: 30px;
+}
+
+.questionNumberText {
+    font-size: 1rem;
+}
+
+.button {
+    margin-top: 52px;
+    border-radius: 20px;
+    width: 16.25rem;
+    color: $main-color;
+    font-weight: bold;
+    text-transform: none;
+    background-color: $melon;
+    border: 2px solid $main-color;
+    gap: 10px;
+    @include for-phone-only {
+        font-size: 2.5rem;
+    }
+}
+.yesnoButton {
+    margin-top: 52px;
+    border-radius: 20px;
+    width: 16.25rem;
+    color: $main-color;
+    font-weight: bold;
+    text-transform: none;
+    background-color: $sand;
+    border: 2px solid $main-color;
+    gap: 10px;
+    @include for-phone-only {
+        font-size: 2.5rem;
+    }
+}
+
+.previousQuestionButton,
+.previousQuestionButton:hover {
+    @extend .button;
+    background-color: $melon;
+}
+
+.nextQuestionButton,
+.nextQuestionButton:hover {
+    @extend .button;
+    background-color: $mint;
+}
