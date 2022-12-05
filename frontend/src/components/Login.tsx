@@ -1,7 +1,7 @@
 import Field from './Field';
 import './LoginAndRegister.scss';
 import { login } from '../services/loginAndRegisterService';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Typography, Button, Link } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import BasicSnackbar from './BasicSnackbar';
@@ -16,6 +16,7 @@ function Login(props: any) {
         message: '',
         severity: ''
     });
+    const disableLogin = username.length === 0 || password.length < 6;
 
     const InputHandler = (value: string, index: string) => {
         index === '0' ? setUsername(value) : setPassword(value);
@@ -38,6 +39,12 @@ function Login(props: any) {
     };
 
     const handleLogin = () => {
+        // This is here to prevent sending of unnecessary
+        // guaranteed to fail calls to the API
+        if (disableLogin) {
+            return;
+        }
+
         login(username, password)
             .then((response: any) => {
                 localStorage.setItem('token', response.token);
@@ -59,6 +66,22 @@ function Login(props: any) {
     const handleRegisterClick = () => {
         navigate('/register');
     };
+
+    useEffect(() => {
+        // Listen for 'Enter'-key
+        const keyDownHandler = (event: any) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                handleLogin();
+            }
+        };
+
+        document.addEventListener('keydown', keyDownHandler);
+
+        return () => {
+            document.removeEventListener('keydown', keyDownHandler);
+        };
+    });
 
     return (
         <div className="main-wrapper">
@@ -85,6 +108,7 @@ function Login(props: any) {
                     className="login-btn"
                     sx={{ mt: '4.5rem', width: 200 }}
                     variant="outlined"
+                    disabled={disableLogin}
                     onClick={handleLogin}
                 >
                     Login
