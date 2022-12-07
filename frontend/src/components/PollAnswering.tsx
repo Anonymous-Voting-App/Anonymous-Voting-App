@@ -96,13 +96,13 @@ const PollAnswering = (props: any) => {
     const NextQuestion = () => {
         console.log('Next');
         setCurrentIndex((currentIndex) => currentIndex + 1);
-        setCurrentQuestion(pollQuestions[currentIndex]);
+        setCurrentQuestion(pollQuestions[currentIndex + 1]);
     };
 
     const PreviousQuestion = () => {
         console.log('Previous');
         setCurrentIndex((currentIndex) => currentIndex - 1);
-        setCurrentQuestion(pollQuestions[currentIndex]);
+        setCurrentQuestion(pollQuestions[currentIndex - 1]);
     };
 
     return (
