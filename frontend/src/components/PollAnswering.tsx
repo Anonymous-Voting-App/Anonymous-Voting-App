@@ -20,14 +20,14 @@ import { ArrowBack, ArrowForward } from '@mui/icons-material';
 import { useParams } from 'react-router-dom';
 
 const PollAnswering = (props: any) => {
+    const { pollId } = useParams();
+
     const [pollName, setPollName] = useState('');
     const [currentQuestion, setCurrentQuestion] = useState<any>({});
     const [currentIndex, setCurrentIndex] = useState(0);
     const [pollQuestions, setQuestions] = useState<any>([]);
-    const { pollId } = useParams();
     const [showMessage, setShowMessage] = useState(false);
     const [voteStatus, setVoteStatus] = useState('hideVote');
-
     const [pollSize, setPollSize] = useState(0);
 
     useEffect(() => {
@@ -101,6 +101,8 @@ const PollAnswering = (props: any) => {
 
     const PreviousQuestion = () => {
         console.log('Previous');
+        setCurrentIndex((currentIndex) => currentIndex - 1);
+        setCurrentQuestion(pollQuestions[currentIndex]);
     };
 
     return (

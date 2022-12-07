@@ -34,8 +34,58 @@ const PollAnsweringComponent = (props: any) => {
     const [showYesNo, setsshowYesNo] = useState(false);
     const [showThumbsUpDown, setsshowThumbsUpDown] = useState(false);
 
+    const [currentQuestionAnswer, setCurrentQuestionAnswer] = useState<any[]>(
+        []
+    );
+    const [questionAnswers, setQuestionAnswers] = useState<any[]>([]);
+
+    const handleQuestionAnswer = (questionNumber: number, answer: any) => {
+        if (questionNumber === questionAnswers.length) {
+            questionAnswers.pop(); // Change question answer
+        }
+
+        // Push answer of the question to the questionAnswers array
+        setQuestionAnswers((answers: any[]) => [...answers, answer]);
+    };
+
+    const handleMultiChoiseQuestionAnswer = (
+        questionNumber: number,
+        option: any
+    ) => {
+        if (questionNumber === questionAnswers.length) {
+            questionAnswers.pop(); // Change question answer
+        }
+
+        if (currentQuestionAnswer.includes(option)) {
+            const index = currentQuestionAnswer.indexOf(option);
+            if (index > -1) {
+                currentQuestionAnswer.splice(index, 1); // Uncheck option
+            }
+        }
+
+        // Push selected options of the question to the currentQuestionAnswer array
+        setCurrentQuestionAnswer((options: any[]) => [...options, option]);
+
+        console.log(currentQuestionAnswer);
+
+        // Push answer of the question to the questionAnswers array
+        setQuestionAnswers((answers: any[]) => [
+            ...answers,
+            currentQuestionAnswer
+        ]);
+    };
+
+    console.log(
+        'answer of question',
+        props.index + 1 + ':',
+        questionAnswers[props.index]
+    );
+
+    console.log('all answers:', questionAnswers);
+
     return (
         <Container>
+            {/* MULTI-CHOIE */}
             {props.questions.type === 'checkBox' ? (
                 <div className="">
                     <Typography className="questionTitle">
@@ -43,11 +93,20 @@ const PollAnsweringComponent = (props: any) => {
                     </Typography>
                     <div className="answerContainer">
                         <FormControl>
-                            {/*replace keys with unique values*/}
                             {props.questions.options.map((option: any) => (
-                                <RadioGroup name="answer" key="option.title">
+                                <RadioGroup
+                                    name="answer"
+                                    key={option.title}
+                                    value={questionAnswers[props.index]}
+                                    onClick={() =>
+                                        handleMultiChoiseQuestionAnswer(
+                                            props.index + 1,
+                                            option.title
+                                        )
+                                    }
+                                >
                                     <FormControlLabel
-                                        value="option.title"
+                                        value={option.title}
                                         control={<Checkbox />}
                                         label={option.title}
                                     />
@@ -57,6 +116,7 @@ const PollAnsweringComponent = (props: any) => {
                     </div>
                 </div>
             ) : null}
+            {/* PICK ONE */}
             {props.questions.type === 'radioBtn' ? (
                 <div className="">
                     <Typography className="questionTitle">
@@ -65,11 +125,21 @@ const PollAnsweringComponent = (props: any) => {
                     <div className="answerContainer">
                         <FormControl>
                             {props.questions.options.map((option: any) => (
-                                <RadioGroup name="answer" key="option.title">
+                                <RadioGroup
+                                    name="answer"
+                                    key={option.title}
+                                    value={questionAnswers[props.index]}
+                                    onChange={() =>
+                                        handleQuestionAnswer(
+                                            props.index + 1,
+                                            option.title
+                                        )
+                                    }
+                                >
                                     <FormControlLabel
-                                        value="option3"
+                                        value={option.title}
                                         control={<Radio />}
-                                        label="Label"
+                                        label={option.title}
                                     />
                                 </RadioGroup>
                             ))}
@@ -78,6 +148,7 @@ const PollAnsweringComponent = (props: any) => {
                 </div>
             ) : null}
             {/*other types need to be added and I didn't test the pick one*/}
+            {/* n of questions */}
             <div className="questionNumber">
                 <Typography
                     className="questionNumberText"
