@@ -582,19 +582,16 @@
                 "type": "object",
                 "properties": {
                     "name": {
-                        "type": "string",
-                        "required": false
+                        "type": "string"
                     },
                     "owner": {
-                        "type": "string",
-                        "required": false
+                        "type": "string"
                     },
                     "visualFlags": {
                         "type": "array",
                         "items": {
                             "type": "string"
-                        },
-                        "required": false
+                        }
                     }
                 }
             },
