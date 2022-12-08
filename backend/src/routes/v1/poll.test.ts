@@ -8,6 +8,12 @@ import {
     spawn
 } from 'child_process';
 
+const admin = {
+    name: 'admin',
+    password: '123456',
+    id: '68e83b78-b6ec-432b-a3a8-6caf2feb0149'
+};
+
 jest.setTimeout(60000);
 
 describe.skip('integration tests for poll api', () => {
@@ -70,10 +76,9 @@ describe.skip('integration tests for poll api', () => {
         });
     });
 
-    test('create poll successfully', (resolve) => {
-        loginAsCreator().then((token) => {
-            let command = `curl -i -X POST -H "Authorization: Bearer ${token}" 
-                -H "Content-Type: application/json" -d "{
+    describe('poll creation', () => {
+        const commandWithoutAuthHeader = `
+            -H "Content-Type: application/json" -d "{
                 \\"name\\": \\"testPoll1\\", 
                 \\"type\\": \\"testType\\", 
                 \\"questions\\": [ 
@@ -117,14 +122,43 @@ describe.skip('integration tests for poll api', () => {
                         \\"description\\": \\"questionDescription\\", 
                         \\"type\\": \\"boolean\\"
                     }
-                ], 
-                \\"owner\\": { 
-                    \\"accountId\\": \\"1eb1cfae-09e7-4456-85cd-e2edfff80544\\", 
-                    \\"ip\\": \\"123\\", 
-                    \\"cookie\\": \\"c123\\" 
-                },
+                ],
                 \\"visualFlags\\": [\\"test1\\", \\"test2\\"] 
             }" http://localhost:8080/api/poll`;
+
+        test('create poll successfully while logged in', (resolve) => {
+            loginAsCreator().then((token) => {
+                let command =
+                    `curl -i -X POST -H "Authorization: Bearer ${token}" ` +
+                    commandWithoutAuthHeader;
+
+                command = formatMultiLineCommandForConsole(command);
+
+                console.log(command);
+
+                exec(command, async (err, stdout) => {
+                    if (err) {
+                        throw err;
+                    }
+
+                    const resultJson = extractJson(stdout);
+
+                    console.log(resultJson);
+
+                    const poll: IPolling.PollData = JSON.parse(resultJson);
+
+                    checkUneditedPrivatePoll(poll);
+
+                    // Save poll into global for further tests.
+                    createdPoll = poll;
+
+                    resolve();
+                });
+            });
+        });
+
+        test('create poll successfully without being logged in', (resolve) => {
+            let command = `curl -i -X POST ` + commandWithoutAuthHeader;
 
             command = formatMultiLineCommandForConsole(command);
 
@@ -141,19 +175,16 @@ describe.skip('integration tests for poll api', () => {
 
                 const poll: IPolling.PollData = JSON.parse(resultJson);
 
-                checkUneditedPrivatePoll(poll);
-
-                // Save poll into global for further tests.
-                createdPoll = poll;
+                checkUneditedPrivatePoll(poll, false, true);
 
                 resolve();
-                console.log('ended create poll test');
             });
         });
     });
 
     test('answer poll successfully', (resolve) => {
         const command = answerPollCommand();
+        console.log(command);
 
         exec(command, handleAnswerResponse.bind(null, resolve));
     });
@@ -195,28 +226,6 @@ describe.skip('integration tests for poll api', () => {
             }
         );
     });
-
-    // Disabled because we don't use this api call
-    // so maintaining tests for it is useless extra work.
-    // - Joonas Halinen 22.11.2022
-    /* describe('get public poll answers', () => {
-        test('get poll answers with public id', (resolve) => {
-            exec(
-                `curl -i -X GET http://localhost:8080/api/poll/${createdPoll.publicId}/answers`,
-                (err, stdout) => {
-                    if (err) {
-                        throw err;
-                    }
-
-                    const resultJson = extractJson(stdout);
-
-                    checkAnswers(JSON.parse(resultJson));
-
-                    resolve();
-                }
-            );
-        });
-    }); */
 
     test('get poll results with public id', (resolve) => {
         exec(
@@ -273,7 +282,7 @@ describe.skip('integration tests for poll api', () => {
                 curl -i -X PATCH -H "Authorization: Bearer ${token}"
                 -H "Content-Type: application/json" -d "{
                 \\"name\\": \\"changed-name\\", 
-                \\"owner\\": \\"c236207a-f48d-4aca-b2be-a75c496dee3d\\",
+                \\"owner\\": \\"${admin.id}\\",
                 \\"visualFlags\\": [\\"changed-flag\\"] 
             }" http://localhost:8080/api/poll/admin/${createdPoll.privateId}`;
 
@@ -372,7 +381,7 @@ describe.skip('integration tests for poll api', () => {
     }
 
     async function loginAsAdmin() {
-        return loginAs('admin', '123456');
+        return loginAs(admin.name, admin.password);
     }
 
     async function loginAs(userName: string, password: string) {
@@ -402,12 +411,26 @@ describe.skip('integration tests for poll api', () => {
         });
     }
 
+    function sortQuestions(questions: Array<{ type: string }>) {
+        type Typed = { type: string };
+
+        questions.sort((elem1: Typed, elem2: Typed) => {
+            if (elem1.type < elem2.type) {
+                return -1;
+            } else if (elem1.type == elem2.type) {
+                return 0;
+            } else {
+                return 1;
+            }
+        });
+    }
+
     function answerPollCommand() {
         const multiQuestion = createdPoll
-            .questions[0] as IPolling.MultiQuestionData;
-        const scaleQuestion = createdPoll.questions[1];
+            .questions[1] as IPolling.MultiQuestionData;
+        const scaleQuestion = createdPoll.questions[3];
         const numberQuestion = createdPoll.questions[2];
-        const booleanQuestion = createdPoll.questions[3];
+        const booleanQuestion = createdPoll.questions[0];
 
         let command = `curl -i -X POST -H "Content-Type: application/json" -d "{
             \\"publicId\\": \\"${createdPoll.publicId}\\", 
@@ -489,11 +512,13 @@ describe.skip('integration tests for poll api', () => {
 
             console.log('Found poll: ' + poll.name + ', ' + poll.id);
             expect(poll.name.includes(searchText)).toBe(true);
-            expect(typeof poll.owner).toBe('object');
-            expect(
-                (poll.owner as { userName: string }).userName.length > 0
-            ).toBe(true);
-            expect((poll.owner as { id: string }).id.length > 0).toBe(true);
+
+            if (typeof poll.owner === 'object' && poll.owner !== null) {
+                expect(
+                    (poll.owner as { userName: string }).userName.length > 0
+                ).toBe(true);
+                expect((poll.owner as { id: string }).id.length > 0).toBe(true);
+            }
         }
     }
 
@@ -645,20 +670,25 @@ describe.skip('integration tests for poll api', () => {
 
     function checkUneditedPrivatePoll(
         poll: IPolling.PollData,
-        omitQuestions = false
+        omitQuestions = false,
+        omitCreator = false
     ) {
-        expect(poll.owner).toEqual({
-            id: '28617090-09df-4869-b3a0-cec3ae324aed',
-            userName: 'test-poll-creator'
-        });
+        if (!omitCreator) {
+            expect(poll.owner).toEqual({
+                id: '28617090-09df-4869-b3a0-cec3ae324aed',
+                userName: 'test-poll-creator'
+            });
+        }
+
         checkUneditedPublicPoll(poll, omitQuestions);
     }
 
+    // For checking as admin
     function checkEditedPrivatePoll(poll: IPolling.PollData) {
         checkEditedPublicPoll(poll);
         expect(poll.owner).toEqual({
-            id: 'c236207a-f48d-4aca-b2be-a75c496dee3d',
-            userName: 'admin'
+            id: admin.id,
+            userName: admin.name
         });
     }
 
@@ -680,16 +710,18 @@ describe.skip('integration tests for poll api', () => {
     }
 
     function checkPublicPoll(poll: IPolling.PollData) {
+        sortQuestions(poll.questions);
+
         expect(poll.id.length > 0).toBe(true);
         expect(poll.questions.length).toBe(4);
 
         checkMultiQuestion(
-            poll.questions[0] as IPolling.MultiQuestionData,
+            poll.questions[1] as IPolling.MultiQuestionData,
             poll
         );
-        checkScaleQuestion(poll.questions[1], poll);
+        checkScaleQuestion(poll.questions[3], poll);
         checkNumberQuestion(poll.questions[2], poll);
-        checkBooleanQuestion(poll.questions[3], poll);
+        checkBooleanQuestion(poll.questions[0], poll);
     }
 
     function checkMultiQuestion(

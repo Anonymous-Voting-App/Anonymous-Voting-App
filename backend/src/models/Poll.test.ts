@@ -9,9 +9,11 @@ import {
     Question as PrismaQuestion,
     Option as PrismaOption,
     Vote as PrismaVote,
-    User as PrismaUser
+    User as PrismaUser,
+    PrismaClient
 } from '@prisma/client';
 import Fingerprint from './user/Fingerprint';
+import { AssertionError } from 'assert';
 
 describe('Poll', () => {
     beforeEach(() => {
@@ -393,6 +395,7 @@ describe('Poll', () => {
             const poll = new Poll(prismaMock, new QuestionFactory(prismaMock));
 
             poll.setId('1');
+            poll.setLoadedFromDatabase(true);
 
             const newDbObj = {
                 name: 'test',
@@ -412,6 +415,71 @@ describe('Poll', () => {
                 where: { id: '1' },
                 data: newDbObj
             });
+        });
+    });
+
+    describe('updateFromEditRequest', () => {
+        const poll = new Poll(prismaMock, new QuestionFactory(prismaMock));
+        poll.setLoadedFromDatabase(true);
+        poll.setPrivateId('Private id');
+        poll.setPublicId('Public id');
+
+        test('queries database with updated poll data', async () => {
+            // Mock the `update` method of the Prisma database client
+            const updateMock = jest.fn();
+            poll._database = {
+                poll: { update: updateMock }
+            } as unknown as PrismaClient;
+
+            const editRequest = {
+                privateId: 'Private id',
+                name: 'New poll name'
+            };
+            await poll.updateFromEditRequest(editRequest);
+
+            // Verify that the `update` method of the database client was called
+            // with the updated poll data
+            expect(updateMock).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    data: expect.objectContaining({
+                        name: 'New poll name'
+                    }),
+                    where: { id: poll.id() }
+                })
+            );
+
+            expect(poll.name()).toBe('New poll name');
+        });
+
+        test('throws error if poll is not loaded from database', async () => {
+            const editRequest = {
+                privateId: 'Private id',
+                name: 'New poll name',
+                type: 'New poll type'
+            };
+            poll.setLoadedFromDatabase(false);
+
+            try {
+                await poll.updateFromEditRequest(editRequest);
+
+                expect(true).toBe(false);
+            } catch (e) {
+                if (e instanceof AssertionError) {
+                    expect(e.message).toBe('is loaded from database');
+                } else {
+                    expect(true).toBe(false);
+                }
+            }
+        });
+
+        test('does not update poll name if not provided in edit request', async () => {
+            const editRequest = {
+                privateId: 'Private id',
+                type: 'New poll type'
+            };
+            poll.setName('Original poll name');
+
+            expect(poll.name()).toBe('Original poll name');
         });
     });
 
