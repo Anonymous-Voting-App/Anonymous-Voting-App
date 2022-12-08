@@ -23,7 +23,7 @@ interface SuccessObject {
 
 jest.setTimeout(60000);
 
-describe.skip('integration tests for user api commands', () => {
+describe('integration tests for user api commands', () => {
     // Global object with the created user's info
     // shared by several tests. Instantiated
     // by the login test.

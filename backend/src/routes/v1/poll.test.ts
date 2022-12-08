@@ -678,12 +678,14 @@ describe('integration tests for poll api', () => {
                 userName: 'test-poll-creator'
             });
         }
+        expect(( poll.id as string ).length > 0).toBe(true);
 
         checkUneditedPublicPoll(poll, omitQuestions);
     }
 
     // For checking as admin
     function checkEditedPrivatePoll(poll: IPolling.PollData) {
+        expect(( poll.id as string ).length > 0).toBe(true);
         checkEditedPublicPoll(poll);
         expect(poll.owner).toEqual({
             id: admin.id,
@@ -711,7 +713,6 @@ describe('integration tests for poll api', () => {
     function checkPublicPoll(poll: IPolling.PollData) {
         sortQuestions(poll.questions);
 
-        expect(poll.id.length > 0).toBe(true);
         expect(poll.questions.length).toBe(4);
 
         checkMultiQuestion(
@@ -775,7 +776,6 @@ describe('integration tests for poll api', () => {
         visualType?: string
     ) {
         expect(question.id.length > 0).toBe(true);
-        expect(question.pollId).toBe(poll.id);
         expect(question.type).toBe(type);
         expect(question.visualType).toBe(
             typeof visualType === 'string' ? visualType : 'default'

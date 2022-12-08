@@ -863,7 +863,6 @@ export default class Poll
             privateId: this.privateId(),
             type: this.type(),
             questions: this.questionsDataObjs(),
-            answers: this.answersDataObjs(),
             visualFlags: this.visualFlags()
         };
 
@@ -881,7 +880,6 @@ export default class Poll
      */
     publicDataObj(): IPolling.PollData {
         const result: IPolling.PollData = {
-            id: this.id(),
             name: this.name(),
             publicId: this.publicId(),
             type: this.type(),
