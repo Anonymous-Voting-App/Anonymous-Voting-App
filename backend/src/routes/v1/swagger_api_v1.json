@@ -600,117 +600,117 @@
             "AddPoll": {
                 "type": "object",
                 "properties": {
-                  "name": {
-                    "type": "string",
-                    "description": "The name of the poll."
-                  },
-                  "type": {
-                    "type": "string",
-                    "description": "The type of the poll (currently unused)."
-                  },
-                  "questions": {
-                    "type": "array",
-                    "description": "An array of questions for the poll.",
-                    "items": {
-                      "$ref": "#/components/schemas/Question"
+                    "name": {
+                        "type": "string",
+                        "description": "The name of the poll."
+                    },
+                    "type": {
+                        "type": "string",
+                        "description": "The type of the poll (currently unused)."
+                    },
+                    "questions": {
+                        "type": "array",
+                        "description": "An array of questions for the poll.",
+                        "items": {
+                            "$ref": "#/components/schemas/Question"
+                        }
+                    },
+                    "visualFlags": {
+                        "type": "array",
+                        "description": "An array of visual flags for the poll.",
+                        "items": {
+                            "type": "string"
+                        }
                     }
-                  },
-                  "visualFlags": {
-                    "type": "array",
-                    "description": "An array of visual flags for the poll.",
-                    "items": {
-                      "type": "string"
-                    }
-                  }
                 }
-              },
-              "Question": {
+            },
+            "Question": {
                 "type": "object",
                 "properties": {
-                  "id": {
+                    "id": {
                         "type": "string",
                         "description": "Id of the question (present only for existing question, should not be given when sending question request)."
-                  },
-                  "title": {
-                    "type": "string",
-                    "description": "The title of the question."
-                  },
-                  "description": {
-                    "type": "string",
-                    "description": "The description of the question."
-                  },
-                  "type": {
-                    "$ref": "#/components/schemas/QuestionType"
-                  },
-                  "minAnswers": {
-                    "type": "number",
-                    "description": "The minimum number of answers required for a multi-choice question."
-                  },
-                  "maxAnswers": {
-                    "type": "number",
-                    "description": "The maximum number of answers allowed for a multi-choice question."
-                  },
-                  "subQuestions": {
-                    "type": "array",
-                    "description": "An array of sub-questions for a multi-choice question.",
-                    "items": {
-                      "$ref": "#/components/schemas/SubQuestion"
+                    },
+                    "title": {
+                        "type": "string",
+                        "description": "The title of the question."
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "The description of the question."
+                    },
+                    "type": {
+                        "$ref": "#/components/schemas/QuestionType"
+                    },
+                    "minAnswers": {
+                        "type": "number",
+                        "description": "The minimum number of answers required for a multi-choice question."
+                    },
+                    "maxAnswers": {
+                        "type": "number",
+                        "description": "The maximum number of answers allowed for a multi-choice question."
+                    },
+                    "subQuestions": {
+                        "type": "array",
+                        "description": "An array of sub-questions for a multi-choice question.",
+                        "items": {
+                            "$ref": "#/components/schemas/SubQuestion"
+                        }
+                    },
+                    "minValue": {
+                        "type": "number",
+                        "description": "The minimum value allowed for a scale question."
+                    },
+                    "maxValue": {
+                        "type": "number",
+                        "description": "The maximum value allowed for a scale question."
+                    },
+                    "step": {
+                        "type": "number",
+                        "description": "The step size for a numeric question (either a scale or number question)."
+                    },
+                    "visualType": {
+                        "type": "string",
+                        "description": "The visual type of the question that tells how the question should be displayed."
                     }
-                  },
-                  "minValue": {
-                    "type": "number",
-                    "description": "The minimum value allowed for a scale question."
-                  },
-                  "maxValue": {
-                    "type": "number",
-                    "description": "The maximum value allowed for a scale question."
-                  },
-                  "step": {
-                    "type": "number",
-                    "description": "The step size for a numeric question (either a scale or number question)."
-                  },
-                  "visualType": {
-                    "type": "string",
-                    "description": "The visual type of the question that tells how the question should be displayed."
-                  }
                 }
-              },
-              "SubQuestion": {
+            },
+            "SubQuestion": {
                 "type": "object",
                 "properties": {
-                  "id": {
+                    "id": {
                         "type": "string",
                         "description": "Id of the question (present only for existing question, should not be given when sending question request)."
-                  },
-                  "title": {
-                    "type": "string",
-                    "description": "The title of the sub-question."
-                  },
-                  "description": {
-                    "type": "string",
-                    "description": "The description of the sub-question."
-                  },
-                  "type": {
-                    "$ref": "#/components/schemas/QuestionType"
-                  },
-                  "visualType": {
-                    "type": "string",
-                    "description": "The visual type of the question that tells how the question should be displayed."
-                  },
-                  "minValue": {
-                    "type": "number",
-                    "description": "The minimum value allowed for a scale question."
-                  },
-                  "maxValue": {
-                    "type": "number",
-                    "description": "The maximum value allowed for a scale question."
-                  },
-                  "step": {
-                    "type": "number",
-                    "description": "The step size for a numeric question (either a scale or number question)."
-                  }
+                    },
+                    "title": {
+                        "type": "string",
+                        "description": "The title of the sub-question."
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "The description of the sub-question."
+                    },
+                    "type": {
+                        "$ref": "#/components/schemas/QuestionType"
+                    },
+                    "visualType": {
+                        "type": "string",
+                        "description": "The visual type of the question that tells how the question should be displayed."
+                    },
+                    "minValue": {
+                        "type": "number",
+                        "description": "The minimum value allowed for a scale question."
+                    },
+                    "maxValue": {
+                        "type": "number",
+                        "description": "The maximum value allowed for a scale question."
+                    },
+                    "step": {
+                        "type": "number",
+                        "description": "The step size for a numeric question (either a scale or number question)."
+                    }
                 }
-              },
+            },
             "PollPrivateInfo": {
                 "properties": {
                     "id": {
@@ -780,9 +780,13 @@
                         "type": "array",
                         "items": {
                             "oneOf": [
-                                { "$ref": "#/components/schemas/QuestionResult" },
-                                { "$ref": "#/components/schemas/MultiQuestionResult" }
-                              ]
+                                {
+                                    "$ref": "#/components/schemas/QuestionResult"
+                                },
+                                {
+                                    "$ref": "#/components/schemas/MultiQuestionResult"
+                                }
+                            ]
                         }
                     }
                 }
@@ -812,16 +816,16 @@
                                             "properties": {
                                                 "answer": {
                                                     "oneOf": [
-                                                      {
-                                                        "type": "string",
-                                                        "example": "test-text-value"
-                                                      },
-                                                      {
-                                                        "type": "boolean"
-                                                      },
-                                                      {
-                                                        "type": "number"
-                                                      }
+                                                        {
+                                                            "type": "string",
+                                                            "example": "test-text-value"
+                                                        },
+                                                        {
+                                                            "type": "boolean"
+                                                        },
+                                                        {
+                                                            "type": "number"
+                                                        }
                                                     ]
                                                 }
                                             }
@@ -834,16 +838,16 @@
                                 "properties": {
                                     "answer": {
                                         "oneOf": [
-                                          {
-                                            "type": "string",
-                                            "example": "test-text-value"
-                                          },
-                                          {
-                                            "type": "boolean"
-                                          },
-                                          {
-                                            "type": "number"
-                                          }
+                                            {
+                                                "type": "string",
+                                                "example": "test-text-value"
+                                            },
+                                            {
+                                                "type": "boolean"
+                                            },
+                                            {
+                                                "type": "number"
+                                            }
                                         ]
                                     }
                                 }
@@ -1014,36 +1018,36 @@
             "UserSession": {
                 "type": "object",
                 "properties": {
-                  "token": {
-                    "type": "string"
-                  },
-                  "user": {
-                    "type": "object",
-                    "properties": {
-                        "id": {
-                            "type": "string"
-                        },
-                        "userName": {
-                            "type": "string"
-                        },
-                        "firstName": {
-                            "type": "string"
-                        },
-                        "lastName": {
-                            "type": "string"
-                        },
-                        "email": {
-                            "type": "string"
-                        }
+                    "token": {
+                        "type": "string"
                     },
-                    "required": [
-                        "id",
-                        "userName",
-                        "firstName",
-                        "lastName",
-                        "email"
-                    ]
-                  }
+                    "user": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "userName": {
+                                "type": "string"
+                            },
+                            "firstName": {
+                                "type": "string"
+                            },
+                            "lastName": {
+                                "type": "string"
+                            },
+                            "email": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "userName",
+                            "firstName",
+                            "lastName",
+                            "email"
+                        ]
+                    }
                 }
             },
             "User": {
@@ -1152,14 +1156,14 @@
             "PollOwner": {
                 "type": "object",
                 "properties": {
-                  "userName": {
-                    "type": "string"
-                  },
-                  "id": {
-                    "type": "string"
-                  }
+                    "userName": {
+                        "type": "string"
+                    },
+                    "id": {
+                        "type": "string"
+                    }
                 }
             }
         }
     }
-  }
+}

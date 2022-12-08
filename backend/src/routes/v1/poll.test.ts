@@ -678,14 +678,14 @@ describe.skip('integration tests for poll api', () => {
                 userName: 'test-poll-creator'
             });
         }
-        expect(( poll.id as string ).length > 0).toBe(true);
+        expect((poll.id as string).length > 0).toBe(true);
 
         checkUneditedPublicPoll(poll, omitQuestions);
     }
 
     // For checking as admin
     function checkEditedPrivatePoll(poll: IPolling.PollData) {
-        expect(( poll.id as string ).length > 0).toBe(true);
+        expect((poll.id as string).length > 0).toBe(true);
         checkEditedPublicPoll(poll);
         expect(poll.owner).toEqual({
             id: admin.id,
