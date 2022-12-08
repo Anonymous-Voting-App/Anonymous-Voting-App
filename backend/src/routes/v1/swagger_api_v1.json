@@ -15,7 +15,13 @@
     },
     "servers": [
         {
-            "url": "https://d2l9c7s1roosdj.cloudfront.net/"
+            "url": "https://lb.knowit-anonymous-voting-app.aws.cybercom.dev/"
+        },
+        {
+            "url": "https://staging.lb.knowit-anonymous-voting-app.aws.cybercom.dev/"
+        },
+        {
+            "url": "http://localhost:8080/"
         }
     ],
     "tags": [
