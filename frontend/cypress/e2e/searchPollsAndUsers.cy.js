@@ -23,6 +23,8 @@ describe('search users and polls as admin', () => {
         cy.get('.searchField').clear();
         cy.get('.searchField').type('poll');
         cy.get('.searchButton').click();
+        //eslint-disable-next-line cypress/no-unnecessary-waiting
+        cy.wait(2000);
         cy.get('.pinkLink').should('exist');
     });
 });

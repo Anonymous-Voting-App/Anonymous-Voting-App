@@ -72,7 +72,7 @@ describe('login and register', () => {
         cy.get('.login-btn').click();
         cy.url().should('include', '/login');
     });
-    it('can login', () => {
+    it('can log in', () => {
         cy.get('.fields').children().first().type(random_string);
         cy.get('.fields').children().eq(1).type('password');
         cy.get('.fields')
@@ -93,5 +93,9 @@ describe('login and register', () => {
             'eq',
             'https://staging.knowit-anonymous-voting-app.aws.cybercom.dev/'
         );
+    });
+    it('can log out', () => {
+        cy.contains('Logout').click();
+        cy.contains('Login').should('exist');
     });
 });
