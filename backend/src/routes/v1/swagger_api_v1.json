@@ -767,25 +767,22 @@
                         "type": "string",
                         "example": "Name of the poll"
                     },
-                    "visualType": {
-                        "type": "string",
-                        "example": "Frontend skin of the question."
-                    },
                     "publicId": {
                         "type": "string",
                         "format": "uuid"
+                    },
+                    "answerCount": {
+                        "type": "number",
+                        "description": "How many times the poll has been answered.",
+                        "example": 2
                     },
                     "questions": {
                         "type": "array",
                         "items": {
                             "oneOf": [
-                                {
-                                    "$ref": "#/components/schemas/MultiQuestionResult"
-                                },
-                                {
-                                    "$ref": "#/components/schemas/QuestionResult"
-                                }
-                            ]
+                                { "$ref": "#/components/schemas/QuestionResult" },
+                                { "$ref": "#/components/schemas/MultiQuestionResult" }
+                              ]
                         }
                     }
                 }
@@ -941,6 +938,10 @@
                         "items": {
                             "$ref": "#/components/schemas/AnswerValueStatistic"
                         }
+                    },
+                    "visualType": {
+                        "type": "string",
+                        "description": "The visual type of the question that tells how the question should be displayed."
                     }
                 }
             },
@@ -979,6 +980,10 @@
                         "items": {
                             "$ref": "#/components/schemas/QuestionResult"
                         }
+                    },
+                    "visualType": {
+                        "type": "string",
+                        "description": "The visual type of the question that tells how the question should be displayed."
                     }
                 }
             },
