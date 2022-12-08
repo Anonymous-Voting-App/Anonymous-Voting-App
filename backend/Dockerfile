@@ -9,7 +9,7 @@ RUN npm run build
 FROM node:lts-slim
 
 # Required because of slim image
-RUN apt-get update && apt-get install -y openssl libssl-dev
+RUN apt-get update && apt-get install -y openssl libssl-dev curl
 
 WORKDIR /app
 
