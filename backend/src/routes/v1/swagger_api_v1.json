@@ -342,11 +342,11 @@
                 }
             }
         },
-        "/api/user/admin/searchByName/{searchText}": {
+        "/api/user/searchByName/{searchText}": {
             "get": {
                 "tags": ["User admin"],
                 "summary": "Search for users by name",
-                "description": "Searches for users with names matching the given search text and returns an array of User objects for the matching users. The caller must be logged in and have admin privileges. User passwords are hashed using Bcrypt.",
+                "description": "Searches for users with names matching the given search text and returns an array of User objects for the matching users. The caller must be logged in and have admin privileges. User passwords are hashed using Bcrypt. Note: the api endpoint is erroneously not under a correct admin path currently, this should be changed in the future.",
                 "parameters": [
                     {
                         "name": "searchText",
@@ -417,7 +417,7 @@
             "post": {
                 "tags": ["User"],
                 "summary": "Sign in an existing user",
-                "description": "Sign in an existing user with the provided user name and password. Returns information of the user and the login session token. The session token must be passed for any api method that requires you to be logged in. The session token is set in the Authorization header of the HTTP request. The authorization header should be in the form: 'Authorization: Bearer ${token}', where ${token} should be replaced with the session token. User password is hashed using Bcrypt.",
+                "description": "Sign in an existing user with the provided user name and password. Returns information of the user and the login session token. The session token must be passed for any api method that requires you to be logged in. The session token is set in the Authorization header of the HTTP request. The authorization header should be in the form: 'Authorization: Bearer ${token}', where ${token} should be replaced with the session token.",
                 "responses": {
                     "200": {
                         "description": "Session token and user's info.",
@@ -446,11 +446,11 @@
                 }
             }
         },
-        "/api/user/admin/{userId}": {
+        "/api/user/{userId}": {
             "patch": {
                 "tags": ["User admin"],
                 "summary": "Edit a user",
-                "description": "Edits the user with the specified user ID. The caller must be logged in and have admin privileges. The request body must contain the new values for the user properties to be edited. Upon successful update, the return result is the updated User object. User password should be given unhashed, it will be hashed in the backend.",
+                "description": "Edits the user with the specified user ID. The caller must be logged in and have admin privileges. The request body must contain the new values for the user properties to be edited. Upon successful update, the return result is the updated User object. User password should be given unhashed, it will be hashed in the backend. Note: the api endpoint is erroneously not under a correct admin path currently, this should be changed in the future.",
                 "parameters": [
                     {
                         "name": "userId",
@@ -475,11 +475,11 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "The updated User object",
+                        "description": "Success message",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/User"
+                                    "$ref": "#/components/schemas/SuccessMessage"
                                 }
                             }
                         }
@@ -489,7 +489,7 @@
             "delete": {
                 "tags": ["User admin"],
                 "summary": "Delete a user",
-                "description": "Deletes the user with the specified user ID. The caller must be logged in and have admin privileges. Upon successful deletion, the return result is an object containing a 'success' property that is set to true.",
+                "description": "Deletes the user with the specified user ID. The caller must be logged in and have admin privileges. Upon successful deletion, the return result is an object containing a 'success' property that is set to true. Note: the api endpoint is erroneously not under a correct admin path currently, this should be changed in the future.",
                 "parameters": [
                     {
                         "name": "userId",
@@ -1018,7 +1018,31 @@
                     "type": "string"
                   },
                   "user": {
-                    "$ref": "#/components/schemas/User"
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "type": "string"
+                        },
+                        "userName": {
+                            "type": "string"
+                        },
+                        "firstName": {
+                            "type": "string"
+                        },
+                        "lastName": {
+                            "type": "string"
+                        },
+                        "email": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "id",
+                        "userName",
+                        "firstName",
+                        "lastName",
+                        "email"
+                    ]
                   }
                 }
             },
