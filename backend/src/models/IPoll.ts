@@ -10,7 +10,7 @@ export interface NewDatabaseObject {
     adminLink: string;
     pollLink: string;
     resultLink: string;
-    creatorId: string;
+    creatorId?: string;
     visualFlags: Array<string>;
 }
 
@@ -20,7 +20,7 @@ export interface DatabaseData {
     type?: string;
     pollLink: string;
     adminLink: string;
-    creator?: IUser.DatabaseData;
+    creator?: IUser.DatabaseData | null | undefined;
     questions?: Array<IQuestion.DatabaseData>;
     answerCount: number;
     visualFlags: Array<string>;
