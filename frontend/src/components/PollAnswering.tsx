@@ -32,8 +32,10 @@ const PollAnswering = (props: any) => {
 
     useEffect(() => {
         console.log(pollId);
+
         getResultData(pollId);
-        console.log(currentQuestion.type, 'current q type');
+        // console.log(currentQuestion.type, 'current q type');
+        // console.log('8532e49c-9bbf-419f-b4f7-0a0120d4e35d')
     }, []);
 
     const getResultData = (id: string | undefined) => {
@@ -43,6 +45,7 @@ const PollAnswering = (props: any) => {
         }
         fetchPoll(id)
             .then((response) => {
+                console.log(response);
                 console.log(response.questions.length);
                 setPollName(response.pollName);
                 setQuestions(response.questions);
