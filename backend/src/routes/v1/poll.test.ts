@@ -16,7 +16,7 @@ const admin = {
 
 jest.setTimeout(60000);
 
-describe.skip('integration tests for poll api', () => {
+describe('integration tests for poll api', () => {
     // The tests first create a poll and then this created
     // poll is used for the further tests.
     let createdPoll: IPolling.PollData;
@@ -433,7 +433,6 @@ describe.skip('integration tests for poll api', () => {
         const booleanQuestion = createdPoll.questions[0];
 
         let command = `curl -i -X POST -H "Content-Type: application/json" -d "{
-            \\"publicId\\": \\"${createdPoll.publicId}\\", 
             \\"answers\\": [
                 {
                     \\"questionId\\": \\"${multiQuestion.id}\\",

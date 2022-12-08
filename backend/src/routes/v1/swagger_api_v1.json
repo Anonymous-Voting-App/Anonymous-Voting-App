@@ -254,9 +254,6 @@
                             }
                         }
                     },
-                    "400": {
-                        "description": "Invalid input provided"
-                    },
                     "404": {
                         "description": "Poll with the specified publicId was not found"
                     }
@@ -609,15 +606,6 @@
                     "type": {
                         "type": "string"
                     },
-                    "owner": {
-                        "type": "object",
-                        "properties": {
-                            "accountId": {
-                                "type": "string",
-                                "format": "uuid"
-                            }
-                        }
-                    },
                     "questions": {
                         "type": "array",
                         "items": {
@@ -680,13 +668,7 @@
                         "type": "string"
                     },
                     "owner": {
-                        "type": "object",
-                        "properties": {
-                            "id": {
-                                "type": "string",
-                                "format": "uuid"
-                            }
-                        }
+                        "$ref": "#/components/schemas/PollOwner"
                     },
                     "questions": {
                         "type": "array",
@@ -707,12 +689,6 @@
                                     }
                                 }
                             ]
-                        }
-                    },
-                    "answers": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/PublicAnswer"
                         }
                     }
                 }
@@ -798,21 +774,39 @@
                             {
                                 "type": "object",
                                 "properties": {
-                                    "subQuestionIds": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "format": "uuid"
-                                        }
+                                    "questionId": {
+                                        "type": "string"
                                     },
-                                    "answer": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "object",
-                                            "properties": {
-                                                "answer": {
+                                    "data": {
+                                        "type": "object",
+                                        "properties": {
+                                            "subQuestionIds": {
+                                                "type": "array",
+                                                "items": {
                                                     "type": "string",
-                                                    "example": "test-text-value"
+                                                    "format": "uuid"
+                                                }
+                                            },
+                                            "answer": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "answer": {
+                                                            "oneOf": [
+                                                              {
+                                                                "type": "string",
+                                                                "example": "test-text-value"
+                                                              },
+                                                              {
+                                                                "type": "boolean"
+                                                              },
+                                                              {
+                                                                "type": "number"
+                                                              }
+                                                            ]
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }
@@ -822,9 +816,27 @@
                             {
                                 "type": "object",
                                 "properties": {
-                                    "answer": {
-                                        "type": "string",
-                                        "example": "test-text-value"
+                                    "questionId": {
+                                        "type": "string"
+                                    },
+                                    "data": {
+                                        "type": "object",
+                                        "properties": {
+                                            "answer": {
+                                                "oneOf": [
+                                                  {
+                                                    "type": "string",
+                                                    "example": "test-text-value"
+                                                  },
+                                                  {
+                                                    "type": "boolean"
+                                                  },
+                                                  {
+                                                    "type": "number"
+                                                  }
+                                                ]
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -1104,6 +1116,17 @@
                         "type": "string",
                         "example": "Created"
                     }
+                }
+            },
+            "PollOwner": {
+                "type": "object",
+                "properties": {
+                  "userName": {
+                    "type": "string"
+                  },
+                  "id": {
+                    "type": "string"
+                  }
                 }
             }
         }
