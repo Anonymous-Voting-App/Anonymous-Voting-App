@@ -16,7 +16,7 @@ const admin = {
 
 jest.setTimeout(60000);
 
-describe('integration tests for poll api', () => {
+describe.skip('integration tests for poll api', () => {
     // The tests first create a poll and then this created
     // poll is used for the further tests.
     let createdPoll: IPolling.PollData;
