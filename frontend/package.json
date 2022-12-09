@@ -51,13 +51,14 @@
         ]
     },
     "devDependencies": {
+        "@types/file-saver": "^2.0.5",
         "@types/jest": "^27.5.2",
         "@types/node": "^16.11.59",
         "@types/react": "^18.0.20",
         "@types/react-dom": "^18.0.6",
-        "@types/file-saver": "^2.0.5",
         "@typescript-eslint/eslint-plugin": "^5.43.0",
         "cypress": "^11.0.1",
+        "cypress-localstorage-commands": "^2.2.2",
         "eslint-config-prettier": "^8.5.0",
         "eslint-plugin-cypress": "^2.12.1",
         "react-router-dom": "^6.4.2",
