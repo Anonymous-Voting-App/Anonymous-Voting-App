@@ -21,14 +21,15 @@ export default class BooleanQuestion extends Question {
      */
 
     _trueFalseAnswerStatistics(): Array<IQuestion.AnswerValueStatistic> {
-        const falseAnswers = this.parentAnswerCount() - this.answerCount();
+        const trueAnswers = this.trueAnswerCount();
+        const falseAnswers = this.falseAnswerCount();
 
         return [
             {
                 value: 'true',
-                count: this.parentAnswerCount(),
+                count: this.countAnswersWithValue('true'),
                 percentage: this._calculateAnswerPercentage(
-                    this.parentAnswerCount(),
+                    trueAnswers,
                     this.parentAnswerCount()
                 )
             },
@@ -93,7 +94,7 @@ export default class BooleanQuestion extends Question {
      */
 
     falseAnswerCount(): number {
-        return this.countAnswersWithValue('false');
+        return this.parentAnswerCount() - this.trueAnswerCount();
     }
 
     /**

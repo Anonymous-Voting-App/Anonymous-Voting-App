@@ -525,10 +525,6 @@ export default class Poll
      */
 
     _answersIsValid(answers: Array<IQuestion.Answer>): boolean {
-        if (answers.length !== Object.keys(this.questions()).length) {
-            return false;
-        }
-
         return (
             this._answersMatchQuestions(answers) &&
             this._questionsAcceptAnswers(answers)
