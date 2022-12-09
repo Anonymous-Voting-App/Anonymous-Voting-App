@@ -14,7 +14,7 @@ export const router = Router();
 /**
  * Create poll
  */
-router.post('/', requireUser(), createPoll);
+router.post('/', createPoll);
 
 /**
  * Gets polls public information

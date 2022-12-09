@@ -594,17 +594,20 @@ export default class Poll
         pre('name is set', this.name().length > 0);
         pre('privateId is set', this.privateId().length > 0);
         pre('publicId is set', this.publicId().length > 0);
-        pre('owner is set', this.owner() instanceof User);
-        pre('owner has v4 uuid', this.owner().hasV4Uuid());
 
-        return {
+        const obj: IPoll.NewDatabaseObject = {
             name: this.name(),
             adminLink: this.privateId(),
             pollLink: this.publicId(),
             resultLink: '',
-            creatorId: this.owner().id(),
             visualFlags: this.visualFlags()
         };
+
+        if (this.owner() instanceof User && this.owner().hasV4Uuid()) {
+            obj.creatorId = this.owner().id();
+        }
+
+        return obj;
     }
 
     /**
@@ -748,7 +751,7 @@ export default class Poll
         this.setAnswerCount(pollData.answerCount);
         this.setVisualFlags(pollData.visualFlags);
 
-        if (typeof pollData.creator === 'object') {
+        if (typeof pollData.creator === 'object' && pollData.creator !== null) {
             this.setOwnerFromDatabaseData(pollData.creator);
         }
 
@@ -860,7 +863,6 @@ export default class Poll
             privateId: this.privateId(),
             type: this.type(),
             questions: this.questionsDataObjs(),
-            answers: this.answersDataObjs(),
             visualFlags: this.visualFlags()
         };
 
@@ -878,7 +880,6 @@ export default class Poll
      */
     publicDataObj(): IPolling.PollData {
         const result: IPolling.PollData = {
-            id: this.id(),
             name: this.name(),
             publicId: this.publicId(),
             type: this.type(),
@@ -947,7 +948,7 @@ export default class Poll
      */
     async createInDatabaseFromRequest(
         request: IPolling.PollRequest,
-        owner: User
+        owner?: User
     ): Promise<void> {
         this.setFromRequest(request, owner);
         this.generateIds();
@@ -957,8 +958,11 @@ export default class Poll
     /**
      * Sets the instance's information from a PollRequest request object.
      */
-    setFromRequest(request: IPolling.PollRequest, owner: User): void {
-        this.setOwner(owner);
+    setFromRequest(request: IPolling.PollRequest, owner?: User): void {
+        if (owner instanceof User) {
+            this.setOwner(owner);
+        }
+
         this.setName(request.name);
         if (Array.isArray(request.visualFlags)) {
             this.setVisualFlags(request.visualFlags);
@@ -1033,6 +1037,8 @@ export default class Poll
      */
 
     async updateInDatabase(): Promise<void> {
+        pre('is loaded from database', this.loadedFromDatabase());
+
         await this._database.poll.update({
             where: { id: this.id() },
             data: this.newDatabaseObject()

@@ -92,7 +92,7 @@ const callService = async (
 
         type serviceFunction = (
             body: string | IPolling.PollRequest | IVotingService.AnswerData,
-            user: User
+            user?: User
         ) => IPolling.PollData | IPolling.AnswerData | null;
 
         const poll = await (service[method] as unknown as serviceFunction)(

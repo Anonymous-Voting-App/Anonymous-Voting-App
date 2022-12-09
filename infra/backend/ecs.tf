@@ -24,11 +24,6 @@ resource "aws_ecs_task_definition" "app" {
           "containerPort" : 8080,
           "hostPort" : 8080,
           "protocol" : "tcp"
-        },
-        {
-          "containerPort" : 5432,
-          "hostPort" : 5432,
-          "protocol" : "tcp"
         }
       ],
       "healthCheck" : {
