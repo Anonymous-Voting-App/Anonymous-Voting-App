@@ -9,8 +9,7 @@ import {
     RadioGroup,
     Radio,
     Checkbox,
-    TextField,
-    FormLabel
+    TextField
 } from '@mui/material';
 import './PollAnsweringComponent.scss';
 import { fetchPoll } from '../services/pollService';
@@ -20,7 +19,7 @@ import { ArrowBack, ArrowForward } from '@mui/icons-material';
 import { useParams } from 'react-router-dom';
 import { queryByTestId } from '@testing-library/react';
 
-const PollAnsweringComponent = (props: any) => {
+const PollAnsweringComponentbackup = (props: any) => {
     console.log(props);
     const [question, setQuestion] = useState([]);
     const { pollId } = useParams();
@@ -40,58 +39,88 @@ const PollAnsweringComponent = (props: any) => {
         []
     );
     const [questionAnswers, setQuestionAnswers] = useState<any[]>([]);
-
-    const [ratingValue, setRatingValue] = useState<number | null>(
-        props.question.ratingValue
-    );
     const [options, setOptions] = useState<any[]>(props.question.options);
 
     useEffect(() => {
         setOptions(props.question.options);
-        setRatingValue(props.question.ratingValue);
-    }, [props.question.options, props.question.ratingValue]);
+    }, [props.question.options]);
+
+    const handleQuestionAnswer = (questionNumber: number, answer: any) => {
+        if (questionNumber === questionAnswers.length) {
+            questionAnswers.pop(); // Change question answer
+        }
+
+        // Push answer of the question to the questionAnswers array
+        setQuestionAnswers((answers: any[]) => [...answers, answer]);
+    };
 
     const handleMultiChoiseQuestionAnswer = (option: any) => {
-        const updatedOptions = options.map((item: any) => {
+        const updatedOption = options.map((item: any) => {
             if (item.optionId === option.optionId) {
                 return { ...item, isSelected: !item.isSelected };
             }
             return item;
         });
-        setOptions(updatedOptions);
-        console.log(updatedOptions);
-        console.log({ quesId: props.question.quesId, options: updatedOptions });
+        setOptions(updatedOption);
+        console.log(updatedOption);
+        console.log({ quesId: props.question.quesId, options: updatedOption });
         props.addAnswer({
             quesId: props.question.quesId,
-            options: updatedOptions
+            options: updatedOption
         });
+        // if (currentQuestionAnswer.includes(option)) {
+        //         const index = currentQuestionAnswer.indexOf(option);
+        //         if (index > -1) {
+        //             currentQuestionAnswer.splice(index, 1); // Uncheck option
+        //         }
+        // }
+
+        // Push selected options of the question to the currentQuestionAnswer array
+        //  setCurrentQuestionAnswer((options: any[]) => [...options, option]);
+        //     console.log(currentQuestionAnswer);
+
+        // Push answer of the question to the questionAnswers array
+        // setQuestionAnswers((answers: any[]) => [
+        //     ...answers,
+        //     currentQuestionAnswer
+        // ]);
     };
 
     const handlePickOneQuestionAnswer = (option: any) => {
         console.log(option);
-        const updatedOptions = options.map((item: any) => {
-            if (item.optionId === option.optionId) {
-                return { ...item, isSelected: !item.isSelected };
-            }
-            return { ...item, isSelected: false };
-        });
-        setOptions(updatedOptions);
-        props.addAnswer({
-            quesId: props.question.quesId,
-            options: updatedOptions
-        });
     };
 
-    const handleRatingQuestionAnswer = (
-        event: any,
-        newValue: number | null
-    ) => {
-        setRatingValue(newValue);
-        props.addAnswer({
-            quesId: props.question.quesId,
-            ratingValue: newValue
-        });
-    };
+    // const handleMultiChoiseQuestionAnswer = (
+    //     options: any,
+    //     e: any
+    // ) => {
+    //     if (questionNumber === questionAnswers.length) {
+    //         questionAnswers.pop(); // Change question answer
+    //     }
+
+    //     if (currentQuestionAnswer.includes(option)) {
+    //         const index = currentQuestionAnswer.indexOf(option);
+    //         if (index > -1) {
+    //             currentQuestionAnswer.splice(index, 1); // Uncheck option
+    //         }
+    //     }
+
+    //     // Push selected options of the question to the currentQuestionAnswer array
+    //     setCurrentQuestionAnswer((options: any[]) => [...options, option]);
+    //     console.log(currentQuestionAnswer);
+
+    //     // Push answer of the question to the questionAnswers array
+    //     setQuestionAnswers((answers: any[]) => [
+    //         ...answers,
+    //         currentQuestionAnswer
+    //     ]);
+    // };
+
+    // console.log(
+    //     'answer of question',
+    //     props.index + 1 + ':',
+    //     questionAnswers[props.index]
+    // );
 
     console.log('all answers:', questionAnswers);
 
@@ -124,6 +153,23 @@ const PollAnsweringComponent = (props: any) => {
                                         }
                                         label={option.title}
                                     />
+                                    // <RadioGroup
+                                    //     name="answer"
+                                    //     key={option.title}
+                                    //     value={questionAnswers[props.index]}
+                                    //     onClick={() =>
+                                    //         handleMultiChoiseQuestionAnswer(
+                                    //             props.index + 1,
+                                    //             option.title
+                                    //         )
+                                    //     }
+                                    // >
+                                    //     <FormControlLabel
+                                    //         value={option.title}
+                                    //         control={<Checkbox />}
+                                    //         label={option.title}
+                                    //     />
+                                    // </RadioGroup>
                                 ))}
                             </FormControl>
                         </div>
@@ -136,60 +182,31 @@ const PollAnsweringComponent = (props: any) => {
                     <Typography className="questionTitle">
                         {props.question.title}
                     </Typography>
-                    {options !== undefined ? (
-                        <div className="answerContainer">
-                            <FormControl>
-                                <RadioGroup
-                                    aria-labelledby="demo-controlled-radio-buttons-group"
-                                    name="controlled-radio-buttons-group"
-                                >
-                                    {options.map((option: any) => (
-                                        <FormControlLabel
-                                            key={option.optionId}
-                                            control={
-                                                <Radio
-                                                    checked={option.isSelected}
-                                                    value={option.title}
-                                                    onChange={() =>
-                                                        handlePickOneQuestionAnswer(
-                                                            option
-                                                        )
-                                                    }
-                                                />
-                                            }
-                                            label={option.title}
-                                        />
-                                    ))}
-                                </RadioGroup>
-                            </FormControl>
-                        </div>
-                    ) : null}
-                </div>
-            ) : null}
-            {props.question.type === 'star' ? (
-                <div className="">
-                    <Typography className="questionTitle">
-                        {props.question.title}
-                    </Typography>
                     <div className="answerContainer">
-                        {ratingValue !== undefined ? ( // to render only controlled input element
-                            <FormControl>
-                                <Rating
-                                    name="simple-controlled"
-                                    value={ratingValue}
-                                    onChange={(event, newValue) => {
-                                        handleRatingQuestionAnswer(
-                                            event,
-                                            newValue
-                                        );
-                                    }}
-                                />
-                            </FormControl>
-                        ) : null}
+                        {/* <FormControl>
+                            {props.question.options.map((option: any) => (
+                                <RadioGroup
+                                    name="answer"
+                                    key={option.title}
+                                    value={questionAnswers[props.index]}
+                                    onChange={() =>
+                                        handleQuestionAnswer(
+                                            props.index + 1,
+                                            option.title
+                                        )
+                                    }
+                                >
+                                    <FormControlLabel
+                                        value={option.title}
+                                        control={<Radio />}
+                                        label={option.title}
+                                    />
+                                </RadioGroup>
+                            ))}
+                        </FormControl> */}
                     </div>
                 </div>
             ) : null}
-
             {/*other types need to be added and I didn't test the pick one*/}
             {/* n of questions */}
             <div className="questionNumber">
@@ -448,4 +465,4 @@ const PollAnsweringComponent = (props: any) => {
     );
 };
 
-export default PollAnsweringComponent;
+export default PollAnsweringComponentbackup;

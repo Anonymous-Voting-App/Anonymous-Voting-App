@@ -1,0 +1,76 @@
+{
+    "name": "pollname",
+    "publicId": "76f1e975-4c98-48d4-a06a-1e2e1e7bb409",
+    "type": "",
+    "answerCount": 0,
+    "questions": [
+        {
+            "id": "74701eed-35a0-4703-867b-82f6a9f9a2a6",
+            "title": "mcq",
+            "description": "mcq",
+            "type": "multi",
+            "visualType": "checkBox",
+            "pollId": "3532bcf7-f291-4944-b360-599702e81301",
+            "answerCount": 0,
+            "answerPercentage": 0,
+            "answerValueStatistics": [],
+            "subQuestions": [
+                {
+                    "id": "570a9e0d-8d37-41e7-a607-74e86e5f5449",
+                    "title": "a",
+                    "description": "a",
+                    "type": "boolean",
+                    "visualType": "default",
+                    "pollId": "3532bcf7-f291-4944-b360-599702e81301",
+                    "answerCount": 0,
+                    "answerPercentage": 0,
+                    "answerValueStatistics": [
+                        { "value": "true", "count": 0, "percentage": 0 },
+                        { "value": "false", "count": 0, "percentage": 0 }
+                    ],
+                    "trueAnswerCount": 0,
+                    "falseAnswerCount": 0,
+                    "trueAnswerPercentage": 0,
+                    "falseAnswerPercentage": 0
+                },
+                {
+                    "id": "51121ac9-e761-4fe5-ad18-d7e52594f76f",
+                    "title": "b",
+                    "description": "b",
+                    "type": "boolean",
+                    "visualType": "default",
+                    "pollId": "3532bcf7-f291-4944-b360-599702e81301",
+                    "answerCount": 0,
+                    "answerPercentage": 0,
+                    "answerValueStatistics": [
+                        { "value": "true", "count": 0, "percentage": 0 },
+                        { "value": "false", "count": 0, "percentage": 0 }
+                    ],
+                    "trueAnswerCount": 0,
+                    "falseAnswerCount": 0,
+                    "trueAnswerPercentage": 0,
+                    "falseAnswerPercentage": 0
+                },
+                {
+                    "id": "431fa04b-baf0-446a-85cf-016d20a294f0",
+                    "title": "c",
+                    "description": "c",
+                    "type": "boolean",
+                    "visualType": "default",
+                    "pollId": "3532bcf7-f291-4944-b360-599702e81301",
+                    "answerCount": 0,
+                    "answerPercentage": 0,
+                    "answerValueStatistics": [
+                        { "value": "true", "count": 0, "percentage": 0 },
+                        { "value": "false", "count": 0, "percentage": 0 }
+                    ],
+                    "trueAnswerCount": 0,
+                    "falseAnswerCount": 0,
+                    "trueAnswerPercentage": 0,
+                    "falseAnswerPercentage": 0
+                }
+            ]
+        }
+    ],
+    "visualFlags": ["hideCount"]
+}

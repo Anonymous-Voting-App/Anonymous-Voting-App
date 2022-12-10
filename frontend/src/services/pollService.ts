@@ -131,6 +131,7 @@ export const fetchPollResult = async (pollId: string) => {
         throw new Error('Request Failed');
     }
     const dataList = await newResponse.json();
+    console.log(dataList);
     const formattedData = formatData(dataList);
 
     return formattedData;
@@ -396,7 +397,8 @@ const formatPollData = (data: any) => {
 
 const setQuesArrayForAnswering = (item: any) => {
     let options;
-
+    let answer;
+    let rating = 0;
     switch (item.visualType) {
         case 'radioBtn':
         case 'checkBox':
@@ -404,8 +406,14 @@ const setQuesArrayForAnswering = (item: any) => {
             options = formatMultiTypeOptionsWithId(multiOptions);
             break;
         case 'star':
+            options = [];
+            break;
         case 'free':
+            options = [];
+            break;
         case 'yesNo':
+            options = [];
+            break;
         case 'upDown':
             options = [];
             break;
@@ -414,11 +422,9 @@ const setQuesArrayForAnswering = (item: any) => {
         title: item.title ? item.title : '',
         quesId: item.id,
         type: item.visualType ? item.visualType : 'radioBtn',
-        totalCount:
-            item.type === 'multi'
-                ? item.subQuestions[0].answerCount
-                : item.answerCount,
-        options: options
+        answer: answer,
+        options: options,
+        ratingValue: rating
     };
 };
 
@@ -427,14 +433,7 @@ const formatMultiTypeOptionsWithId = (options: [any]) => {
         return {
             optionId: option.id,
             title: option.title,
-            count: option.trueAnswerCount,
-            percentage:
-                (option.trueAnswerPercentage * 100)
-                    .toFixed(1)
-                    .toString()
-                    .split('.')[1] === '0'
-                    ? Math.round(option.trueAnswerPercentage * 100)
-                    : (option.trueAnswerPercentage * 100).toFixed(1)
+            isSelected: false
         };
     });
 
