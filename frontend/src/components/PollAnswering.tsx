@@ -2,13 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Container, Typography, Button } from '@mui/material';
 import './PollAnswering.scss';
 import PollAnsweringComponent from './PollAnsweringComponent';
-import { fetchPoll } from '../services/pollService';
+import { fetchPoll, submitPollAnswer } from '../services/pollService';
 import { ArrowBack, ArrowForward } from '@mui/icons-material';
 import { useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const PollAnswering = (props: any) => {
     const { pollId } = useParams();
-
+    const navigate = useNavigate();
     const [pollName, setPollName] = useState('');
     const [currentQuestion, setCurrentQuestion] = useState<any>({});
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -17,21 +18,8 @@ const PollAnswering = (props: any) => {
     const [showSubmit, setshowSubmit] = useState(false);
 
     useEffect(() => {
-        console.log(pollId);
-
         getResultData(pollId);
-        // 8532e49c-9bbf-419f-b4f7-0a0120d4e35d all
-        //76f1e975-4c98-48d4-a06a-1e2e1e7bb409 single mcq
-        // 4d31b0f1-d698-4df1-b71d-db971ac8f4da single radioBtn
-        // 36370b52-2cdc-4c99-86a4-e2cfff186c6b single freetxt
-        // f2a316ae-840c-41ab-9ab2-8efa06b53c55 mcq-pickOne
-        // 2739ffac-ad88-4513-817f-53ade4035b56 mcq-pickOne-rating
-        //69ded7bc-c818-4538-8dc5-18bbdc69325a mcq-po-star-free
-        // f7dc3c8e-1404-430c-9b1a-aedb62f63518  yes/no
-        //4eab67de-6710-4f35-95ee-bfadf5319d49 upDown
-        // b7c5dba5-2b37-493b-9495-d29e357e00ad rating
-        //dummy2.json consist file has dummy req body format
-    }, [pollId]);
+    }, []);
 
     const getResultData = (id: string | undefined) => {
         if (!id) {
@@ -40,7 +28,7 @@ const PollAnswering = (props: any) => {
         }
         fetchPoll(id)
             .then((response) => {
-                console.log(response);
+                // console.log(response);
                 setPollName(response.pollName);
                 setPollQuestions(response.questions);
                 if (response.questions.length === 1) {
@@ -57,7 +45,6 @@ const PollAnswering = (props: any) => {
                         'Sorry, An error encountered while fetching your poll'
                 });
             });
-        // console.log('fetchPoll');
     };
 
     const setQuesType = (type: string) => {
@@ -137,8 +124,31 @@ const PollAnswering = (props: any) => {
     };
 
     const handleSubmit = () => {
-        formatAnswerData(pollQuestions);
-        //implement formatting logic and all question answered condition check
+        const answers = formatAnswerData(pollQuestions);
+        submitPollAnswer(pollId, answers)
+            .then((response) => {
+                // 1576d894-2571-4281-933d-431d246bb460
+                if (response.success) {
+                    props.showNotification({
+                        severity: 'success',
+                        message: 'Poll answered submitted successfully'
+                    });
+                    navigate(`/result/${pollId}`);
+                } else {
+                    props.showNotification({
+                        severity: 'error',
+                        message:
+                            'Sorry, An error encountered while submitting your poll answer'
+                    });
+                }
+            })
+            .catch(() => {
+                props.showNotification({
+                    severity: 'error',
+                    message:
+                        'Sorry, An error encountered while creating your poll'
+                });
+            });
     };
 
     const formatAnswerData = (answeredPoll: Array<any>) => {
@@ -157,16 +167,21 @@ const PollAnswering = (props: any) => {
                 case 'free':
                     answerObj = formatFreeTypeAnswer(item);
                     break;
-                // case 'yesNo':
-                // case 'upDown':
-                //     return {
-                //         ...item,
-                //         booleanValue: answerObj.booleanValue
-                //     };
+                case 'yesNo':
+                case 'upDown':
+                    answerObj = formatYesNoTypeAnswer(item);
+                    break;
             }
             return answerObj;
         });
-        console.log(updatedQuestions);
+
+        // console.log(updatedQuestions);
+        const answerArray = updatedQuestions.filter((answerObj: any) => {
+            return answerObj !== null;
+        });
+        console.log(answerArray);
+
+        return answerArray;
     };
 
     const formatMutliTypeAnswer = (item: any) => {
@@ -194,6 +209,17 @@ const PollAnswering = (props: any) => {
         const data = { answer: item.freeText };
         return { questionId: item.quesId, type: 'free', data: data };
     };
+
+    // for boolean type ques, item is passed if selection is true else null value is passed
+    const formatYesNoTypeAnswer = (item: any) => {
+        if (item.booleanValue === 'yes') {
+            const data = { answer: true };
+            return { questionId: item.quesId, type: 'boolean', data: data };
+        } else {
+            return null;
+        }
+    };
+
     return (
         <Container className="poll-answer-wrapper">
             <Typography className="questionType" variant="h4">

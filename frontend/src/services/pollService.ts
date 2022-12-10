@@ -144,8 +144,7 @@ export const fetchPollResult = async (pollId: string) => {
  */
 const formatData = (data: any) => {
     const newList = data.questions.map((item: any) => {
-        console.log(setQuesArray(item));
-
+        // console.log(setQuesArray(item));
         return setQuesArray(item);
     });
     return {
@@ -242,9 +241,11 @@ const formatRatingOptions = (options: [any]) => {
 
     let ratingTypeOptions = newArray.map((arr) => {
         const obj =
-            respOptions.findIndex((option) => option.value === arr.title) === -1
+            respOptions.findIndex(
+                (option) => Number(option.value) === arr.title
+            ) === -1
                 ? arr
-                : respOptions.find((item) => item.value === arr.title);
+                : respOptions.find((item) => Number(item.value) === arr.title);
         return obj;
     });
     // for fixing title - value keys
@@ -434,4 +435,30 @@ const formatMultiTypeOptionsWithId = (options: [any]) => {
     });
 
     return formattedOptions;
+};
+
+export const submitPollAnswer = async (
+    pollId: string | undefined,
+    answers: any
+) => {
+    const pollContent = {
+        answers: answers
+    };
+
+    const response = await fetch(
+        `${getBackendUrl()}/api/poll/${pollId}/answers`,
+        {
+            method: 'POST',
+            body: JSON.stringify(pollContent),
+            headers: {
+                'Content-type': 'application/json; charset=UTF-8'
+            }
+        }
+    );
+    if (response.status !== 201) {
+        throw new Error('Request Failed');
+    }
+    const data = await response.json();
+    // console.log(data);
+    return data;
 };

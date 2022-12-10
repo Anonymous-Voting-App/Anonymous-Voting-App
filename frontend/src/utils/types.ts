@@ -28,7 +28,7 @@ export interface ResultQuesObj {
 
 export interface ResultOptionObj {
     count: number;
-    title: string | number;
+    title: string | number | any;
     percentage: number;
 }
 
