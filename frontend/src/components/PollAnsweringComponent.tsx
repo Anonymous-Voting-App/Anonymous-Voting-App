@@ -3,53 +3,39 @@ import {
     Container,
     Typography,
     Rating,
-    Button,
     FormControl,
     FormControlLabel,
     RadioGroup,
     Radio,
     Checkbox,
-    TextField,
-    FormLabel
+    TextField
 } from '@mui/material';
 import './PollAnsweringComponent.scss';
-import { fetchPoll } from '../services/pollService';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
-import { ArrowBack, ArrowForward } from '@mui/icons-material';
-import { useParams } from 'react-router-dom';
-import { queryByTestId } from '@testing-library/react';
 
 const PollAnsweringComponent = (props: any) => {
-    console.log(props);
-    const [question, setQuestion] = useState([]);
-    const { pollId } = useParams();
-    const [showMessage, setShowMessage] = useState(false);
-    const [voteStatus, setVoteStatus] = useState('hideVote');
-
-    const [pollQuestions, setQuestions] = useState([]);
-    const [pollSize, setPollSize] = useState(0);
-
-    const [showPickOne, setshowPickOne] = useState(true);
-    const [showMultiChoice, setshowMultiChoice] = useState(false);
-    const [showStartRating, setsshowStartRating] = useState(false);
-    const [showFreeText, setsshowFreeText] = useState(false);
-    const [showYesNo, setsshowYesNo] = useState(false);
-    const [showThumbsUpDown, setsshowThumbsUpDown] = useState(false);
-    const [currentQuestionAnswer, setCurrentQuestionAnswer] = useState<any[]>(
-        []
-    );
-    const [questionAnswers, setQuestionAnswers] = useState<any[]>([]);
-
+    // console.log(props);
     const [ratingValue, setRatingValue] = useState<number | null>(
         props.question.ratingValue
     );
+    const [freeText, setFreeText] = useState<string>(props.question.freeText);
     const [options, setOptions] = useState<any[]>(props.question.options);
+    const [booleanValue, setBooleanValue] = useState<string>(
+        props.question.booleanValue
+    );
 
     useEffect(() => {
+        setFreeText(props.question.freeText);
         setOptions(props.question.options);
         setRatingValue(props.question.ratingValue);
-    }, [props.question.options, props.question.ratingValue]);
+        setBooleanValue(props.question.booleanValue);
+    }, [
+        props.question.options,
+        props.question.ratingValue,
+        props.question.freeText,
+        props.question.booleanValue
+    ]);
 
     const handleMultiChoiseQuestionAnswer = (option: any) => {
         const updatedOptions = options.map((item: any) => {
@@ -59,8 +45,6 @@ const PollAnsweringComponent = (props: any) => {
             return item;
         });
         setOptions(updatedOptions);
-        console.log(updatedOptions);
-        console.log({ quesId: props.question.quesId, options: updatedOptions });
         props.addAnswer({
             quesId: props.question.quesId,
             options: updatedOptions
@@ -68,7 +52,7 @@ const PollAnsweringComponent = (props: any) => {
     };
 
     const handlePickOneQuestionAnswer = (option: any) => {
-        console.log(option);
+        // console.log(option);
         const updatedOptions = options.map((item: any) => {
             if (item.optionId === option.optionId) {
                 return { ...item, isSelected: !item.isSelected };
@@ -93,10 +77,34 @@ const PollAnsweringComponent = (props: any) => {
         });
     };
 
-    console.log('all answers:', questionAnswers);
+    const handleFreeTextQuestionAnswer = (event: any) => {
+        setFreeText(event.target.value);
+        // console.log({
+        //     quesId: props.question.quesId,
+        //     freeText: event.target.value
+        // }, 'PASSED TO PARENT')
+        props.addAnswer({
+            quesId: props.question.quesId,
+            freeText: event.target.value
+        });
+    };
+
+    const handleYesNoQuestionAnswer = (event: any) => {
+        setBooleanValue((event.target as HTMLInputElement).value);
+        props.addAnswer({
+            quesId: props.question.quesId,
+            booleanValue: (event.target as HTMLInputElement).value
+        });
+        // setBooleanValue(val === 'yes' ? true : false);
+        // props.addAnswer({
+        //     quesId: props.question.quesId,
+        //     booleanValue: val === 'yes' ? true : false
+        // });
+        // val === 'yes' ? setBtnClass({ yesBtnClass: 'yesActive', noBtnClass: '' }) : setBtnClass({ yesBtnClass: '', noBtnClass: 'noActive' })
+    };
 
     return (
-        <Container>
+        <Container className="answer-component-wrapper">
             {/* MULTI-CHOIE */}
             {props.question.type === 'checkBox' ? (
                 <div className="">
@@ -166,6 +174,7 @@ const PollAnsweringComponent = (props: any) => {
                     ) : null}
                 </div>
             ) : null}
+            {/* STAR RATING */}
             {props.question.type === 'star' ? (
                 <div className="">
                     <Typography className="questionTitle">
@@ -184,6 +193,106 @@ const PollAnsweringComponent = (props: any) => {
                                         );
                                     }}
                                 />
+                            </FormControl>
+                        ) : null}
+                    </div>
+                </div>
+            ) : null}
+            {/* FREEE */}
+            {props.question.type === 'free' ? (
+                <div className="">
+                    <Typography className="questionTitle">
+                        {props.question.title}
+                    </Typography>
+                    <div className="answerContainer">
+                        {freeText !== undefined ? (
+                            <FormControl>
+                                <TextField
+                                    fullWidth
+                                    label="Answer here..."
+                                    value={freeText}
+                                    sx={{ width: 500, maxWidth: '100%' }}
+                                    onChange={(event) =>
+                                        handleFreeTextQuestionAnswer(event)
+                                    }
+                                />
+                            </FormControl>
+                        ) : null}
+                    </div>
+                </div>
+            ) : null}
+            {/* YESNO */}
+            {props.question.type === 'yesNo' ? (
+                <div className="">
+                    <Typography className="questionTitle">
+                        {props.question.title}
+                    </Typography>
+                    <div className="answerContainer">
+                        {booleanValue !== undefined ? (
+                            <FormControl>
+                                <RadioGroup
+                                    aria-labelledby="demo-controlled-radio-buttons-group"
+                                    name="controlled-radio-buttons-group"
+                                    value={booleanValue}
+                                    onChange={(event) =>
+                                        handleYesNoQuestionAnswer(event)
+                                    }
+                                >
+                                    <FormControlLabel
+                                        value="yes"
+                                        control={<Radio />}
+                                        label="Yes"
+                                    />
+                                    <FormControlLabel
+                                        value="no"
+                                        control={<Radio />}
+                                        label="No"
+                                    />
+                                </RadioGroup>
+                            </FormControl>
+                        ) : null}
+                    </div>
+                    {/* <div className="buttonsContainer">
+                        <Button onClick={()=>{handleYesNoQuestionAnswer('yes')}} className="yesnoButton">Yes</Button>
+                        <Button onClick={()=>{handleYesNoQuestionAnswer('no')}} className="yesnoButton">No</Button>
+                    </div> */}
+                </div>
+            ) : null}
+            {/* upDown */}
+            {props.question.type === 'upDown' ? (
+                <div className="">
+                    <Typography className="questionTitle">
+                        {props.question.title}
+                    </Typography>
+                    <div className="answerContainer">
+                        {booleanValue !== undefined ? (
+                            <FormControl className="updown-container">
+                                <RadioGroup
+                                    name="controlled-radio-buttons-group"
+                                    value={booleanValue}
+                                    onChange={(event) =>
+                                        handleYesNoQuestionAnswer(event)
+                                    }
+                                >
+                                    <FormControlLabel
+                                        value="yes"
+                                        control={<Radio />}
+                                        label={
+                                            <ThumbUpIcon
+                                                sx={{ fontSize: 40 }}
+                                            ></ThumbUpIcon>
+                                        }
+                                    />
+                                    <FormControlLabel
+                                        value="no"
+                                        control={<Radio />}
+                                        label={
+                                            <ThumbDownIcon
+                                                sx={{ fontSize: 40 }}
+                                            ></ThumbDownIcon>
+                                        }
+                                    />
+                                </RadioGroup>
                             </FormControl>
                         ) : null}
                     </div>
@@ -215,235 +324,9 @@ const PollAnsweringComponent = (props: any) => {
                     {console.log(props.question.length)} */}
                 </Typography>
                 <Typography className="questionNumberText" display="inline">
-                    {' '}
-                    questions
+                    {props.total}&nbsp; questions
                 </Typography>
             </div>
-            {/* {showMultiChoice ? (
-                <div className="">
-                    <Typography className="questionTitle">{'Title'}</Typography>
-                    <div className="answerContainer">
-                        <FormControl>
-                            <RadioGroup name="answer">
-                                <FormControlLabel
-                                    value="option1"
-                                    control={<Checkbox />}
-                                    label="Car"
-                                />
-                                <FormControlLabel
-                                    value="option2"
-                                    control={<Checkbox />}
-                                    label="Bike"
-                                />
-                                <FormControlLabel
-                                    value="option3"
-                                    control={<Checkbox />}
-                                    label="Motor cycle"
-                                />
-                                <FormControlLabel
-                                    value="option4"
-                                    control={<Checkbox />}
-                                    label="None"
-                                />
-                                                            <RadioGroup name="answer">
-                                <FormControlLabel
-                                    value="option1"
-                                    control={<Radio />}
-                                    label="Label"
-                                />
-                                <FormControlLabel
-                                    value="option2"
-                                    control={<Radio />}
-                                    label="Label"
-                                />
-                                <FormControlLabel
-                                    value="option3"
-                                    control={<Radio />}
-                                    label="Label"
-                                />
-                            </RadioGroup>
-                            </RadioGroup>
-                        </FormControl>
-                    </div>
-                    <div className="questionNumber">
-                        <Typography
-                            className=""
-                            display="inline"
-                            id="question_num"
-                        >
-                            num
-                        </Typography>
-                        <Typography className="" display="inline">
-                            {' '}
-                            of{' '}
-                        </Typography>
-                        <Typography
-                            className=""
-                            display="inline"
-                            id="total_num"
-                        >
-                            num
-                        </Typography>
-                        <Typography className="" display="inline">
-                            {' '}
-                            questions
-                        </Typography>
-                    </div>
-                </div>
-            ) : null}
-
-            {showStartRating ? (
-                <div className="">
-                    <Typography className="questionTitle">{'Title'}</Typography>
-                    <div className="answerContainer">
-                        <FormControl>
-                            <Rating
-                                name="rating-group"
-                                sx={{ fontSize: 100 }}
-                            />
-                        </FormControl>
-                    </div>
-                    <div className="questionNumber">
-                        <Typography
-                            className=""
-                            display="inline"
-                            id="question_num"
-                        >
-                            num
-                        </Typography>
-                        <Typography className="" display="inline">
-                            {' '}
-                            of{' '}
-                        </Typography>
-                        <Typography
-                            className=""
-                            display="inline"
-                            id="total_num"
-                        >
-                            num
-                        </Typography>
-                        <Typography className="" display="inline">
-                            {' '}
-                            questions
-                        </Typography>
-                    </div>
-                </div>
-            ) : null}
-
-            {showFreeText ? (
-                <div className="">
-                    <Typography className="questionTitle">{'Title'}</Typography>
-                    <div className="answerContainer">
-                        <FormControl>
-                            <TextField
-                                fullWidth
-                                label="Answer here..."
-                                sx={{ width: 500, maxWidth: '100%' }}
-                            />
-                        </FormControl>
-                    </div>
-                    <div className="questionNumber">
-                        <Typography
-                            className=""
-                            display="inline"
-                            id="question_num"
-                        >
-                            num
-                        </Typography>
-                        <Typography className="" display="inline">
-                            {' '}
-                            of{' '}
-                        </Typography>
-                        <Typography
-                            className=""
-                            display="inline"
-                            id="total_num"
-                        >
-                            num
-                        </Typography>
-                        <Typography className="" display="inline">
-                            {' '}
-                            questions
-                        </Typography>
-                    </div>
-                </div>
-            ) : null}
-
-            {showYesNo ? (
-                <div className="">
-                    <Typography className="questionTitle">{'Title'}</Typography>
-                    <div className="buttonsContainer">
-                        <Button className="yesnoButton">Yes</Button>
-                        <Button className="yesnoButton">No</Button>
-                    </div>
-                    <div className="questionNumber">
-                        <Typography
-                            className=""
-                            display="inline"
-                            id="question_num"
-                        >
-                            num
-                        </Typography>
-                        <Typography className="" display="inline">
-                            {' '}
-                            of{' '}
-                        </Typography>
-                        <Typography
-                            className=""
-                            display="inline"
-                            id="total_num"
-                        >
-                            num
-                        </Typography>
-                        <Typography className="" display="inline">
-                            {' '}
-                            questions
-                        </Typography>
-                    </div>
-                </div>
-            ) : null}
-
-            {showThumbsUpDown ? (
-                <div className="">
-                    <Typography className="questionTitle">{'Title'}</Typography>
-                    <div className="answerContainer">
-                        <FormControl>
-                            <div className="thumbsContainer">
-                                <ThumbUpIcon
-                                    sx={{ fontSize: 100 }}
-                                ></ThumbUpIcon>
-                                <ThumbDownIcon
-                                    sx={{ fontSize: 100 }}
-                                ></ThumbDownIcon>
-                            </div>
-                        </FormControl>
-                    </div>
-                    <div className="questionNumber">
-                        <Typography
-                            className=""
-                            display="inline"
-                            id="question_num"
-                        >
-                            num
-                        </Typography>
-                        <Typography className="" display="inline">
-                            {' '}
-                            of{' '}
-                        </Typography>
-                        <Typography
-                            className=""
-                            display="inline"
-                            id="total_num"
-                        >
-                            num
-                        </Typography>
-                        <Typography className="" display="inline">
-                            {' '}
-                            questions
-                        </Typography>
-                    </div>
-                </div>
-            ) : null} */}
         </Container>
     );
 };

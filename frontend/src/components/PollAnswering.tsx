@@ -1,21 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import {
-    Container,
-    Typography,
-    Rating,
-    Button,
-    FormControl,
-    FormControlLabel,
-    RadioGroup,
-    Radio,
-    Checkbox,
-    TextField
-} from '@mui/material';
+import { Container, Typography, Button } from '@mui/material';
 import './PollAnswering.scss';
 import PollAnsweringComponent from './PollAnsweringComponent';
 import { fetchPoll } from '../services/pollService';
-import ThumbDownIcon from '@mui/icons-material/ThumbDown';
-import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import { ArrowBack, ArrowForward } from '@mui/icons-material';
 import { useParams } from 'react-router-dom';
 
@@ -25,13 +12,9 @@ const PollAnswering = (props: any) => {
     const [pollName, setPollName] = useState('');
     const [currentQuestion, setCurrentQuestion] = useState<any>({});
     const [currentIndex, setCurrentIndex] = useState(0);
-    const [pollQuestions, setQuestions] = useState<any>([]);
-    const [showMessage, setShowMessage] = useState(false);
-    const [voteStatus, setVoteStatus] = useState('hideVote');
-    const [pollSize, setPollSize] = useState(0);
+    const [pollQuestions, setPollQuestions] = useState<any>([]);
     const [showNext, setsshowNext] = useState(true);
     const [showSubmit, setshowSubmit] = useState(false);
-    const [answerArray, setAnswerArray] = useState<any>([]);
 
     useEffect(() => {
         console.log(pollId);
@@ -40,8 +23,12 @@ const PollAnswering = (props: any) => {
         // 8532e49c-9bbf-419f-b4f7-0a0120d4e35d all
         //76f1e975-4c98-48d4-a06a-1e2e1e7bb409 single mcq
         // 4d31b0f1-d698-4df1-b71d-db971ac8f4da single radioBtn
+        // 36370b52-2cdc-4c99-86a4-e2cfff186c6b single freetxt
         // f2a316ae-840c-41ab-9ab2-8efa06b53c55 mcq-pickOne
         // 2739ffac-ad88-4513-817f-53ade4035b56 mcq-pickOne-rating
+        //69ded7bc-c818-4538-8dc5-18bbdc69325a mcq-po-star-free
+        // f7dc3c8e-1404-430c-9b1a-aedb62f63518  yes/no
+        //4eab67de-6710-4f35-95ee-bfadf5319d49 upDown
     }, []);
 
     const getResultData = (id: string | undefined) => {
@@ -53,13 +40,11 @@ const PollAnswering = (props: any) => {
             .then((response) => {
                 console.log(response);
                 setPollName(response.pollName);
-                setQuestions(response.questions);
-                console.log(
-                    currentIndex,
-                    response.questions.length,
-                    'CURRENT INDEX'
-                );
-
+                setPollQuestions(response.questions);
+                if (response.questions.length === 1) {
+                    setsshowNext(false);
+                    setshowSubmit(true);
+                }
                 setCurrentQuestion(response.questions[currentIndex]);
             })
             .catch(() => {
@@ -101,26 +86,36 @@ const PollAnswering = (props: any) => {
     };
 
     const handleSubmit = () => {
+        //implement formatting logic and all question answered condition check
         console.log(pollQuestions);
     };
 
     const NextQuestion = () => {
+        setsshowNext(true);
+        setshowSubmit(false);
         setCurrentIndex((currentIndex) => currentIndex + 1);
         setCurrentQuestion(pollQuestions[currentIndex + 1]);
         console.log(currentIndex);
+        if (currentIndex === pollQuestions.length - 2) {
+            setsshowNext(false);
+            setshowSubmit(true);
+        }
     };
 
     const PreviousQuestion = () => {
         // console.log('Previous');
-        console.log(currentIndex - 1, 'CURRENT INDEX');
         setsshowNext(true);
-
+        setshowSubmit(false);
         setCurrentIndex((currentIndex) => currentIndex - 1);
         setCurrentQuestion(pollQuestions[currentIndex - 1]);
+        // if(currentIndex  === pollQuestions.length - 1 ){
+        //     console.log(currentIndex,pollQuestions.length-1,'ci , l-1')
+        //     setsshowNext(false);
+        //     setshowSubmit(true);
+        // }
     };
 
     const handleAddAnswer = (answerObj: any) => {
-        console.log(answerObj, 'ANSWER OBJECT');
         const updatedQuestions = pollQuestions.map((item: any) => {
             if (item.quesId === answerObj.quesId) {
                 switch (item.type) {
@@ -132,19 +127,24 @@ const PollAnswering = (props: any) => {
                     case 'free':
                         return { ...item, freeText: answerObj.freeText };
                     case 'yesNo':
-                        return { ...item, options: answerObj.options };
                     case 'upDown':
-                        return { ...item, options: answerObj.options };
+                        return {
+                            ...item,
+                            booleanValue: answerObj.booleanValue
+                        };
                 }
             }
             return item;
         });
-        setQuestions(updatedQuestions);
+        setPollQuestions(updatedQuestions);
         console.log(updatedQuestions, 'updated poll question list');
     };
 
     return (
-        <Container>
+        <Container className="poll-answer-wrapper">
+            <Typography className="questionType" variant="h4">
+                Poll Name : {pollName}
+            </Typography>
             <Typography className="questionType" variant="h4">
                 {setQuesType(currentQuestion.type)}
             </Typography>
@@ -153,6 +153,7 @@ const PollAnswering = (props: any) => {
                     question={currentQuestion}
                     index={currentIndex}
                     addAnswer={handleAddAnswer}
+                    total={pollQuestions.length}
                 ></PollAnsweringComponent>
             </div>
 
@@ -162,6 +163,7 @@ const PollAnswering = (props: any) => {
                     variant="outlined"
                     id="submitButton"
                     onClick={handlePreviousClick}
+                    disabled={currentIndex === 0}
                 >
                     <ArrowBack />
                     Previous question

@@ -1,5 +1,4 @@
 @import '../styles/colors';
-
 @mixin for-phone-only {
     @media (max-width: 599px) {
         @content;
@@ -75,6 +74,7 @@
         font-size: 2.5rem;
     }
 }
+
 .yesnoButton {
     margin-top: 52px;
     border-radius: 20px;

@@ -60,7 +60,7 @@ const PollResult = (props: any) => {
     };
 
     return (
-        <Container>
+        <Container className="poll-result-wrapper">
             <Typography className="poll-name" variant="h4">
                 {pollName}
             </Typography>

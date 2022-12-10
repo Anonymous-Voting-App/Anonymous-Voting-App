@@ -397,8 +397,9 @@ const formatPollData = (data: any) => {
 
 const setQuesArrayForAnswering = (item: any) => {
     let options;
-    let answer;
-    let rating = 0;
+    // let freeText = '';
+    // let rating = 0;
+    // let booleanV;
     switch (item.visualType) {
         case 'radioBtn':
         case 'checkBox':
@@ -406,14 +407,8 @@ const setQuesArrayForAnswering = (item: any) => {
             options = formatMultiTypeOptionsWithId(multiOptions);
             break;
         case 'star':
-            options = [];
-            break;
         case 'free':
-            options = [];
-            break;
         case 'yesNo':
-            options = [];
-            break;
         case 'upDown':
             options = [];
             break;
@@ -422,9 +417,10 @@ const setQuesArrayForAnswering = (item: any) => {
         title: item.title ? item.title : '',
         quesId: item.id,
         type: item.visualType ? item.visualType : 'radioBtn',
-        answer: answer,
         options: options,
-        ratingValue: rating
+        ratingValue: 0,
+        freeText: '',
+        booleanValue: ''
     };
 };
 
