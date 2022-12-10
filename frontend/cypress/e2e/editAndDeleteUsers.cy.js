@@ -1,5 +1,3 @@
-import 'cypress-localstorage-commands';
-
 describe('search users and polls as admin', () => {
     var random_string = generate_random_string(8);
     function generate_random_string(string_length) {
@@ -12,7 +10,7 @@ describe('search users and polls as admin', () => {
         return random_string;
     }
 
-    before(() => {
+    it('can edit password and admin status and delete user', () => {
         cy.visit(
             'https://staging.knowit-anonymous-voting-app.aws.cybercom.dev/register'
         );
@@ -31,10 +29,6 @@ describe('search users and polls as admin', () => {
         cy.get('.fields').children().first().type('testAdmin');
         cy.get('.fields').children().eq(1).type('admin@1234');
         cy.get('.login-btn').click();
-        cy.saveLocalStorage();
-    });
-    it('can edit password and admin status', () => {
-        cy.restoreLocalStorage();
         //eslint-disable-next-line cypress/no-unnecessary-waiting
         cy.wait(2000);
         cy.contains('My polls').click();
@@ -60,8 +54,6 @@ describe('search users and polls as admin', () => {
             'eq',
             'https://staging.knowit-anonymous-voting-app.aws.cybercom.dev/'
         );
-    });
-    it('can delete user', () => {
         cy.visit(
             'https://staging.knowit-anonymous-voting-app.aws.cybercom.dev/login'
         );
@@ -76,6 +68,6 @@ describe('search users and polls as admin', () => {
         cy.get('.searchField').type(random_string);
         cy.get('.searchButton').click();
         cy.contains('Delete user').click();
-        cy.contains(random_string).should('not.exist');
+        cy.contains('No data found').should('exist');
     });
 });
