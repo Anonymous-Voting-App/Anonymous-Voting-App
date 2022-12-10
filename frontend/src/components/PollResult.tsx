@@ -80,7 +80,6 @@ const PollResult = (props: any) => {
                     Copy Answering link
                 </Link>
             </div>
-            {showMessage ? <div className="messageDiv">Link copied</div> : null}
             {pollResult.length > 0 ? (
                 <>
                     {pollResult.map((question, index) => (
