@@ -29,7 +29,9 @@ const PollAnswering = (props: any) => {
         //69ded7bc-c818-4538-8dc5-18bbdc69325a mcq-po-star-free
         // f7dc3c8e-1404-430c-9b1a-aedb62f63518  yes/no
         //4eab67de-6710-4f35-95ee-bfadf5319d49 upDown
-    }, []);
+        // b7c5dba5-2b37-493b-9495-d29e357e00ad rating
+        //dummy2.json consist file has dummy req body format
+    }, [pollId]);
 
     const getResultData = (id: string | undefined) => {
         if (!id) {
@@ -85,11 +87,6 @@ const PollAnswering = (props: any) => {
         PreviousQuestion();
     };
 
-    const handleSubmit = () => {
-        //implement formatting logic and all question answered condition check
-        console.log(pollQuestions);
-    };
-
     const NextQuestion = () => {
         setsshowNext(true);
         setshowSubmit(false);
@@ -109,7 +106,6 @@ const PollAnswering = (props: any) => {
         setCurrentIndex((currentIndex) => currentIndex - 1);
         setCurrentQuestion(pollQuestions[currentIndex - 1]);
         // if(currentIndex  === pollQuestions.length - 1 ){
-        //     console.log(currentIndex,pollQuestions.length-1,'ci , l-1')
         //     setsshowNext(false);
         //     setshowSubmit(true);
         // }
@@ -140,6 +136,64 @@ const PollAnswering = (props: any) => {
         console.log(updatedQuestions, 'updated poll question list');
     };
 
+    const handleSubmit = () => {
+        formatAnswerData(pollQuestions);
+        //implement formatting logic and all question answered condition check
+    };
+
+    const formatAnswerData = (answeredPoll: Array<any>) => {
+        console.log(answeredPoll);
+        let answerObj: any;
+        const updatedQuestions = answeredPoll.map((item: any) => {
+            switch (item.type) {
+                case 'radioBtn':
+                case 'checkBox':
+                    console.log(formatMutliTypeAnswer(item));
+                    answerObj = formatMutliTypeAnswer(item);
+                    break;
+                case 'star':
+                    answerObj = formatRatingTypeAnswer(item);
+                    break;
+                case 'free':
+                    answerObj = formatFreeTypeAnswer(item);
+                    break;
+                // case 'yesNo':
+                // case 'upDown':
+                //     return {
+                //         ...item,
+                //         booleanValue: answerObj.booleanValue
+                //     };
+            }
+            return answerObj;
+        });
+        console.log(updatedQuestions);
+    };
+
+    const formatMutliTypeAnswer = (item: any) => {
+        const subQuestionIds = item.options
+            .filter((option: any) => option.isSelected === true)
+            .map((option: any) => {
+                return option.optionId;
+            });
+        const answer = subQuestionIds.map((obj: any) => {
+            return { answer: true };
+        });
+        const data = {
+            subQuestionIds: subQuestionIds,
+            answer: answer
+        };
+        return { questionId: item.quesId, type: 'multi', data: data };
+    };
+
+    const formatRatingTypeAnswer = (item: any) => {
+        const data = { answer: item.ratingValue };
+        return { questionId: item.quesId, type: 'scale', data: data };
+    };
+
+    const formatFreeTypeAnswer = (item: any) => {
+        const data = { answer: item.freeText };
+        return { questionId: item.quesId, type: 'free', data: data };
+    };
     return (
         <Container className="poll-answer-wrapper">
             <Typography className="questionType" variant="h4">
