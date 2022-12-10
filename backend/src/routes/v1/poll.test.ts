@@ -462,12 +462,6 @@ describe.skip('integration tests for poll api', () => {
                     \\"data\\": {
                         \\"answer\\": 2
                     }
-                },
-                {
-                    \\"questionId\\": \\"${booleanQuestion.id}\\",
-                    \\"data\\": {
-                        \\"answer\\": true
-                    }
                 }
             ]
         }" http://localhost:8080/api/poll/${createdPoll.publicId}/answers`;
@@ -633,16 +627,18 @@ describe.skip('integration tests for poll api', () => {
 
         expect(question.answerCount).toBe(1);
         expect(question.answerPercentage).toBe(1);
+        expect(question.trueAnswerCount).toBe(0);
+        expect(question.falseAnswerCount).toBe(1);
         expect(question.answerValueStatistics).toEqual([
             {
                 value: 'true',
-                count: 1,
-                percentage: 1
+                count: 0,
+                percentage: 0
             },
             {
                 value: 'false',
-                count: 0,
-                percentage: 0
+                count: 1,
+                percentage: 1
             }
         ]);
     }
