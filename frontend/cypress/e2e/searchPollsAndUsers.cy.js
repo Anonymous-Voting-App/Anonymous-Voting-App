@@ -1,11 +1,17 @@
+import 'cypress-localstorage-commands';
+
 describe('search users and polls as admin', () => {
-    it('can search users and polls', () => {
+    before(() => {
         cy.visit(
             'https://staging.knowit-anonymous-voting-app.aws.cybercom.dev/login'
         );
         cy.get('.fields').children().first().type('testAdmin');
         cy.get('.fields').children().eq(1).type('admin@1234');
         cy.get('.login-btn').click();
+        cy.saveLocalStorage();
+    });
+    it('can search users and get results', () => {
+        cy.restoreLocalStorage();
         //eslint-disable-next-line cypress/no-unnecessary-waiting
         cy.wait(2000);
         cy.contains('My polls').click();
@@ -14,6 +20,10 @@ describe('search users and polls as admin', () => {
         cy.get('.searchField').type('user');
         cy.get('.searchButton').click();
         cy.get('.pinkLink').should('exist');
+        cy.saveLocalStorage();
+    });
+    it('can search polls and get results', () => {
+        cy.restoreLocalStorage();
         cy.contains('User name').click();
         cy.contains('Poll name').click();
         cy.get('.searchField').clear();

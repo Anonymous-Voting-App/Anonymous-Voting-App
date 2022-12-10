@@ -1,3 +1,5 @@
+import 'cypress-localstorage-commands';
+
 describe('submit a poll, edit votes, delete poll', () => {
     var random_string = generate_random_string(8);
     function generate_random_string(string_length) {
@@ -10,7 +12,7 @@ describe('submit a poll, edit votes, delete poll', () => {
         return random_string;
     }
 
-    it('can choose to show vote count, submit poll and edit poll', () => {
+    before(() => {
         cy.visit(
             'https://staging.knowit-anonymous-voting-app.aws.cybercom.dev/login'
         );
@@ -24,9 +26,18 @@ describe('submit a poll, edit votes, delete poll', () => {
         cy.contains('Star rating').click();
         const question = 'Is this working?';
         cy.get('.question-field').type(`${question}`);
+        cy.saveLocalStorage();
+    });
+
+    it('can choose to show vote count', () => {
+        cy.restoreLocalStorage();
         cy.get('.vote-count-toggle-btn').click();
         cy.get('.vote-count-toggle-btn').find('input').should('be.checked');
+        cy.saveLocalStorage();
+    });
 
+    it('can submit poll', () => {
+        cy.restoreLocalStorage();
         cy.get('.submit-poll-btn').click();
         cy.get('.MuiAlert-filledSuccess').should('exist');
         //eslint-disable-next-line cypress/no-unnecessary-waiting
@@ -37,6 +48,11 @@ describe('submit a poll, edit votes, delete poll', () => {
         cy.wait(3500);
         cy.contains('Copy Answering link').click();
         cy.get('.MuiAlert-filledSuccess').should('exist');
+        cy.saveLocalStorage();
+    });
+
+    it('can edit poll', () => {
+        cy.restoreLocalStorage();
         cy.contains('My polls').click();
         cy.contains('Search by').click();
         cy.contains('Poll name').click();
