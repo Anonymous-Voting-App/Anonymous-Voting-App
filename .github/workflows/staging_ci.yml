@@ -282,7 +282,7 @@ jobs:
                   task-definition: ${{ steps.task-def.outputs.task-definition }}
                   service: ${{ env.ECS_SERVICE }}
                   cluster: ${{ env.ECS_CLUSTER }}
-                  wait-for-service-stability: false
+                  wait-for-service-stability: true
 
             - name: De-register previous revision
               if: ${{ steps.download-task.outputs.revision > 0 }}
@@ -291,7 +291,7 @@ jobs:
 
     migrate-staging-database:
         name: Migrate changes to staging database
-        needs: backend-build-staging
+        needs: backend-deploy-staging
         runs-on: ubuntu-latest
 
         defaults:

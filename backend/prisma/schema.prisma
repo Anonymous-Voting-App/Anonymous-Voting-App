@@ -14,13 +14,13 @@ model Poll {
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   name        String
-  creatorId   String     @db.Uuid
+  creatorId   String?     @db.Uuid
   adminLink   String
   pollLink    String
   resultLink  String
   isActive    Boolean    @default(true)
   answerCount Int        @default(0)
-  creator     User       @relation("PollUser", fields: [creatorId], references: [id], onDelete: Cascade)
+  creator     User?       @relation("PollUser", fields: [creatorId], references: [id], onDelete: Cascade)
   questions   Question[] @relation("PollQuestions")
   visualFlags String[]
 }
