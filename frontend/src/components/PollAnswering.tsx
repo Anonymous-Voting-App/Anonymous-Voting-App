@@ -124,31 +124,40 @@ const PollAnswering = (props: any) => {
     };
 
     const handleSubmit = () => {
-        const answers = formatAnswerData(pollQuestions);
-        submitPollAnswer(pollId, answers)
-            .then((response) => {
-                // 1576d894-2571-4281-933d-431d246bb460
-                if (response.success) {
-                    props.showNotification({
-                        severity: 'success',
-                        message: 'Poll answered submitted successfully'
-                    });
-                    navigate(`/result/${pollId}`);
-                } else {
+        if (localStorage.getItem(pollId!) === null) {
+            window.localStorage.setItem(pollId!, pollId!);
+
+            const answers = formatAnswerData(pollQuestions);
+            submitPollAnswer(pollId, answers)
+                .then((response) => {
+                    // 1576d894-2571-4281-933d-431d246bb460
+                    if (response.success) {
+                        props.showNotification({
+                            severity: 'success',
+                            message: 'Poll answered submitted successfully'
+                        });
+                        navigate(`/result/${pollId}`);
+                    } else {
+                        props.showNotification({
+                            severity: 'error',
+                            message:
+                                'Sorry, An error encountered while submitting your poll answer'
+                        });
+                    }
+                })
+                .catch(() => {
                     props.showNotification({
                         severity: 'error',
                         message:
-                            'Sorry, An error encountered while submitting your poll answer'
+                            'Sorry, An error encountered while creating your poll'
                     });
-                }
-            })
-            .catch(() => {
-                props.showNotification({
-                    severity: 'error',
-                    message:
-                        'Sorry, An error encountered while creating your poll'
                 });
+        } else {
+            props.showNotification({
+                severity: 'error',
+                message: 'You can only answer once'
             });
+        }
     };
 
     const formatAnswerData = (answeredPoll: Array<any>) => {
