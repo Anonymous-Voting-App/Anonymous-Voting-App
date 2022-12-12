@@ -182,7 +182,7 @@ const PollAnsweringComponent = (props: any) => {
                     </Typography>
                     <div className="answerContainer">
                         {ratingValue !== undefined ? ( // to render only controlled input element
-                            <FormControl>
+                            <FormControl className="starContainer">
                                 <Rating
                                     name="simple-controlled"
                                     value={ratingValue}
@@ -210,11 +210,13 @@ const PollAnsweringComponent = (props: any) => {
                                 <TextField
                                     fullWidth
                                     label="Answer here..."
+                                    multiline
                                     value={freeText}
                                     sx={{ width: 500, maxWidth: '100%' }}
                                     onChange={(event) =>
                                         handleFreeTextQuestionAnswer(event)
                                     }
+                                    className="free-text"
                                 />
                             </FormControl>
                         ) : null}
@@ -274,19 +276,33 @@ const PollAnsweringComponent = (props: any) => {
                                         handleYesNoQuestionAnswer(event)
                                     }
                                 >
-                                    <FormControlLabel
+                                    <Radio
                                         value="yes"
-                                        control={<Radio />}
-                                        label={
+                                        checkedIcon={
+                                            <ThumbUpIcon
+                                                sx={{
+                                                    fontSize: 40,
+                                                    color: 'black'
+                                                }}
+                                            ></ThumbUpIcon>
+                                        }
+                                        icon={
                                             <ThumbUpIcon
                                                 sx={{ fontSize: 40 }}
                                             ></ThumbUpIcon>
                                         }
                                     />
-                                    <FormControlLabel
+                                    <Radio
                                         value="no"
-                                        control={<Radio />}
-                                        label={
+                                        checkedIcon={
+                                            <ThumbDownIcon
+                                                sx={{
+                                                    fontSize: 40,
+                                                    color: 'black'
+                                                }}
+                                            ></ThumbDownIcon>
+                                        }
+                                        icon={
                                             <ThumbDownIcon
                                                 sx={{ fontSize: 40 }}
                                             ></ThumbDownIcon>

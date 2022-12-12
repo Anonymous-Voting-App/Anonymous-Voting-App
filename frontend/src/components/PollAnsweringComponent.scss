@@ -5,8 +5,8 @@
     }
 }
 
-.MuiContainer-root {
-    margin-top: 100px !important;
+.answer-component-wrapper.MuiContainer-root:first-child {
+    margin-top: 10px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -15,7 +15,7 @@
 
 .questionType {
     margin-top: -7px;
-    padding-top: 80px;
+    //padding-top: 80px;
     font-weight: 600;
 }
 
@@ -46,9 +46,24 @@
 }
 
 .starContainer {
-    margin-top: 30px;
     display: flex;
     justify-content: center;
+    text-align: center;
+    margin: auto;
+    margin-top: 30px;
+    width: 50%;
+    right: 10px;
+}
+
+.free-text {
+    .MuiInputBase-root {
+        .MuiOutlinedInput-notchedOutline {
+            border: 1px solid $main-color;
+        }
+    }
+    .Mui-focused {
+        color: $main-color;
+    }
 }
 
 .questionNumber {

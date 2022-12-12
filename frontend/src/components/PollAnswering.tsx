@@ -231,11 +231,11 @@ const PollAnswering = (props: any) => {
 
     return (
         <Container className="poll-answer-wrapper">
-            <Typography className="questionType" variant="h4">
-                Poll Name : {pollName}
+            <Typography className="pollName" variant="h4">
+                {pollName}
             </Typography>
-            <Typography className="questionType" variant="h4">
-                {setQuesType(currentQuestion.type)}
+            <Typography className="question-type" variant="h4">
+                {setQuesType(currentQuestion.type)}:
             </Typography>
             <div>
                 <PollAnsweringComponent
