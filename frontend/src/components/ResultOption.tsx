@@ -9,7 +9,14 @@ const ResultOption = (props: any) => {
     const { optionData, highestCount, totalCount, type, voteStatus } = props;
     const showIcon = highestCount === optionData.count ? true : false;
     const showVote = voteStatus === 'showCount' ? true : false;
-
+    let textData = '';
+    if (type === 'free' && optionData === '') {
+        textData = '';
+    } else if (type === 'free' && optionData.title === 'No feedback') {
+        textData = 'No feedback';
+    } else {
+        textData = optionData.title.value;
+    }
     return (
         <div className="option-wrapper">
             {type === 'radioBtn' || type === 'checkBox' || type === 'yesNo' ? (
@@ -86,7 +93,7 @@ const ResultOption = (props: any) => {
             ) : null}
             {type === 'free' ? (
                 <div className="free-type">
-                    <div>{optionData.title}</div>
+                    <div>{textData}</div>
                 </div>
             ) : null}
         </div>
