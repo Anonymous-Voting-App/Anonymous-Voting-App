@@ -15,7 +15,6 @@ import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 
 const PollAnsweringComponent = (props: any) => {
-    // console.log(props);
     const [ratingValue, setRatingValue] = useState<number | null>(
         props.question.ratingValue
     );

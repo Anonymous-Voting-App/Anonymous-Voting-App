@@ -10,6 +10,7 @@ const PollResult = (props: any) => {
     const [pollResult, setPollResult] = useState([]);
     const { pollId } = useParams();
     const [voteStatus, setVoteStatus] = useState('hideVote');
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [showMessage, setShowMessage] = useState(false);
 
     useEffect(() => {

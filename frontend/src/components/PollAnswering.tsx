@@ -19,6 +19,7 @@ const PollAnswering = (props: any) => {
 
     useEffect(() => {
         getResultData(pollId);
+        //eslint-disable-next-line
     }, []);
 
     const getResultData = (id: string | undefined) => {
@@ -149,7 +150,7 @@ const PollAnswering = (props: any) => {
                     props.showNotification({
                         severity: 'error',
                         message:
-                            'Sorry, An error encountered while creating your poll'
+                            'Sorry, An error encountered while submitting your poll answer'
                     });
                 });
         } else {
