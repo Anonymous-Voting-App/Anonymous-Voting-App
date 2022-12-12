@@ -14,9 +14,10 @@ import './AdminView.scss';
 import { fetchSearchPoll } from '../services/pollService';
 import { fetchSearchUser } from '../services/userService';
 // import AdminViewPoll from './AdminViewPoll';
-import AdminViewUser from './AdminViewUser';
+// import AdminViewUser from './AdminViewUser';
 import BasicSnackbar from './BasicSnackbar';
 import AdminViewPollDataGrid from './AdminViewPollDataGrid';
+import AdminViewUserDataGrid from './AdminViewUserDataGrid';
 
 // const TEST_USERS = ['Martti', 'user123'];
 
@@ -199,33 +200,27 @@ const AdminView = () => {
                     ) : null}
 
                     {showPollList ? (
-                        // pollList.map((poll: any) => {
-                        //     return (
-                        //         <div key={poll.id}>
-                        //             <AdminViewPoll
-                        //                 pollData={poll}
-                        //                 showNotification={handleNotification}
-                        //             ></AdminViewPoll>
-                        //         </div>
-                        //     );
-                        // })
                         <AdminViewPollDataGrid
                             data={pollList}
                             showNotification={handleNotification}
                         ></AdminViewPollDataGrid>
                     ) : null}
-                    {showUserList
-                        ? userList.map((user: any) => {
-                              return (
-                                  <div key={user.id}>
-                                      <AdminViewUser
-                                          userData={user}
-                                          showNotification={handleNotification}
-                                      ></AdminViewUser>
-                                  </div>
-                              );
-                          })
-                        : null}
+                    {showUserList ? (
+                        // userList.map((user: any) => {
+                        //       return (
+                        //           <div key={user.id}>
+                        //               <AdminViewUser
+                        //                   userData={user}
+                        //                   showNotification={handleNotification}
+                        //               ></AdminViewUser>
+                        //           </div>
+                        //       );
+                        //   })
+                        <AdminViewUserDataGrid
+                            data={userList}
+                            showNotification={handleNotification}
+                        ></AdminViewUserDataGrid>
+                    ) : null}
                 </div>
             )}
             <BasicSnackbar
