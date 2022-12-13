@@ -10,16 +10,12 @@ import IconButton from '@mui/material/IconButton';
 import './NavBar.scss';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../services/loginAndRegisterService';
+import { userIsLoggedIn } from '../utils/userUtilities';
 
 const NavBar = () => {
     const [sidebarOpen, setSidebarOpen] = useState(true);
 
     const navigate = useNavigate();
-
-    const userIsLoggedIn = () => {
-        const token = localStorage.getItem('token');
-        return typeof token === 'string';
-    };
 
     const logoutAndNavigateToHome = () => {
         logout();

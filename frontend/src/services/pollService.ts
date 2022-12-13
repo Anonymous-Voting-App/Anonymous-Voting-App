@@ -1,7 +1,7 @@
 import { PollQuesObj } from '../utils/types';
 import getBackendUrl from '../utils/getBackendUrl';
 import { getAuthorizationToken } from '../utils/getAuthorizationToken';
-import { getCurrentUser } from '../utils/getCurrentUser';
+import { getCurrentUser } from '../utils/userUtilities';
 
 // function to modify question type before calling api
 const updatePollBody = (questions: PollQuesObj[]) => {

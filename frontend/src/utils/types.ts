@@ -38,4 +38,5 @@ export interface CurrentUser {
     lastName: string;
     email: string;
     userName: string;
+    isAdmin?: boolean;
 }

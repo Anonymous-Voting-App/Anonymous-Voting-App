@@ -88,7 +88,8 @@ export const verifyUser = async (
                 firstName: existingUser.firstname,
                 lastName: existingUser.lastname,
                 email: existingUser.email,
-                userName: existingUser.username
+                userName: existingUser.username,
+                isAdmin: existingUser.isAdmin ? true : undefined
             };
 
             return data;
