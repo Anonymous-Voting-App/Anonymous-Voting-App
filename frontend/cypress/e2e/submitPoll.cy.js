@@ -40,14 +40,28 @@ describe('submit a poll, edit votes, delete poll', () => {
         cy.restoreLocalStorage();
         cy.get('.submit-poll-btn').click();
         cy.get('.MuiAlert-filledSuccess').should('exist');
-        //eslint-disable-next-line cypress/no-unnecessary-waiting
-        cy.wait(3500);
-        cy.contains('Copy Result link').click();
-        cy.get('.MuiAlert-filledSuccess').should('exist');
-        //eslint-disable-next-line cypress/no-unnecessary-waiting
-        cy.wait(3500);
-        cy.contains('Copy Answering link').click();
-        cy.get('.MuiAlert-filledSuccess').should('exist');
+        cy.contains('Copy Result link')
+            .click()
+            .then(() => {
+                cy.window().then((win) => {
+                    win.navigator.clipboard.readText().then((text) => {
+                        console.log('Helloooo:' + text);
+                        expect(text).to.contains('/result');
+                    });
+                });
+            });
+        cy.get('.hamburgerMenu').click();
+        cy.get('.hamburgerMenu').click();
+        cy.contains('Copy Answering link')
+            .click()
+            .then(() => {
+                cy.window().then((win) => {
+                    win.navigator.clipboard.readText().then((text) => {
+                        console.log('Helloooo:' + text);
+                        expect(text).to.contains('/answer');
+                    });
+                });
+            });
         cy.saveLocalStorage();
     });
 

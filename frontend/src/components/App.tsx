@@ -92,6 +92,15 @@ function App() {
                                         showNotification={handleNotification}
                                     />
                                 }
+                            />{' '}
+                            <Route
+                                path={'/answer/:pollId'}
+                                element={
+                                    <PollAnswering
+                                        pollId={pollId}
+                                        showNotification={handleNotification}
+                                    />
+                                }
                             />
                         </Routes>
                         <BasicSnackbar

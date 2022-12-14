@@ -16,6 +16,8 @@ describe('edit and delete users as admin', () => {
         cy.visit(
             'https://staging.knowit-anonymous-voting-app.aws.cybercom.dev/register'
         );
+        //eslint-disable-next-line cypress/no-unnecessary-waiting
+        cy.wait(2000);
         cy.get('.fields').children().first().type(random_string);
         cy.get('.fields').children().eq(1).type('password');
         cy.get('.fields').children().eq(2).type('password');
@@ -27,10 +29,12 @@ describe('edit and delete users as admin', () => {
             .type(random_string + '@gmail.com');
         cy.get('.login-btn').click();
         //eslint-disable-next-line cypress/no-unnecessary-waiting
-        cy.wait(2000);
+        cy.wait(3000);
         cy.get('.fields').children().first().type('testAdmin');
         cy.get('.fields').children().eq(1).type('admin@1234');
         cy.get('.login-btn').click();
+        //eslint-disable-next-line cypress/no-unnecessary-waiting
+        cy.wait(2000);
         cy.saveLocalStorage();
     });
     it('can edit password and admin status', () => {
@@ -75,7 +79,7 @@ describe('edit and delete users as admin', () => {
         cy.contains('User name').click();
         cy.get('.searchField').type(random_string);
         cy.get('.searchButton').click();
-        cy.contains('Delete user').click();
+        cy.contains('Delete').click();
         cy.contains('No data found').should('exist');
     });
 });

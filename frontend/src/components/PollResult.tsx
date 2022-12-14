@@ -10,6 +10,8 @@ const PollResult = (props: any) => {
     const [pollResult, setPollResult] = useState([]);
     const { pollId } = useParams();
     const [voteStatus, setVoteStatus] = useState('hideVote');
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [showMessage, setShowMessage] = useState(false);
 
     useEffect(() => {
         getResultData(pollId);
@@ -37,17 +39,29 @@ const PollResult = (props: any) => {
             });
     };
     const handleResultLink = async (event: any) => {
-        const pollAnsweringUrl = `${window.location.origin}/result/${pollId}`;
-        await navigator.clipboard.writeText(pollAnsweringUrl); //**currently copying link of result page -  answering url has to be added when answering component is implemented
+        const pollResultUrl = `${window.location.origin}/result/${pollId}`;
+        await navigator.clipboard.writeText(pollResultUrl);
+        setShowMessage(true);
+        // //timer for link copied message
+        setTimeout(() => {
+            setShowMessage(false);
+        }, 500);
+        event.stopPropagation();
+    };
 
-        props.showNotification({
-            severity: 'success',
-            message: 'Link copied'
-        });
+    const handleAnswerLink = async (event: any) => {
+        const pollAnswerUrl = `${window.location.origin}/answer/${pollId}`;
+        await navigator.clipboard.writeText(pollAnswerUrl);
+        setShowMessage(true);
+        // //timer for link copied message
+        setTimeout(() => {
+            setShowMessage(false);
+        }, 500);
+        event.stopPropagation();
     };
 
     return (
-        <Container>
+        <Container className="poll-result-wrapper">
             <Typography className="poll-name" variant="h4">
                 {pollName}
             </Typography>
@@ -62,7 +76,7 @@ const PollResult = (props: any) => {
                 <Link
                     href="#"
                     className="pinkLink"
-                    onClick={(e) => handleResultLink(e)}
+                    onClick={(e) => handleAnswerLink(e)}
                 >
                     Copy Answering link
                 </Link>

@@ -3,10 +3,10 @@ import { DataGrid } from '@mui/x-data-grid';
 import { Link } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { deletePoll } from '../services/pollService';
-import './AdminViewPollDataGrid.scss';
+import './AdminViewDataGrid.scss';
+
 const AdminViewPollDataGrid = (props: any) => {
     const [pageSize, setPageSize] = React.useState<number>(5);
-
     const navigate = useNavigate();
 
     const showSnackBar = (status: { severity: string; message: string }) => {

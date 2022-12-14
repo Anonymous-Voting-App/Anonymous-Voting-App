@@ -63,11 +63,13 @@ function Registration() {
     const handleRegister = () => {
         register(username, password, firstName, lastName, email)
             .then(() => {
-                navigate('/login');
                 showNotification({
                     severity: 'success',
                     message: 'Register successful'
                 });
+                setTimeout(() => {
+                    navigate('/login');
+                }, 800);
             })
             .catch(() => {
                 showNotification({

@@ -88,7 +88,7 @@ export const createPoll = async (
 };
 
 /**
- * Function for fetching poll result
+ * Function for fetching poll data for poll answering screen
  * @param pollId
  * @returns
  */
@@ -99,12 +99,14 @@ export const fetchPoll = async (pollId: string) => {
             Accept: 'application/json'
         }
     });
+
     if (newResponse.status !== 200) {
+        console.log('error');
         throw new Error('Request Failed');
     }
-    const dataList = await newResponse.json();
-    const formattedData = formatData(dataList);
 
+    const dataList = await newResponse.json();
+    const formattedData = formatPollData(dataList);
     return formattedData;
 };
 
@@ -114,10 +116,7 @@ export const fetchPoll = async (pollId: string) => {
  * @returns
  */
 export const fetchPollResult = async (pollId: string) => {
-    // pollId = '1576d894-2571-4281-933d-431d246bb460';
-    // a6fb06b2-7146-42c0-820b-346a9d1e0539
-    // 63189e12-7a23-4630-8984-5cc2a2629d24 - rating type ques only
-    // ee651f25-a6f7-4602-b517-2031396a0b26 - thumbs up/down
+    // console.log('8532e49c-9bbf-419f-b4f7-0a0120d4e35d')
     const newResponse = await fetch(
         // `${window.location.origin}/dummy2.json`,
         `${getBackendUrl()}/api/poll/${pollId}/results`,
@@ -132,6 +131,7 @@ export const fetchPollResult = async (pollId: string) => {
         throw new Error('Request Failed');
     }
     const dataList = await newResponse.json();
+    console.log(dataList);
     const formattedData = formatData(dataList);
 
     return formattedData;
@@ -144,6 +144,7 @@ export const fetchPollResult = async (pollId: string) => {
  */
 const formatData = (data: any) => {
     const newList = data.questions.map((item: any) => {
+        // console.log(setQuesArray(item));
         return setQuesArray(item);
     });
     return {
@@ -155,6 +156,7 @@ const formatData = (data: any) => {
 
 const setQuesArray = (item: any) => {
     let options;
+
     switch (item.visualType) {
         case 'radioBtn':
         case 'checkBox':
@@ -239,9 +241,11 @@ const formatRatingOptions = (options: [any]) => {
 
     let ratingTypeOptions = newArray.map((arr) => {
         const obj =
-            respOptions.findIndex((option) => option.value === arr.title) === -1
+            respOptions.findIndex(
+                (option) => Number(option.value) === arr.title
+            ) === -1
                 ? arr
-                : respOptions.find((item) => item.value === arr.title);
+                : respOptions.find((item) => Number(item.value) === arr.title);
         return obj;
     });
     // for fixing title - value keys
@@ -374,5 +378,87 @@ export const editPoll = async (
     }
     const data = await response.json();
 
+    return data;
+};
+
+/**
+ * functions for formatting response data of poll api
+ * formatPollData, setQuesArrayForAnswering, formatMultiTypeOptionsWithId,
+ */
+const formatPollData = (data: any) => {
+    const newList = data.questions.map((item: any) => {
+        return setQuesArrayForAnswering(item);
+    });
+    return {
+        pollName: data.name,
+        questions: newList,
+        voteCount: data?.visualFlags[0]
+    };
+};
+
+const setQuesArrayForAnswering = (item: any) => {
+    let options;
+    // let freeText = '';
+    // let rating = 0;
+    // let booleanV;
+    switch (item.visualType) {
+        case 'radioBtn':
+        case 'checkBox':
+            const multiOptions = item.subQuestions ? item.subQuestions : [];
+            options = formatMultiTypeOptionsWithId(multiOptions);
+            break;
+        case 'star':
+        case 'free':
+        case 'yesNo':
+        case 'upDown':
+            options = [];
+            break;
+    }
+    return {
+        title: item.title ? item.title : '',
+        quesId: item.id,
+        type: item.visualType ? item.visualType : 'radioBtn',
+        options: options,
+        ratingValue: 0,
+        freeText: '',
+        booleanValue: ''
+    };
+};
+
+const formatMultiTypeOptionsWithId = (options: [any]) => {
+    const formattedOptions = options.map((option) => {
+        return {
+            optionId: option.id,
+            title: option.title,
+            isSelected: false
+        };
+    });
+
+    return formattedOptions;
+};
+
+export const submitPollAnswer = async (
+    pollId: string | undefined,
+    answers: any
+) => {
+    const pollContent = {
+        answers: answers
+    };
+
+    const response = await fetch(
+        `${getBackendUrl()}/api/poll/${pollId}/answers`,
+        {
+            method: 'POST',
+            body: JSON.stringify(pollContent),
+            headers: {
+                'Content-type': 'application/json; charset=UTF-8'
+            }
+        }
+    );
+    if (response.status !== 201) {
+        throw new Error('Request Failed');
+    }
+    const data = await response.json();
+    // console.log(data);
     return data;
 };

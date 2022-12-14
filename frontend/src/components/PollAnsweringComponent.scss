@@ -5,29 +5,22 @@
     }
 }
 
-.MuiContainer-root {
-    margin-top: 100px;
+.answer-component-wrapper.MuiContainer-root:first-child {
+    margin-top: 10px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
 }
 
-.question-type {
+.questionType {
     margin-top: -7px;
-    margin-top: 50px;
-    font-weight: 600;
-    font-size: large;
-}
-
-.pollName {
-    margin-top: -7px;
-    padding-top: 80px;
+    //padding-top: 80px;
     font-weight: 600;
 }
 
 .questionTitle {
-    padding-top: 80px;
+    padding-top: 0px;
     font-size: 40px;
 }
 
@@ -53,9 +46,24 @@
 }
 
 .starContainer {
-    margin-top: 30px;
     display: flex;
     justify-content: center;
+    text-align: center;
+    margin: auto;
+    margin-top: 30px;
+    width: 50%;
+    right: 10px;
+}
+
+.free-text {
+    .MuiInputBase-root {
+        .MuiOutlinedInput-notchedOutline {
+            border: 1px solid $main-color;
+        }
+    }
+    .Mui-focused {
+        color: $main-color;
+    }
 }
 
 .questionNumber {
@@ -107,4 +115,12 @@
 .nextQuestionButton:hover {
     @extend .button;
     background-color: $mint;
+}
+
+.updown-container {
+    .MuiFormGroup-root {
+        display: flex;
+        flex-direction: row;
+        gap: 100px;
+    }
 }
