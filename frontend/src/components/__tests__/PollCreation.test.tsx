@@ -25,7 +25,7 @@ test('Renders submit button for submitting the poll questions', () => {
             <PollCreation />
         </Router>
     );
-    const button = screen.getByRole('button', { name: 'Submit Poll' });
+    const button = screen.getByRole('button', { name: 'Create a poll' });
     expect(button).toBeInTheDocument();
     expect(button.getAttribute('type')).toBe('submit');
 });
