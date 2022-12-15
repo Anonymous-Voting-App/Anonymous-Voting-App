@@ -282,7 +282,7 @@ function PollCreation(props: any) {
                 sx={{ mt: '1.125rem', width: 200 }}
             >
                 {' '}
-                Submit Poll{' '}
+                Create a poll{' '}
             </Button>
             <Button
                 variant="contained"
