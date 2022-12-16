@@ -26,6 +26,9 @@ const NavBar = () => {
         userIsLoggedIn() ? logoutAndNavigateToHome() : navigate('/login');
     };
 
+    const navigateToHomePage = () => {
+        navigate('/');
+    };
     return (
         <>
             <AppBar className="navigation">
@@ -45,6 +48,7 @@ const NavBar = () => {
                     className="logo"
                     src={AVALogo}
                     alt="Anonymous voting app logo"
+                    onClick={() => navigateToHomePage()}
                 />
 
                 <Typography className="login" onClick={handleClick}>

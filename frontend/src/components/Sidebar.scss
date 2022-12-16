@@ -1,5 +1,4 @@
 @import '../styles/colors';
-
 .sidebar {
     margin-top: 80px;
     position: absolute;
@@ -16,7 +15,6 @@
 
 .page {
     padding-left: 60px;
-
     .text {
         font-size: 24px;
     }
@@ -26,8 +24,7 @@
     position: absolute;
     bottom: 40px;
     left: 49px;
-
     filter: brightness(0) saturate(100%) invert(15%) sepia(1%)
         hue-rotate(318deg) contrast(86%);
-    cursor: pointer;
+    // cursor: pointer;
 }

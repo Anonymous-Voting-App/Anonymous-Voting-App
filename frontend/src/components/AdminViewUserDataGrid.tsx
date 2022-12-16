@@ -57,7 +57,7 @@ const AdminViewUserDataGrid = (props: any) => {
                             className="pinkLink"
                             onClick={(e) => handleEdit(params.row)}
                         >
-                            Edit poll
+                            Edit user
                         </Link>
                         <Link
                             className="deleteLink"

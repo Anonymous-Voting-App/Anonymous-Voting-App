@@ -1,5 +1,4 @@
 @import '../styles/colors';
-
 @mixin for-phone-only {
     @media (max-width: 599px) {
         @content;
@@ -23,11 +22,9 @@
             font-size: 2rem;
         }
     }
-
     .MuiSvgIcon-root {
         transform: rotate(90deg);
         font-size: 3rem !important;
-
         @include for-phone-only {
             font-size: 2rem !important;
         }
@@ -45,12 +42,10 @@
     }
     .MuiInputBase-root {
         border-bottom: 1px solid $main-color;
-
         &.MuiInput-underline:after {
             border-bottom: black;
         }
     }
-
     .MuiFormLabel-root {
         width: 100%;
         color: $placeholder-text-color;
@@ -65,11 +60,9 @@
     background-color: $mint;
     text-transform: none;
     border: 2px solid $main-color;
-
     @include for-phone-only {
-        font-size: 2.5rem;
+        font-size: 1rem;
     }
-
     .MuiSvgIcon-root {
         margin-right: 0.625rem;
     }
@@ -83,18 +76,27 @@
     background-color: $main-color;
     text-transform: none;
     border: 2px solid $main-color;
-
     @include for-phone-only {
-        font-size: 2.5rem;
+        font-size: 1rem;
     }
 }
-.css-1r3dwil-MuiButtonBase-root-MuiButton-root.Mui-disabled {
+
+// .css-1r3dwil-MuiButtonBase-root-MuiButton-root.Mui-disabled,
+// .css-1x2nin.Mui-disabled {
+//     color: rgba(0, 0, 0, 0.26);
+//     box-shadow: none;
+//     border: none;
+//     //border: rgba(1, 1, 1, 0.515);
+//     background-color: rgba(0, 0, 0, 0.12);
+// }
+.Mui-disabled {
     color: rgba(0, 0, 0, 0.26);
     box-shadow: none;
     border: none;
     //border: rgba(1, 1, 1, 0.515);
     background-color: rgba(0, 0, 0, 0.12);
 }
+
 .cancel-poll-btn,
 .cancel-poll-btn:hover {
     border-radius: 20px;
@@ -105,9 +107,8 @@
     background-color: $cancel-background-color;
     text-transform: none;
     border: 2px solid $main-color;
-
     @include for-phone-only {
-        font-size: 2.5rem;
+        font-size: 1rem;
     }
 }
 
@@ -121,7 +122,6 @@
     display: flex;
     justify-content: center;
     margin: 6.25rem 0 0 0;
-
     .MuiSwitch-switchBase {
         color: $black;
         position: absolute;
@@ -133,19 +133,18 @@
         height: 15px;
         width: 15px;
     }
-
     .Mui-checked + .MuiSwitch-track {
         border: 1px solid $black;
         background-color: $lollipop;
         opacity: 10;
     }
-
     .MuiSwitch-track {
         border: 1px solid $black;
         background-color: $toggle-background-color;
         opacity: 10;
     }
 }
+
 .vote-count-toggle-btn {
     .Mui-checked.css-5ryogn-MuiButtonBase-root-MuiSwitch-switchBase {
         color: $black;

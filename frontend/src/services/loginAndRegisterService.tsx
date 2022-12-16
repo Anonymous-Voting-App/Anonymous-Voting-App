@@ -48,9 +48,11 @@ export const register = async (
             'Content-type': 'application/json'
         }
     });
-
     if (response.status !== 201) {
-        throw new Error('Request Failed');
+        const data = await response.json();
+        // console.log(data)
+        // throw new Error(data.message);
+        return data;
     }
 
     const data = await response.json();
