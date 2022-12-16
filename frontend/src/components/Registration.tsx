@@ -68,16 +68,30 @@ function Registration() {
             });
         } else {
             register(username, password, firstName, lastName, email)
-                .then(() => {
-                    showNotification({
-                        severity: 'success',
-                        message: 'Register successful'
-                    });
-                    setTimeout(() => {
-                        navigate('/login');
-                    }, 800);
+                .then((response) => {
+                    console.log(response);
+                    if (response.code === 201) {
+                        showNotification({
+                            severity: 'success',
+                            message: 'Register successful'
+                        });
+                        setTimeout(() => {
+                            navigate('/login');
+                        }, 800);
+                    } else {
+                        const message = Array.isArray(response.message)
+                            ? response.message.length > 2
+                                ? 'All fields are mandatory'
+                                : response.message.join(', ')
+                            : response.message;
+                        showNotification({
+                            severity: 'error',
+                            message: message
+                        });
+                    }
                 })
                 .catch(() => {
+                    // console.log(error)
                     showNotification({
                         severity: 'error',
                         message: 'Register unsuccessful'
