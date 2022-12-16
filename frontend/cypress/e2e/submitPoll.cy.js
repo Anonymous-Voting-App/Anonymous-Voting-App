@@ -49,6 +49,12 @@ describe('submit a poll, edit votes, delete poll', () => {
         cy.restoreLocalStorage();
         cy.get('.submit-poll-btn').click();
         cy.get('.MuiAlert-filledSuccess').should('exist');
+        cy.saveLocalStorage();
+    });
+
+    it('can copy result and answer links', () => {
+        cy.viewport(1024, 768);
+        cy.restoreLocalStorage();
         cy.contains('Copy Result link')
             .click()
             .then(() => {
@@ -73,6 +79,8 @@ describe('submit a poll, edit votes, delete poll', () => {
     });
 
     it('can edit poll', () => {
+        cy.viewport(1024, 768);
+        cy.restoreLocalStorage();
         cy.viewport(1024, 768);
         cy.restoreLocalStorage();
         cy.contains('My polls').click();
