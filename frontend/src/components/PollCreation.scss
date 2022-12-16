@@ -81,8 +81,15 @@
     }
 }
 
-.css-1r3dwil-MuiButtonBase-root-MuiButton-root.Mui-disabled,
-.css-1x2nin.Mui-disabled {
+// .css-1r3dwil-MuiButtonBase-root-MuiButton-root.Mui-disabled,
+// .css-1x2nin.Mui-disabled {
+//     color: rgba(0, 0, 0, 0.26);
+//     box-shadow: none;
+//     border: none;
+//     //border: rgba(1, 1, 1, 0.515);
+//     background-color: rgba(0, 0, 0, 0.12);
+// }
+.Mui-disabled {
     color: rgba(0, 0, 0, 0.26);
     box-shadow: none;
     border: none;

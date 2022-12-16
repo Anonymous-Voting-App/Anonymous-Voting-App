@@ -162,7 +162,7 @@ const PollAnswering = (props: any) => {
     };
 
     const formatAnswerData = (answeredPoll: Array<any>) => {
-        console.log(answeredPoll);
+        // console.log(answeredPoll);
         let answerObj: any;
         const updatedQuestions = answeredPoll.map((item: any) => {
             switch (item.type) {
@@ -189,7 +189,7 @@ const PollAnswering = (props: any) => {
         const answerArray = updatedQuestions.filter((answerObj: any) => {
             return answerObj !== null;
         });
-        console.log(answerArray);
+        // console.log(answerArray);
 
         return answerArray;
     };
