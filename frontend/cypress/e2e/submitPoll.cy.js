@@ -12,17 +12,10 @@ describe('submit a poll, edit votes, delete poll', () => {
         return random_string;
     }
 
-    Cypress.on('uncaught:exception', (err, runnable) => {
-        // returning false here should prevent Cypress from
-        // failing the test
-        return false;
-    });
-
     before(() => {
         cy.visit(
             'https://staging.knowit-anonymous-voting-app.aws.cybercom.dev/login'
         );
-        cy.viewport(1024, 768);
         cy.get('.fields').children().first().type('testAdmin');
         cy.get('.fields').children().eq(1).type('admin@1234');
         cy.get('.login-btn').click();
@@ -37,7 +30,6 @@ describe('submit a poll, edit votes, delete poll', () => {
     });
 
     it('can choose to show vote count', () => {
-        cy.viewport(1024, 768);
         cy.restoreLocalStorage();
         cy.get('.vote-count-toggle-btn').click();
         cy.get('.vote-count-toggle-btn').find('input').should('be.checked');
@@ -45,43 +37,39 @@ describe('submit a poll, edit votes, delete poll', () => {
     });
 
     it('can submit poll', () => {
-        cy.viewport(1024, 768);
         cy.restoreLocalStorage();
         cy.get('.submit-poll-btn').click();
         cy.get('.MuiAlert-filledSuccess').should('exist');
         cy.saveLocalStorage();
     });
 
-    it('can copy result and answer links', () => {
-        cy.viewport(1024, 768);
-        cy.restoreLocalStorage();
-        cy.contains('Copy Result link')
-            .click()
-            .then(() => {
-                cy.window().then((win) => {
-                    win.navigator.clipboard.readText().then((text) => {
-                        expect(text).to.contains('/result');
-                    });
-                });
-            });
-        cy.get('.hamburgerMenu').click();
-        cy.get('.hamburgerMenu').click();
-        cy.contains('Copy Answering link')
-            .click()
-            .then(() => {
-                cy.window().then((win) => {
-                    win.navigator.clipboard.readText().then((text) => {
-                        expect(text).to.contains('/answer');
-                    });
-                });
-            });
-        cy.saveLocalStorage();
-    });
+    // it('can copy result and answer links', () => {
+    //     cy.restoreLocalStorage();
+    //     cy.contains('Copy Result link')
+    //         .click()
+    //         .then(() => {
+    //             cy.window().then((win) => {
+    //                 win.navigator.clipboard.readText().then((text) => {
+    //                     expect(text).to.contains('/result');
+    //                 });
+    //             });
+    //         });
+    //     cy.get('.hamburgerMenu').click();
+    //     cy.get('.hamburgerMenu').click();
+    //     cy.contains('Copy Answering link')
+    //         .click()
+    //         .then(() => {
+    //             cy.window().then((win) => {
+    //                 win.navigator.clipboard.readText().then((text) => {
+    //                     expect(text).to.contains('/answer');
+    //                 });
+    //             });
+    //         });
+    //     cy.saveLocalStorage();
+    // });
 
     it('can edit poll', () => {
-        cy.viewport(1024, 768);
         cy.restoreLocalStorage();
-        cy.viewport(1024, 768);
         cy.restoreLocalStorage();
         cy.contains('My polls').click();
         cy.contains('Search by').click();

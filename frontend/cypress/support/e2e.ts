@@ -25,7 +25,7 @@ Cypress.on('uncaught:exception', (err, runnable) => {
     return false;
 });
 
-Cypress.on(
-    'uncaught:exception',
-    (err) => !err.message.includes('Uncaught exception')
-);
+// Cypress.on(
+//     'uncaught:exception',
+//     (err) => !err.message.includes('Uncaught exception')
+// );
