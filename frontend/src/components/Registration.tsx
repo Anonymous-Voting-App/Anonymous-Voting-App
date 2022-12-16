@@ -61,22 +61,29 @@ function Registration() {
     };
 
     const handleRegister = () => {
-        register(username, password, firstName, lastName, email)
-            .then(() => {
-                showNotification({
-                    severity: 'success',
-                    message: 'Register successful'
-                });
-                setTimeout(() => {
-                    navigate('/login');
-                }, 800);
-            })
-            .catch(() => {
-                showNotification({
-                    severity: 'error',
-                    message: 'Register unsuccessful'
-                });
+        if (password !== passwordAgain) {
+            showNotification({
+                severity: 'error',
+                message: "Passwords don't match"
             });
+        } else {
+            register(username, password, firstName, lastName, email)
+                .then(() => {
+                    showNotification({
+                        severity: 'success',
+                        message: 'Register successful'
+                    });
+                    setTimeout(() => {
+                        navigate('/login');
+                    }, 800);
+                })
+                .catch(() => {
+                    showNotification({
+                        severity: 'error',
+                        message: 'Register unsuccessful'
+                    });
+                });
+        }
     };
 
     return (
