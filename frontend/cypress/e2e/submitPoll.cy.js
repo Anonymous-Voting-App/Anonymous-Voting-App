@@ -40,32 +40,36 @@ describe('submit a poll, edit votes, delete poll', () => {
         cy.restoreLocalStorage();
         cy.get('.submit-poll-btn').click();
         cy.get('.MuiAlert-filledSuccess').should('exist');
-        cy.contains('Copy Result link')
-            .click()
-            .then(() => {
-                cy.window().then((win) => {
-                    win.navigator.clipboard.readText().then((text) => {
-                        console.log('Helloooo:' + text);
-                        expect(text).to.contains('/result');
-                    });
-                });
-            });
-        cy.get('.hamburgerMenu').click();
-        cy.get('.hamburgerMenu').click();
-        cy.contains('Copy Answering link')
-            .click()
-            .then(() => {
-                cy.window().then((win) => {
-                    win.navigator.clipboard.readText().then((text) => {
-                        console.log('Helloooo:' + text);
-                        expect(text).to.contains('/answer');
-                    });
-                });
-            });
         cy.saveLocalStorage();
     });
 
+    // it('can copy result and answer links', () => {
+    //     cy.restoreLocalStorage();
+    //     cy.contains('Copy Result link')
+    //         .click()
+    //         .then(() => {
+    //             cy.window().then((win) => {
+    //                 win.navigator.clipboard.readText().then((text) => {
+    //                     expect(text).to.contains('/result');
+    //                 });
+    //             });
+    //         });
+    //     cy.get('.hamburgerMenu').click();
+    //     cy.get('.hamburgerMenu').click();
+    //     cy.contains('Copy Answering link')
+    //         .click()
+    //         .then(() => {
+    //             cy.window().then((win) => {
+    //                 win.navigator.clipboard.readText().then((text) => {
+    //                     expect(text).to.contains('/answer');
+    //                 });
+    //             });
+    //         });
+    //     cy.saveLocalStorage();
+    // });
+
     it('can edit poll', () => {
+        cy.restoreLocalStorage();
         cy.restoreLocalStorage();
         cy.contains('My polls').click();
         cy.contains('Search by').click();
