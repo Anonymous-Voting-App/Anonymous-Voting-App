@@ -17,7 +17,7 @@ describe('edit and delete users as admin', () => {
             'https://staging.knowit-anonymous-voting-app.aws.cybercom.dev/register'
         );
         //eslint-disable-next-line cypress/no-unnecessary-waiting
-        cy.wait(2000);
+        cy.wait(5000);
         cy.get('.fields').children().first().type(random_string);
         cy.get('.fields').children().eq(1).type('password');
         cy.get('.fields').children().eq(2).type('password');
@@ -29,12 +29,12 @@ describe('edit and delete users as admin', () => {
             .type(random_string + '@gmail.com');
         cy.get('.login-btn').click();
         //eslint-disable-next-line cypress/no-unnecessary-waiting
-        cy.wait(3000);
+        cy.wait(6000);
         cy.get('.fields').children().first().type('testAdmin');
         cy.get('.fields').children().eq(1).type('admin@1234');
         cy.get('.login-btn').click();
         //eslint-disable-next-line cypress/no-unnecessary-waiting
-        cy.wait(2000);
+        cy.wait(5000);
         cy.saveLocalStorage();
     });
     it('can edit password and admin status', () => {
@@ -54,7 +54,7 @@ describe('edit and delete users as admin', () => {
         cy.contains('Update').click();
         cy.get('.MuiAlert-filledSuccess').should('exist');
         //eslint-disable-next-line cypress/no-unnecessary-waiting
-        cy.wait(2000);
+        cy.wait(3000);
         cy.contains('Logout').click();
         cy.contains('Login').click();
         cy.get('.fields').children().first().type(random_string);
@@ -73,7 +73,7 @@ describe('edit and delete users as admin', () => {
         cy.get('.fields').children().eq(1).type('admin@1234');
         cy.get('.login-btn').click();
         //eslint-disable-next-line cypress/no-unnecessary-waiting
-        cy.wait(2000);
+        cy.wait(3000);
         cy.contains('My polls').click();
         cy.contains('Search by').click();
         cy.contains('User name').click();

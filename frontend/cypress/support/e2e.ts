@@ -20,7 +20,12 @@ import './commands';
 // require('./commands')
 
 Cypress.on('uncaught:exception', (err, runnable) => {
-    // returning false here prevents Cypress from
+    // returning false here should prevent Cypress from
     // failing the test
     return false;
 });
+
+Cypress.on(
+    'uncaught:exception',
+    (err) => !err.message.includes('Uncaught exception')
+);
