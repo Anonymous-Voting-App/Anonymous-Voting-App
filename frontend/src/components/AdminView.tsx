@@ -11,10 +11,13 @@ import {
 } from '@mui/material';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import './AdminView.scss';
-import { fetchSearchResult } from '../services/pollAndUserService';
-import AdminViewPoll from './AdminViewPoll';
-import AdminViewUser from './AdminViewUser';
+import { fetchSearchPoll } from '../services/pollService';
+import { fetchSearchUser } from '../services/userService';
+// import AdminViewPoll from './AdminViewPoll';
+// import AdminViewUser from './AdminViewUser';
 import BasicSnackbar from './BasicSnackbar';
+import AdminViewPollDataGrid from './AdminViewPollDataGrid';
+import AdminViewUserDataGrid from './AdminViewUserDataGrid';
 
 // const TEST_USERS = ['Martti', 'user123'];
 
@@ -74,9 +77,9 @@ const AdminView = () => {
      */
     const handleSearchClick = async () => {
         // setShowSearchResults(true);
-        if (searchBy === 'Poll name/ID') {
+        if (searchBy === 'Poll name') {
             const data = await fetchData(searchText, 'poll');
-            console.log(pollList);
+
             if (data.length > 0) {
                 setShowUserList(false);
                 setShowPollList(true);
@@ -92,7 +95,7 @@ const AdminView = () => {
             }
         } else {
             const data = await fetchData(searchText, 'user');
-            console.log(userList);
+
             if (data.length > 0) {
                 setShowUserList(true);
                 setShowPollList(false);
@@ -117,9 +120,12 @@ const AdminView = () => {
      * @returns
      */
     const fetchData = (text: string, searchType: string) => {
-        const searchResult = fetchSearchResult(text, searchType)
+        const searchResult = (
+            searchType === 'poll'
+                ? fetchSearchPoll(text)
+                : fetchSearchUser(text)
+        )
             .then((response: { data: string | any[] }) => {
-                console.log(response.data);
                 if (response.data.length > 0) {
                     setShowErrorMsg(false);
                     return response.data;
@@ -128,7 +134,6 @@ const AdminView = () => {
                 return [];
             })
             .catch((error) => {
-                console.log(error, 'No data');
                 setShowErrorMsg(true);
                 const status = {
                     message: 'Sorry no data found',
@@ -161,8 +166,8 @@ const AdminView = () => {
                         value={searchBy}
                         onChange={handleTypeChange}
                     >
-                        <MenuItem value="Poll name/ID">Poll name/ID</MenuItem>
-                        <MenuItem value="User name/ID">User name/ID</MenuItem>
+                        <MenuItem value="Poll name">Poll name</MenuItem>
+                        <MenuItem value="User name">User name</MenuItem>
                     </Select>
                 </FormControl>
                 <TextField
@@ -194,30 +199,28 @@ const AdminView = () => {
                         </div>
                     ) : null}
 
-                    {showPollList
-                        ? pollList.map((poll: any) => {
-                              return (
-                                  <div key={poll.id}>
-                                      <AdminViewPoll
-                                          pollData={poll}
-                                          showNotification={handleNotification}
-                                      ></AdminViewPoll>
-                                  </div>
-                              );
-                          })
-                        : null}
-                    {showUserList
-                        ? userList.map((user: any) => {
-                              return (
-                                  <div key={user.id}>
-                                      <AdminViewUser
-                                          userData={user}
-                                          showNotification={handleNotification}
-                                      ></AdminViewUser>
-                                  </div>
-                              );
-                          })
-                        : null}
+                    {showPollList ? (
+                        <AdminViewPollDataGrid
+                            data={pollList}
+                            showNotification={handleNotification}
+                        ></AdminViewPollDataGrid>
+                    ) : null}
+                    {showUserList ? (
+                        // userList.map((user: any) => {
+                        //       return (
+                        //           <div key={user.id}>
+                        //               <AdminViewUser
+                        //                   userData={user}
+                        //                   showNotification={handleNotification}
+                        //               ></AdminViewUser>
+                        //           </div>
+                        //       );
+                        //   })
+                        <AdminViewUserDataGrid
+                            data={userList}
+                            showNotification={handleNotification}
+                        ></AdminViewUserDataGrid>
+                    ) : null}
                 </div>
             )}
             <BasicSnackbar

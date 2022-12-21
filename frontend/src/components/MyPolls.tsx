@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Typography, Button, TextField } from '@mui/material';
-import { fetchAllPolls } from '../services/pollAndUserService';
-import AdminViewPoll from './AdminViewPoll';
+import { fetchAllPolls } from '../services/pollService';
+import AdminViewPollDataGrid from './AdminViewPollDataGrid';
 import BasicSnackbar from './BasicSnackbar';
 import './MyPolls.scss';
 
@@ -44,8 +44,8 @@ const MyPolls = (props: any) => {
                     data.map((poll: any) => {
                         if (poll.name.includes(searchText)) {
                             newList = [...newList, poll];
-                            return 0;
                         }
+                        return newList;
                     });
                     setResultCount(newList.length);
                     setPollList(newList);
@@ -53,6 +53,14 @@ const MyPolls = (props: any) => {
             })
             .catch((error) => {
                 console.log('error');
+                setShowErrorMsg(true);
+                setOpen(true);
+                setNotificationObj({
+                    ...notificationObj,
+                    message:
+                        'Sorry, An error encountered while fetching your polls',
+                    severity: 'error'
+                });
             });
     };
 
@@ -87,17 +95,14 @@ const MyPolls = (props: any) => {
                 <div className="search-content">
                     {
                         <div className="count-data">
-                            Results found: {resultCount}
+                            Polls found: {resultCount}
                         </div>
                     }
 
-                    {pollList.map((poll: any) => {
-                        return (
-                            <div key={poll.id}>
-                                <AdminViewPoll pollData={poll}></AdminViewPoll>
-                            </div>
-                        );
-                    })}
+                    <AdminViewPollDataGrid
+                        data={pollList}
+                        //showNotification={handleNotification}
+                    ></AdminViewPollDataGrid>
                 </div>
             )}
             <BasicSnackbar

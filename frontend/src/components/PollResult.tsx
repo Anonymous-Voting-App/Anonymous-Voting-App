@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Link, Typography } from '@mui/material';
 import './PollResult.scss';
-import { fetchPollResult } from '../services/pollAndUserService';
+import { fetchPollResult } from '../services/pollService';
 import ResultCard from './ResultCard';
+import { useParams } from 'react-router-dom';
 
 const PollResult = (props: any) => {
     const [pollName, setPollName] = useState('');
     const [pollResult, setPollResult] = useState([]);
-    const pollId = window.location.href.substring(
-        window.location.href.lastIndexOf('/') + 1
-    );
+    const { pollId } = useParams();
     const [voteStatus, setVoteStatus] = useState('hideVote');
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [showMessage, setShowMessage] = useState(false);
 
     useEffect(() => {
@@ -18,16 +18,18 @@ const PollResult = (props: any) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const getResultData = (id: string) => {
+    const getResultData = (id: string | undefined) => {
+        if (!id) {
+            return;
+        }
+
         fetchPollResult(id)
             .then((response) => {
-                console.log(response);
                 setPollName(response.pollName);
                 setPollResult(response.questions);
                 setVoteStatus(response.voteCount);
             })
-            .catch((error) => {
-                // console.log(error);
+            .catch(() => {
                 setPollName('Oops!! No data fetched');
                 props.showNotification({
                     severity: 'error',
@@ -37,8 +39,19 @@ const PollResult = (props: any) => {
             });
     };
     const handleResultLink = async (event: any) => {
-        const pollAnsweringUrl = `${window.location.origin}/result/${pollId}`;
-        await navigator.clipboard.writeText(pollAnsweringUrl); //**currently copying link of result page -  answering url has to be added when answering component is implemented
+        const pollResultUrl = `${window.location.origin}/result/${pollId}`;
+        await navigator.clipboard.writeText(pollResultUrl);
+        setShowMessage(true);
+        // //timer for link copied message
+        setTimeout(() => {
+            setShowMessage(false);
+        }, 500);
+        event.stopPropagation();
+    };
+
+    const handleAnswerLink = async (event: any) => {
+        const pollAnswerUrl = `${window.location.origin}/answer/${pollId}`;
+        await navigator.clipboard.writeText(pollAnswerUrl);
         setShowMessage(true);
         // //timer for link copied message
         setTimeout(() => {
@@ -48,7 +61,7 @@ const PollResult = (props: any) => {
     };
 
     return (
-        <Container>
+        <Container className="poll-result-wrapper">
             <Typography className="poll-name" variant="h4">
                 {pollName}
             </Typography>
@@ -63,12 +76,11 @@ const PollResult = (props: any) => {
                 <Link
                     href="#"
                     className="pinkLink"
-                    onClick={(e) => handleResultLink(e)}
+                    onClick={(e) => handleAnswerLink(e)}
                 >
                     Copy Answering link
                 </Link>
             </div>
-            {showMessage ? <div className="messageDiv">Link copied</div> : null}
             {pollResult.length > 0 ? (
                 <>
                     {pollResult.map((question, index) => (

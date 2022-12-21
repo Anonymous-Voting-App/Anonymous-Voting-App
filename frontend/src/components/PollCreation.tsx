@@ -9,7 +9,7 @@ import React, { useState, useEffect } from 'react';
 import { ArrowRightAlt, AddCircleOutline } from '@mui/icons-material';
 import './PollCreation.scss';
 import Question from './Question';
-import { createPoll } from '../services/pollAndUserService';
+import { createPoll } from '../services/pollService';
 import { PollQuesObj } from '../utils/types';
 import { useNavigate } from 'react-router-dom';
 
@@ -188,7 +188,6 @@ function PollCreation(props: any) {
      * Function to handle the submit event
      */
     const submitHandler = () => {
-        console.log(questions, pollName, showCount);
         const countData = showCount ? 'showCount' : 'hideCount';
         createPoll(pollName, questions, countData)
             .then((response) => {
@@ -200,8 +199,7 @@ function PollCreation(props: any) {
                 });
                 navigate(`result/${response.publicId}`);
             })
-            .catch((error) => {
-                console.log(error);
+            .catch(() => {
                 props.showNotification({
                     severity: 'error',
                     message:
@@ -284,7 +282,7 @@ function PollCreation(props: any) {
                 sx={{ mt: '1.125rem', width: 200 }}
             >
                 {' '}
-                Submit Poll{' '}
+                Create a poll{' '}
             </Button>
             <Button
                 variant="contained"

@@ -1,14 +1,12 @@
 import { PollQuesObj } from '../utils/types';
 import getBackendUrl from '../utils/getBackendUrl';
+import { getAuthorizationToken } from '../utils/getAuthorizationToken';
+import { getCurrentUser } from '../utils/userUtilities';
 
-//**token to be dynamically set once login integrated
-const token =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjdjZmUwOTEwLTFkNjUtNDMyMS1hNTg5LTlkYWRjMmY4MzdlYiIsImZpcnN0TmFtZSI6ImphbmUiLCJsYXN0TmFtZSI6ImRvZSIsImVtYWlsIjoiYWRtaW5AbWFpbC5jb20iLCJ1c2VyTmFtZSI6InRlc3RBZG1pbiIsImlhdCI6MTY2OTg4NTk0NiwiZXhwIjoxNjcwMDU4NzQ2LCJzdWIiOiI3Y2ZlMDkxMC0xZDY1LTQzMjEtYTU4OS05ZGFkYzJmODM3ZWIifQ.zpg9IJ8LkW8m4QZfi9jtupk87mbvro6uCb3ltByNGRE';
 // function to modify question type before calling api
 const updatePollBody = (questions: PollQuesObj[]) => {
     const updatedQuestions = questions.map(
         ({ subQuestions, minAnswers, maxAnswers, ...element }) => {
-            console.log(element.visualType);
             let quesObj;
             switch (element.visualType) {
                 case 'radioBtn':
@@ -47,7 +45,7 @@ const updatePollBody = (questions: PollQuesObj[]) => {
             return quesObj;
         }
     );
-    console.log(updatedQuestions);
+
     return updatedQuestions;
 };
 
@@ -63,22 +61,23 @@ export const createPoll = async (
     visualFlags: string
 ) => {
     const updatedQuestions = updatePollBody(questions);
+
     const pollContent = {
         name: title,
         type: 'string',
         owner: {
-            accountId: '7cfe0910-1d65-4321-a589-9dadc2f837eb' // hardcoded
+            accountId: getCurrentUser()?.id
         },
         questions: updatedQuestions,
         visualFlags: [visualFlags]
     };
-    console.log(pollContent);
+
     const response = await fetch(`${getBackendUrl()}/api/poll`, {
         method: 'POST',
         body: JSON.stringify(pollContent),
         headers: {
             'Content-type': 'application/json; charset=UTF-8',
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${getAuthorizationToken()}`
         }
     });
     if (response.status !== 201) {
@@ -89,15 +88,35 @@ export const createPoll = async (
 };
 
 /**
+ * Function for fetching poll data for poll answering screen
+ * @param pollId
+ * @returns
+ */
+export const fetchPoll = async (pollId: string) => {
+    const newResponse = await fetch(`${getBackendUrl()}/api/poll/${pollId}`, {
+        headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json'
+        }
+    });
+
+    if (newResponse.status !== 200) {
+        console.log('error');
+        throw new Error('Request Failed');
+    }
+
+    const dataList = await newResponse.json();
+    const formattedData = formatPollData(dataList);
+    return formattedData;
+};
+
+/**
  * Function for fetching poll result
  * @param pollId
  * @returns
  */
 export const fetchPollResult = async (pollId: string) => {
-    // pollId = '1576d894-2571-4281-933d-431d246bb460';
-    // a6fb06b2-7146-42c0-820b-346a9d1e0539
-    // 63189e12-7a23-4630-8984-5cc2a2629d24 - rating type ques only
-    // ee651f25-a6f7-4602-b517-2031396a0b26 - thumbs up/down
+    // console.log('8532e49c-9bbf-419f-b4f7-0a0120d4e35d')
     const newResponse = await fetch(
         // `${window.location.origin}/dummy2.json`,
         `${getBackendUrl()}/api/poll/${pollId}/results`,
@@ -112,6 +131,7 @@ export const fetchPollResult = async (pollId: string) => {
         throw new Error('Request Failed');
     }
     const dataList = await newResponse.json();
+    console.log(dataList);
     const formattedData = formatData(dataList);
 
     return formattedData;
@@ -124,6 +144,7 @@ export const fetchPollResult = async (pollId: string) => {
  */
 const formatData = (data: any) => {
     const newList = data.questions.map((item: any) => {
+        // console.log(setQuesArray(item));
         return setQuesArray(item);
     });
     return {
@@ -135,6 +156,7 @@ const formatData = (data: any) => {
 
 const setQuesArray = (item: any) => {
     let options;
+
     switch (item.visualType) {
         case 'radioBtn':
         case 'checkBox':
@@ -182,7 +204,6 @@ const formatFreeTextOptions = (options: [any]) => {
 };
 
 const formatMultiTypeOptions = (options: [any]) => {
-    console.log(options);
     const formattedOptions = options.map((option) => {
         return {
             title: option.title,
@@ -217,12 +238,14 @@ const formatRatingOptions = (options: [any]) => {
                 percentage: 0
             };
         });
-    // console.log(newArray);
+
     let ratingTypeOptions = newArray.map((arr) => {
         const obj =
-            respOptions.findIndex((option) => option.value === arr.title) === -1
+            respOptions.findIndex(
+                (option) => Number(option.value) === arr.title
+            ) === -1
                 ? arr
-                : respOptions.find((item) => item.value === arr.title);
+                : respOptions.find((item) => Number(item.value) === arr.title);
         return obj;
     });
     // for fixing title - value keys
@@ -233,7 +256,7 @@ const formatRatingOptions = (options: [any]) => {
             percentage: Number(option.percentage)
         };
     });
-    console.log(ratingTypeOptions);
+
     return ratingTypeOptions.length > 0
         ? ratingTypeOptions.reverse()
         : newArray;
@@ -245,7 +268,6 @@ const formatBooleanOptions = (options: [any]) => {
         { title: false, count: 0, percentage: 0 }
     ];
     const booleanTypeOptions = options.map((option) => {
-        console.log(option);
         return {
             title: option.value === 'true' ? 'Yes' : 'No',
             count: option.count,
@@ -258,47 +280,28 @@ const formatBooleanOptions = (options: [any]) => {
                     : (option.percentage * 100).toFixed(1)
         };
     });
-    console.log(booleanTypeOptions);
+
     return booleanTypeOptions.length > 0 ? booleanTypeOptions : newArray;
 };
 
-export const fetchSearchResult = async (
-    searchString: string,
-    searchType: string
-) => {
-    const searchBy = searchType === 'poll' ? 'searchByName' : 'searchByID';
-    const authToken = token;
-    let newResponse;
+export const fetchSearchPoll = async (searchString: string) => {
+    const authToken = getAuthorizationToken();
 
-    // const searchBy = 'searchByName';
-    // searchString = 'polltest101';
-    searchType === 'poll'
-        ? (newResponse = await fetch(
-              `${getBackendUrl()}/api/poll/admin/${searchBy}/${searchString}`,
-              {
-                  headers: {
-                      'Content-Type': 'application/json',
-                      Accept: 'application/json',
-                      Authorization: `Bearer ${authToken}`
-                  }
-              }
-          ))
-        : (newResponse = await fetch(
-              `${getBackendUrl()}/api/user/searchByName/${searchString}`,
-              {
-                  headers: {
-                      'Content-Type': 'application/json',
-                      Accept: 'application/json',
-                      Authorization: `Bearer ${authToken}`
-                  }
-              }
-          ));
+    const newResponse = await fetch(
+        `${getBackendUrl()}/api/poll/admin/searchByName/${searchString}`,
+        {
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                Authorization: `Bearer ${authToken}`
+            }
+        }
+    );
 
     if (newResponse.status !== 200) {
         throw new Error('Request Failed');
     }
     const dataList = await newResponse.json();
-    console.log(dataList);
 
     return dataList;
 };
@@ -311,37 +314,20 @@ export const deletePoll = async (pollId: string) => {
             headers: {
                 'Content-Type': 'application/json',
                 Accept: 'application/json',
-                Authorization: `Bearer ${token}`
+                Authorization: `Bearer ${getAuthorizationToken()}`
             }
         }
     );
-    if (newResponse.status !== 200) {
-        throw new Error('Request Failed');
-    }
-    const dataList = await newResponse.json();
-    console.log(dataList);
-
-    return dataList;
-};
-
-export const deleteUser = async (userId: string) => {
-    const newResponse = await fetch(`${getBackendUrl()}/api/user/${userId}`, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-            Authorization: `Bearer ${token}`
-        }
-    });
 
     if (newResponse.status !== 200) {
         throw new Error('Request Failed');
     }
+
     const dataList = await newResponse.json();
-    console.log(dataList);
 
     return dataList;
 };
+
 export const getEditPollData = async (privateId: string) => {
     const newResponse = await fetch(
         `${getBackendUrl()}/api/poll/admin/${privateId}`,
@@ -349,46 +335,19 @@ export const getEditPollData = async (privateId: string) => {
             headers: {
                 'Content-Type': 'application/json',
                 Accept: 'application/json',
-                Authorization: `Bearer ${token}`
+                Authorization: `Bearer ${getAuthorizationToken()}`
             }
         }
     );
+
     if (newResponse.status !== 200) {
         throw new Error('Request Failed');
     }
     const dataList = await newResponse.json();
-    console.log(dataList);
 
     return dataList;
 };
 
-export const updateUser = async (
-    userId: string,
-    username: string,
-    adminToggle: boolean,
-    newPassword: string
-) => {
-    const editedUserData = {
-        name: username,
-        isAdmin: adminToggle,
-        password: newPassword
-    };
-    const response = await fetch(`${getBackendUrl()}/api/user/${userId}`, {
-        method: 'PATCH',
-        body: JSON.stringify(editedUserData),
-        headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-            Authorization: `Bearer ${token}`
-        }
-    });
-    if (response.status !== 200) {
-        throw new Error('Request Failed');
-    }
-
-    const responseJSON = await response.json();
-    return responseJSON;
-};
 export const editPoll = async (
     privateId: string,
     newName: string,
@@ -400,7 +359,7 @@ export const editPoll = async (
         owner: ownerId,
         visualFlags: [showCount]
     };
-    //localhost:8080/api/poll/admin/d14c1c6a-7a98-4684-8fdc-49689c55263c
+
     const response = await fetch(
         `${getBackendUrl()}/api/poll/admin/${privateId}`,
         {
@@ -409,15 +368,15 @@ export const editPoll = async (
             headers: {
                 'Content-Type': 'application/json',
                 Accept: 'application/json',
-                Authorization: `Bearer ${token}`
+                Authorization: `Bearer ${getAuthorizationToken()}`
             }
         }
     );
+
     if (response.status !== 200) {
         throw new Error('Request Failed');
     }
     const data = await response.json();
-    console.log(data);
 
     return data;
 };
@@ -427,7 +386,7 @@ export const fetchAllPolls = async () => {
         headers: {
             'Content-Type': 'application/json',
             Accept: 'application/json',
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${getAuthorizationToken()}`
         }
     });
     if (newResponse.status !== 200) {
@@ -437,4 +396,86 @@ export const fetchAllPolls = async () => {
     console.log(dataList);
 
     return dataList;
+};
+
+/**
+ * functions for formatting response data of poll api
+ * formatPollData, setQuesArrayForAnswering, formatMultiTypeOptionsWithId,
+ */
+const formatPollData = (data: any) => {
+    const newList = data.questions.map((item: any) => {
+        return setQuesArrayForAnswering(item);
+    });
+    return {
+        pollName: data.name,
+        questions: newList,
+        voteCount: data?.visualFlags[0]
+    };
+};
+
+const setQuesArrayForAnswering = (item: any) => {
+    let options;
+    // let freeText = '';
+    // let rating = 0;
+    // let booleanV;
+    switch (item.visualType) {
+        case 'radioBtn':
+        case 'checkBox':
+            const multiOptions = item.subQuestions ? item.subQuestions : [];
+            options = formatMultiTypeOptionsWithId(multiOptions);
+            break;
+        case 'star':
+        case 'free':
+        case 'yesNo':
+        case 'upDown':
+            options = [];
+            break;
+    }
+    return {
+        title: item.title ? item.title : '',
+        quesId: item.id,
+        type: item.visualType ? item.visualType : 'radioBtn',
+        options: options,
+        ratingValue: 0,
+        freeText: '',
+        booleanValue: ''
+    };
+};
+
+const formatMultiTypeOptionsWithId = (options: [any]) => {
+    const formattedOptions = options.map((option) => {
+        return {
+            optionId: option.id,
+            title: option.title,
+            isSelected: false
+        };
+    });
+
+    return formattedOptions;
+};
+
+export const submitPollAnswer = async (
+    pollId: string | undefined,
+    answers: any
+) => {
+    const pollContent = {
+        answers: answers
+    };
+
+    const response = await fetch(
+        `${getBackendUrl()}/api/poll/${pollId}/answers`,
+        {
+            method: 'POST',
+            body: JSON.stringify(pollContent),
+            headers: {
+                'Content-type': 'application/json; charset=UTF-8'
+            }
+        }
+    );
+    if (response.status !== 201) {
+        throw new Error('Request Failed');
+    }
+    const data = await response.json();
+    // console.log(data);
+    return data;
 };

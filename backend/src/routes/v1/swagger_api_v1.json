@@ -15,13 +15,19 @@
     },
     "servers": [
         {
-            "url": "https://d2l9c7s1roosdj.cloudfront.net/"
+            "url": "https://lb.knowit-anonymous-voting-app.aws.cybercom.dev/"
+        },
+        {
+            "url": "https://staging.lb.knowit-anonymous-voting-app.aws.cybercom.dev/"
+        },
+        {
+            "url": "http://localhost:8080/"
         }
     ],
     "tags": [
         {
             "name": "Poll admin",
-            "description": "Adminstration endpoints for polls"
+            "description": "Administration endpoints for polls"
         },
         {
             "name": "Poll public",
@@ -34,9 +40,34 @@
     ],
     "paths": {
         "/api/poll": {
+            "get": {
+                "summary": "Get a list of the logged in user's polls",
+                "description": "Retrieve an array of PollPrivateInfo objects that belong to the logged in user. The caller must be logged in and pass their session token in the authorization header.",
+                "tags": ["Poll public"],
+                "responses": {
+                    "200": {
+                        "description": "A list of the logged in user's PollPrivateInfo objects",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/PollPrivateInfo"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
             "post": {
                 "tags": ["Poll public"],
-                "description": "Creates a new poll from given information for specified user. A poll consists of questions and each question has sub-questions. The sub-questions correspond to the different choices a question has. For now, the sub-question titles have to be unique in the poll due to how the database schema is currently set up.\n\nCurrently a test user \"1eb1cfae-09e7-4456-85cd-e2edfff80544\" can be set as the owner of new polls. Descriptions are also not saved to the database currently due to the database schema. The type properties for the poll, questions and sub-questions need to be given. The type property for the poll currently does nothing so it can be set to an empty string.\n",
+                "description": "Creates a new poll from given information, either for the logged in user (if session token is passed in authorization header) or anonymously. Descriptions are not saved to the database currently due to the database schema. The type properties for the poll and questions need to be given. The type property for the poll currently does nothing so it can be set to an empty string.\n",
                 "responses": {
                     "201": {
                         "description": "Poll created",
@@ -96,45 +127,6 @@
             }
         },
         "/api/poll/{publicId}/answers": {
-            "get": {
-                "tags": ["Poll public"],
-                "description": "Get public answer data of the poll.",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "publicId",
-                        "description": "publicId of the poll to get.",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Information about the answers to the poll.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "answers": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/components/schemas/PrivateAnswer"
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Poll not found"
-                    }
-                }
-            },
             "post": {
                 "tags": ["Poll public"],
                 "description": "Answers all the poll's questions at once. All questions directly under the poll are mandatory and need to be answered. On the other hand, a sub-question of a multi-question follows the restrictions of the multi-question and thus may contain optional questions.",
@@ -214,7 +206,7 @@
         "/api/poll/admin/{privateId}": {
             "get": {
                 "tags": ["Poll admin"],
-                "description": "Fetches a poll's private information using a privateId of the poll for the admin view.",
+                "description": "Fetches a poll's private information using a privateId of the poll.",
                 "parameters": [
                     {
                         "in": "path",
@@ -240,6 +232,296 @@
                     },
                     "404": {
                         "description": "Poll not found"
+                    }
+                }
+            },
+            "patch": {
+                "tags": ["Poll admin"],
+                "description": "Edits a poll with given privateId according to given properties to change. Only name, owner (id) and visualFlags currently supported.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "privateId",
+                        "description": "privateId of the poll to edit.",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Poll was successfully updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessMessage"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Poll with the specified publicId was not found"
+                    }
+                },
+                "requestBody": {
+                    "description": "Edit a poll",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EditPoll"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["Poll admin"],
+                "summary": "Delete a poll",
+                "description": "Deletes the poll with the specified private ID. The caller must be logged in and have admin privileges. Upon successful deletion, the return result is an object containing a 'success' property that is set to true.",
+                "parameters": [
+                    {
+                        "name": "privateId",
+                        "in": "path",
+                        "description": "The private ID of the poll to delete",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "An object containing a 'success' property indicating the result of the deletion",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/poll/admin/searchByName/{searchText}": {
+            "get": {
+                "tags": ["Poll admin"],
+                "summary": "Search for polls by name",
+                "description": "Searches for polls with names matching the given search text and returns an array of PollPrivateInfo objects for the matching polls. The caller must be logged in and have admin privileges.",
+                "parameters": [
+                    {
+                        "name": "searchText",
+                        "in": "path",
+                        "description": "The search text to use for matching poll names",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "An array of PollPrivateInfo objects for the matching polls",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/PollPrivateInfo"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/searchByName/{searchText}": {
+            "get": {
+                "tags": ["User admin"],
+                "summary": "Search for users by name",
+                "description": "Searches for users with names matching the given search text and returns an array of User objects for the matching users. The caller must be logged in and have admin privileges. User passwords are hashed using Bcrypt. Note: the api endpoint is erroneously not under a correct admin path currently, this should be changed in the future.",
+                "parameters": [
+                    {
+                        "name": "searchText",
+                        "in": "path",
+                        "description": "The search text to use for matching user names",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "An array of User objects for the matching users",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/User"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/signup": {
+            "post": {
+                "tags": ["User"],
+                "summary": "Sign up a new user",
+                "description": "Sign up a new user with the provided information",
+                "responses": {
+                    "201": {
+                        "description": "Whether user was successfully signed up. If was, code is 201 and message is 'Created'.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CodedMessage"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input provided"
+                    }
+                },
+                "requestBody": {
+                    "description": "Sign up a new user",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SignupInfo"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/login": {
+            "post": {
+                "tags": ["User"],
+                "summary": "Sign in an existing user",
+                "description": "Sign in an existing user with the provided user name and password. Returns information of the user and the login session token. The session token must be passed for any api method that requires you to be logged in. The session token is set in the Authorization header of the HTTP request. The authorization header should be in the form: 'Authorization: Bearer ${token}', where ${token} should be replaced with the session token.",
+                "responses": {
+                    "200": {
+                        "description": "Session token and user's info.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserSession"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Incorrect username or password"
+                    }
+                },
+                "requestBody": {
+                    "description": "Sign in an existing user",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Credentials"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/{userId}": {
+            "patch": {
+                "tags": ["User admin"],
+                "summary": "Edit a user",
+                "description": "Edits the user with the specified user ID. The caller must be logged in and have admin privileges. The request body must contain the new values for the user properties to be edited. Upon successful update, the return result is the updated User object. User password should be given unhashed, it will be hashed in the backend. Note: the api endpoint is erroneously not under a correct admin path currently, this should be changed in the future.",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "The user ID of the user to edit",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "The new values for the user properties to be edited",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EditUser"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success message",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessMessage"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["User admin"],
+                "summary": "Delete a user",
+                "description": "Deletes the user with the specified user ID. The caller must be logged in and have admin privileges. Upon successful deletion, the return result is an object containing a 'success' property that is set to true. Note: the api endpoint is erroneously not under a correct admin path currently, this should be changed in the future.",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "The user ID of the user to delete",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "An object containing a 'success' property indicating the result of the deletion",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -299,66 +581,139 @@
     },
     "components": {
         "schemas": {
-            "QuestionType": {
-                "type": "string",
-                "description": "One of: \"free\" (free-form text question), \"multi\" (question containing sub-questions), \"number\" (number question), \"scale\" (number question with a specified range of allowed values).",
-                "example": "free"
-            },
-            "AddPoll": {
+            "EditPoll": {
+                "type": "object",
                 "properties": {
                     "name": {
-                        "type": "string",
-                        "example": "Name of the poll"
-                    },
-                    "type": {
                         "type": "string"
                     },
                     "owner": {
-                        "type": "object",
-                        "properties": {
-                            "accountId": {
-                                "type": "string",
-                                "format": "uuid"
-                            }
+                        "type": "string"
+                    },
+                    "visualFlags": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
                         }
+                    }
+                }
+            },
+            "QuestionType": {
+                "type": "string",
+                "description": "One of: \"free\" (free-form text question), \"multi\" (question containing sub-questions), \"number\" (number question), \"scale\" (number question with a specified range of allowed values), \"boolean\" (question that takes an answer of either true or false).",
+                "example": "free"
+            },
+            "AddPoll": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "description": "The name of the poll."
+                    },
+                    "type": {
+                        "type": "string",
+                        "description": "The type of the poll (currently unused)."
                     },
                     "questions": {
                         "type": "array",
+                        "description": "An array of questions for the poll.",
                         "items": {
-                            "type": "object",
-                            "properties": {
-                                "title": {
-                                    "type": "string",
-                                    "example": "Title of question"
-                                },
-                                "description": {
-                                    "type": "string",
-                                    "example": "Description of question"
-                                },
-                                "type": {
-                                    "type": "string"
-                                },
-                                "subQuestions": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "object",
-                                        "properties": {
-                                            "title": {
-                                                "type": "string",
-                                                "example": "Title of sub-question"
-                                            },
-                                            "description": {
-                                                "type": "string",
-                                                "example": "Description of sub-question"
-                                            },
-                                            "type": {
-                                                "type": "string"
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                            "$ref": "#/components/schemas/Question"
                         }
+                    },
+                    "visualFlags": {
+                        "type": "array",
+                        "description": "An array of visual flags for the poll.",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "Question": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Id of the question (present only for existing question, should not be given when sending question request)."
+                    },
+                    "title": {
+                        "type": "string",
+                        "description": "The title of the question."
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "The description of the question."
+                    },
+                    "type": {
+                        "$ref": "#/components/schemas/QuestionType"
+                    },
+                    "minAnswers": {
+                        "type": "number",
+                        "description": "The minimum number of answers required for a multi-choice question."
+                    },
+                    "maxAnswers": {
+                        "type": "number",
+                        "description": "The maximum number of answers allowed for a multi-choice question."
+                    },
+                    "subQuestions": {
+                        "type": "array",
+                        "description": "An array of sub-questions for a multi-choice question.",
+                        "items": {
+                            "$ref": "#/components/schemas/SubQuestion"
+                        }
+                    },
+                    "minValue": {
+                        "type": "number",
+                        "description": "The minimum value allowed for a scale question."
+                    },
+                    "maxValue": {
+                        "type": "number",
+                        "description": "The maximum value allowed for a scale question."
+                    },
+                    "step": {
+                        "type": "number",
+                        "description": "The step size for a numeric question (either a scale or number question)."
+                    },
+                    "visualType": {
+                        "type": "string",
+                        "description": "The visual type of the question that tells how the question should be displayed."
+                    }
+                }
+            },
+            "SubQuestion": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Id of the question (present only for existing question, should not be given when sending question request)."
+                    },
+                    "title": {
+                        "type": "string",
+                        "description": "The title of the sub-question."
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "The description of the sub-question."
+                    },
+                    "type": {
+                        "$ref": "#/components/schemas/QuestionType"
+                    },
+                    "visualType": {
+                        "type": "string",
+                        "description": "The visual type of the question that tells how the question should be displayed."
+                    },
+                    "minValue": {
+                        "type": "number",
+                        "description": "The minimum value allowed for a scale question."
+                    },
+                    "maxValue": {
+                        "type": "number",
+                        "description": "The maximum value allowed for a scale question."
+                    },
+                    "step": {
+                        "type": "number",
+                        "description": "The step size for a numeric question (either a scale or number question)."
                     }
                 }
             },
@@ -384,49 +739,18 @@
                         "type": "string"
                     },
                     "owner": {
-                        "type": "object",
-                        "properties": {
-                            "id": {
-                                "type": "string",
-                                "format": "uuid"
-                            }
-                        }
+                        "$ref": "#/components/schemas/PollOwner"
                     },
                     "questions": {
                         "type": "array",
                         "items": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/components/schemas/Question"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "subQuestions": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/components/schemas/Question"
-                                            }
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "answers": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/PublicAnswer"
+                            "$ref": "#/components/schemas/Question"
                         }
                     }
                 }
             },
             "PollPublicInfo": {
                 "properties": {
-                    "id": {
-                        "type": "string",
-                        "format": "uuid"
-                    },
                     "name": {
                         "type": "string",
                         "example": "Name of the poll"
@@ -438,32 +762,13 @@
                     "questions": {
                         "type": "array",
                         "items": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/components/schemas/Question"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "subQuestions": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/components/schemas/Question"
-                                            }
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/components/schemas/Question"
                         }
                     }
                 }
             },
             "PollResults": {
                 "properties": {
-                    "id": {
-                        "type": "string",
-                        "format": "uuid"
-                    },
                     "name": {
                         "type": "string",
                         "example": "Name of the poll"
@@ -472,15 +777,20 @@
                         "type": "string",
                         "format": "uuid"
                     },
+                    "answerCount": {
+                        "type": "number",
+                        "description": "How many times the poll has been answered.",
+                        "example": 2
+                    },
                     "questions": {
                         "type": "array",
                         "items": {
                             "oneOf": [
                                 {
-                                    "$ref": "#/components/schemas/MultiQuestionResult"
+                                    "$ref": "#/components/schemas/QuestionResult"
                                 },
                                 {
-                                    "$ref": "#/components/schemas/QuestionResult"
+                                    "$ref": "#/components/schemas/MultiQuestionResult"
                                 }
                             ]
                         }
@@ -493,11 +803,7 @@
                         "type": "string",
                         "format": "uuid"
                     },
-                    "type": {
-                        "type": "string",
-                        "example": "multi"
-                    },
-                    "answer": {
+                    "data": {
                         "oneOf": [
                             {
                                 "type": "object",
@@ -515,8 +821,18 @@
                                             "type": "object",
                                             "properties": {
                                                 "answer": {
-                                                    "type": "string",
-                                                    "example": "test-text-value"
+                                                    "oneOf": [
+                                                        {
+                                                            "type": "string",
+                                                            "example": "test-text-value"
+                                                        },
+                                                        {
+                                                            "type": "boolean"
+                                                        },
+                                                        {
+                                                            "type": "number"
+                                                        }
+                                                    ]
                                                 }
                                             }
                                         }
@@ -527,8 +843,18 @@
                                 "type": "object",
                                 "properties": {
                                     "answer": {
-                                        "type": "string",
-                                        "example": "test-text-value"
+                                        "oneOf": [
+                                            {
+                                                "type": "string",
+                                                "example": "test-text-value"
+                                            },
+                                            {
+                                                "type": "boolean"
+                                            },
+                                            {
+                                                "type": "number"
+                                            }
+                                        ]
                                     }
                                 }
                             }
@@ -588,49 +914,6 @@
                     }
                 }
             },
-            "Question": {
-                "properties": {
-                    "id": {
-                        "type": "string",
-                        "format": "uuid"
-                    },
-                    "title": {
-                        "type": "string",
-                        "example": "Title of the sub-question"
-                    },
-                    "description": {
-                        "type": "string",
-                        "example": "Description of the sub-question"
-                    },
-                    "pollId": {
-                        "type": "string",
-                        "format": "uuid"
-                    },
-                    "type": {
-                        "$ref": "#/components/schemas/QuestionType"
-                    },
-                    "minAnswers": {
-                        "type": "number",
-                        "example": 1
-                    },
-                    "maxAnswers": {
-                        "type": "number",
-                        "example": 1
-                    },
-                    "minValue": {
-                        "type": "number",
-                        "example": 1
-                    },
-                    "maxValue": {
-                        "type": "number",
-                        "example": 5
-                    },
-                    "step": {
-                        "type": "number",
-                        "example": 1
-                    }
-                }
-            },
             "QuestionResult": {
                 "properties": {
                     "id": {
@@ -665,6 +948,10 @@
                         "items": {
                             "$ref": "#/components/schemas/AnswerValueStatistic"
                         }
+                    },
+                    "visualType": {
+                        "type": "string",
+                        "description": "The visual type of the question that tells how the question should be displayed."
                     }
                 }
             },
@@ -703,6 +990,10 @@
                         "items": {
                             "$ref": "#/components/schemas/QuestionResult"
                         }
+                    },
+                    "visualType": {
+                        "type": "string",
+                        "description": "The visual type of the question that tells how the question should be displayed."
                     }
                 }
             },
@@ -727,6 +1018,155 @@
                     "success": {
                         "type": "boolean",
                         "example": true
+                    }
+                }
+            },
+            "UserSession": {
+                "type": "object",
+                "properties": {
+                    "token": {
+                        "type": "string"
+                    },
+                    "user": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "userName": {
+                                "type": "string"
+                            },
+                            "firstName": {
+                                "type": "string"
+                            },
+                            "lastName": {
+                                "type": "string"
+                            },
+                            "email": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "userName",
+                            "firstName",
+                            "lastName",
+                            "email"
+                        ]
+                    }
+                }
+            },
+            "User": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "userName": {
+                        "type": "string"
+                    },
+                    "firstName": {
+                        "type": "string"
+                    },
+                    "lastName": {
+                        "type": "string"
+                    },
+                    "isAdmin": {
+                        "type": "boolean"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "password": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id",
+                    "userName",
+                    "firstName",
+                    "lastName",
+                    "isAdmin",
+                    "email",
+                    "password"
+                ]
+            },
+            "EditUser": {
+                "type": "object",
+                "properties": {
+                    "userName": {
+                        "type": "string"
+                    },
+                    "firstName": {
+                        "type": "string"
+                    },
+                    "lastName": {
+                        "type": "string"
+                    },
+                    "isAdmin": {
+                        "type": "boolean"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "password": {
+                        "type": "string"
+                    }
+                }
+            },
+            "Credentials": {
+                "type": "object",
+                "properties": {
+                    "username": {
+                        "type": "string"
+                    },
+                    "password": {
+                        "type": "string"
+                    }
+                },
+                "required": ["username", "password"]
+            },
+            "SignupInfo": {
+                "type": "object",
+                "properties": {
+                    "username": {
+                        "type": "string"
+                    },
+                    "password": {
+                        "type": "string"
+                    },
+                    "firstname": {
+                        "type": "string"
+                    },
+                    "lastname": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    }
+                }
+            },
+            "CodedMessage": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "number",
+                        "example": 201
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Created"
+                    }
+                }
+            },
+            "PollOwner": {
+                "type": "object",
+                "properties": {
+                    "userName": {
+                        "type": "string"
+                    },
+                    "id": {
+                        "type": "string"
                     }
                 }
             }

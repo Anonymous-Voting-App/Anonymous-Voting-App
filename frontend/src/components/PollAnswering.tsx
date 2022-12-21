@@ -1,369 +1,251 @@
-import React, { useState } from 'react';
-import {
-    Container,
-    Typography,
-    Rating,
-    Button,
-    FormControl,
-    FormControlLabel,
-    RadioGroup,
-    Radio,
-    Checkbox,
-    TextField
-} from '@mui/material';
-import ThumbDownIcon from '@mui/icons-material/ThumbDown';
-import ThumbUpIcon from '@mui/icons-material/ThumbUp';
-import { ArrowBack, ArrowForward } from '@mui/icons-material';
+import React, { useState, useEffect } from 'react';
+import { Container, Typography, Button } from '@mui/material';
 import './PollAnswering.scss';
-//import Question from './Question';
+import PollAnsweringComponent from './PollAnsweringComponent';
+import { fetchPoll, submitPollAnswer } from '../services/pollService';
+import { ArrowBack, ArrowForward } from '@mui/icons-material';
+import { useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const PollAnswering = (props: any) => {
-    const [showPickOne, setshowPickOne] = useState(true);
-    const [showMultiChoice, setshowMultiChoice] = useState(true);
-    const [showStartRating, setsshowStartRating] = useState(true);
-    const [showFreeText, setsshowFreeText] = useState(true);
-    const [showYesNo, setsshowYesNo] = useState(true);
-    const [showThumbsUpDown, setsshowThumbsUpDown] = useState(true);
+    const { pollId } = useParams();
+    const navigate = useNavigate();
+    const [pollName, setPollName] = useState('');
+    const [currentQuestion, setCurrentQuestion] = useState<any>({});
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const [pollQuestions, setPollQuestions] = useState<any>([]);
+    const [showNext, setsshowNext] = useState(true);
+    const [showSubmit, setshowSubmit] = useState(false);
 
-    //const [QuestionType, setQuestionType] = useState('pickOne');
+    useEffect(() => {
+        getResultData(pollId);
+        //eslint-disable-next-line
+    }, []);
 
-    //const [questions, setQuestions] = useState([
-    //    {
-    //        title: '',
-    //        description: '',
-    //        type: '',
-    //        minAnswers: 1,
-    //        maxAnswers: 1,
-    //        subQuestions: [{ title: '', description: '', type: '' }]
-    //    }
-    //]);
+    const getResultData = (id: string | undefined) => {
+        if (!id) {
+            // console.log('resultData');
+            return;
+        }
+        fetchPoll(id)
+            .then((response) => {
+                // console.log(response);
+                setPollName(response.pollName);
+                setPollQuestions(response.questions);
+                if (response.questions.length === 1) {
+                    setsshowNext(false);
+                    setshowSubmit(true);
+                }
+                setCurrentQuestion(response.questions[currentIndex]);
+            })
+            .catch(() => {
+                setPollName('Oops!! No data fetched');
+                props.showNotification({
+                    severity: 'error',
+                    message:
+                        'Sorry, An error encountered while fetching your poll'
+                });
+            });
+    };
+
+    const setQuesType = (type: string) => {
+        switch (type) {
+            case 'checkBox':
+                return 'Multi-choice';
+            case 'radioBtn':
+                return 'Pick one';
+            case 'star':
+                return 'Star rating';
+            case 'free':
+                return 'Free text';
+            case 'yesNo':
+                return 'Yes/No';
+            case 'upDown':
+                return 'Thumbs Up/Down';
+            default:
+                return 'Pick One';
+        }
+    };
 
     const handleNextClick = () => {
-        setshowPickOne(true);
-        setshowMultiChoice(false);
-        setsshowStartRating(false);
-        setsshowFreeText(false);
-        setsshowYesNo(false);
-        setsshowThumbsUpDown(false);
-
         NextQuestion();
-
-        (document.getElementById('submitButton') as HTMLInputElement).disabled =
-            false;
     };
 
     const handlePreviousClick = () => {
-        setshowPickOne(true);
-        setshowMultiChoice(true);
-        setsshowStartRating(true);
-        setsshowFreeText(true);
-        setsshowYesNo(true);
-        setsshowThumbsUpDown(true);
-        (document.getElementById('submitButton') as HTMLInputElement).disabled =
-            true;
+        PreviousQuestion();
     };
 
     const NextQuestion = () => {
-        console.log('Next');
+        setsshowNext(true);
+        setshowSubmit(false);
+        setCurrentIndex((currentIndex) => currentIndex + 1);
+        setCurrentQuestion(pollQuestions[currentIndex + 1]);
+        console.log(currentIndex);
+        if (currentIndex === pollQuestions.length - 2) {
+            setsshowNext(false);
+            setshowSubmit(true);
+        }
+    };
+
+    const PreviousQuestion = () => {
+        // console.log('Previous');
+        setsshowNext(true);
+        setshowSubmit(false);
+        setCurrentIndex((currentIndex) => currentIndex - 1);
+        setCurrentQuestion(pollQuestions[currentIndex - 1]);
+        // if(currentIndex  === pollQuestions.length - 1 ){
+        //     setsshowNext(false);
+        //     setshowSubmit(true);
+        // }
+    };
+
+    const handleAddAnswer = (answerObj: any) => {
+        const updatedQuestions = pollQuestions.map((item: any) => {
+            if (item.quesId === answerObj.quesId) {
+                switch (item.type) {
+                    case 'radioBtn':
+                    case 'checkBox':
+                        return { ...item, options: answerObj.options };
+                    case 'star':
+                        return { ...item, ratingValue: answerObj.ratingValue };
+                    case 'free':
+                        return { ...item, freeText: answerObj.freeText };
+                    case 'yesNo':
+                    case 'upDown':
+                        return {
+                            ...item,
+                            booleanValue: answerObj.booleanValue
+                        };
+                }
+            }
+            return item;
+        });
+        setPollQuestions(updatedQuestions);
+        console.log(updatedQuestions, 'updated poll question list');
+    };
+
+    const handleSubmit = () => {
+        if (localStorage.getItem(pollId!) === null) {
+            window.localStorage.setItem(pollId!, pollId!);
+
+            const answers = formatAnswerData(pollQuestions);
+            submitPollAnswer(pollId, answers)
+                .then((response) => {
+                    // 1576d894-2571-4281-933d-431d246bb460
+                    if (response.success) {
+                        props.showNotification({
+                            severity: 'success',
+                            message: 'Poll answered submitted successfully'
+                        });
+                        navigate(`/result/${pollId}`);
+                    } else {
+                        props.showNotification({
+                            severity: 'error',
+                            message:
+                                'Sorry, An error encountered while submitting your poll answer'
+                        });
+                    }
+                })
+                .catch(() => {
+                    props.showNotification({
+                        severity: 'error',
+                        message:
+                            'Sorry, An error encountered while submitting your poll answer'
+                    });
+                });
+        } else {
+            props.showNotification({
+                severity: 'error',
+                message: 'You can only answer once'
+            });
+        }
+    };
+
+    const formatAnswerData = (answeredPoll: Array<any>) => {
+        // console.log(answeredPoll);
+        let answerObj: any;
+        const updatedQuestions = answeredPoll.map((item: any) => {
+            switch (item.type) {
+                case 'radioBtn':
+                case 'checkBox':
+                    console.log(formatMutliTypeAnswer(item));
+                    answerObj = formatMutliTypeAnswer(item);
+                    break;
+                case 'star':
+                    answerObj = formatRatingTypeAnswer(item);
+                    break;
+                case 'free':
+                    answerObj = formatFreeTypeAnswer(item);
+                    break;
+                case 'yesNo':
+                case 'upDown':
+                    answerObj = formatYesNoTypeAnswer(item);
+                    break;
+            }
+            return answerObj;
+        });
+
+        // console.log(updatedQuestions);
+        const answerArray = updatedQuestions.filter((answerObj: any) => {
+            return answerObj !== null;
+        });
+        // console.log(answerArray);
+
+        return answerArray;
+    };
+
+    const formatMutliTypeAnswer = (item: any) => {
+        const subQuestionIds = item.options
+            .filter((option: any) => option.isSelected === true)
+            .map((option: any) => {
+                return option.optionId;
+            });
+        const answer = subQuestionIds.map((obj: any) => {
+            return { answer: true };
+        });
+        const data = {
+            subQuestionIds: subQuestionIds,
+            answer: answer
+        };
+        return { questionId: item.quesId, type: 'multi', data: data };
+    };
+
+    const formatRatingTypeAnswer = (item: any) => {
+        const data = { answer: item.ratingValue };
+        return { questionId: item.quesId, type: 'scale', data: data };
+    };
+
+    const formatFreeTypeAnswer = (item: any) => {
+        const data = { answer: item.freeText };
+        return { questionId: item.quesId, type: 'free', data: data };
+    };
+
+    // for boolean type ques, item is passed if selection is true else null value is passed
+    const formatYesNoTypeAnswer = (item: any) => {
+        if (item.booleanValue === 'yes') {
+            const data = { answer: true };
+            return { questionId: item.quesId, type: 'boolean', data: data };
+        } else {
+            return null;
+        }
     };
 
     return (
-        <Container>
-            {showPickOne ? (
-                <div className="">
-                    <Typography className="questionType" variant="h4">
-                        Pick one:
-                    </Typography>
-                    <Typography className="questionTitle">
-                        What is the best lunch type?
-                    </Typography>
-                    <div className="answerContainer">
-                        <FormControl>
-                            <RadioGroup name="answer">
-                                <FormControlLabel
-                                    value="option1"
-                                    control={<Radio />}
-                                    label="Pizza"
-                                />
-                                <FormControlLabel
-                                    value="option2"
-                                    control={<Radio />}
-                                    label="Burger"
-                                />
-                                <FormControlLabel
-                                    value="option3"
-                                    control={<Radio />}
-                                    label="Pasta"
-                                />
-                            </RadioGroup>
-                        </FormControl>
-                    </div>
-                    <div className="questionNumber">
-                        <Typography
-                            className="questionNumberText"
-                            display="inline"
-                            id="question_num"
-                        >
-                            1
-                        </Typography>
-                        <Typography
-                            className="questionNumberText"
-                            display="inline"
-                        >
-                            {' '}
-                            of{' '}
-                        </Typography>
-                        <Typography
-                            className="questionNumberText"
-                            display="inline"
-                            id="total_num"
-                        >
-                            6
-                        </Typography>
-                        <Typography
-                            className="questionNumberText"
-                            display="inline"
-                        >
-                            {' '}
-                            questions
-                        </Typography>
-                    </div>
-                </div>
-            ) : null}
-
-            {showMultiChoice ? (
-                <div className="">
-                    <Typography className="questionType" variant="h4">
-                        Multi - choice:
-                    </Typography>
-                    <Typography className="questionTitle">
-                        What vehicles do you own?
-                    </Typography>
-                    <div className="answerContainer">
-                        <FormControl>
-                            <RadioGroup name="answer">
-                                <FormControlLabel
-                                    value="option1"
-                                    control={<Checkbox />}
-                                    label="Car"
-                                />
-                                <FormControlLabel
-                                    value="option2"
-                                    control={<Checkbox />}
-                                    label="Bike"
-                                />
-                                <FormControlLabel
-                                    value="option3"
-                                    control={<Checkbox />}
-                                    label="Motor cycle"
-                                />
-                                <FormControlLabel
-                                    value="option4"
-                                    control={<Checkbox />}
-                                    label="None"
-                                />
-                            </RadioGroup>
-                        </FormControl>
-                    </div>
-                    <div className="questionNumber">
-                        <Typography
-                            className=""
-                            display="inline"
-                            id="question_num"
-                        >
-                            2
-                        </Typography>
-                        <Typography className="" display="inline">
-                            {' '}
-                            of{' '}
-                        </Typography>
-                        <Typography
-                            className=""
-                            display="inline"
-                            id="total_num"
-                        >
-                            6
-                        </Typography>
-                        <Typography className="" display="inline">
-                            {' '}
-                            questions
-                        </Typography>
-                    </div>
-                </div>
-            ) : null}
-
-            {showStartRating ? (
-                <div className="">
-                    <Typography className="questionType" variant="h4">
-                        Star rating:
-                    </Typography>
-                    <Typography className="questionTitle">
-                        What rate this vehicle: Car
-                    </Typography>
-                    <div className="answerContainer">
-                        <FormControl>
-                            <Rating
-                                name="rating-group"
-                                sx={{ fontSize: 100 }}
-                            />
-                        </FormControl>
-                    </div>
-                    <div className="questionNumber">
-                        <Typography
-                            className=""
-                            display="inline"
-                            id="question_num"
-                        >
-                            3
-                        </Typography>
-                        <Typography className="" display="inline">
-                            {' '}
-                            of{' '}
-                        </Typography>
-                        <Typography
-                            className=""
-                            display="inline"
-                            id="total_num"
-                        >
-                            6
-                        </Typography>
-                        <Typography className="" display="inline">
-                            {' '}
-                            questions
-                        </Typography>
-                    </div>
-                </div>
-            ) : null}
-
-            {showFreeText ? (
-                <div className="">
-                    <Typography className="questionType" variant="h4">
-                        Free text:
-                    </Typography>
-                    <Typography className="questionTitle">
-                        What kind of vehicle do you use?
-                    </Typography>
-                    <div className="answerContainer">
-                        <FormControl>
-                            <TextField
-                                fullWidth
-                                label="Answer here..."
-                                sx={{ width: 500, maxWidth: '100%' }}
-                            />
-                        </FormControl>
-                    </div>
-                    <div className="questionNumber">
-                        <Typography
-                            className=""
-                            display="inline"
-                            id="question_num"
-                        >
-                            4
-                        </Typography>
-                        <Typography className="" display="inline">
-                            {' '}
-                            of{' '}
-                        </Typography>
-                        <Typography
-                            className=""
-                            display="inline"
-                            id="total_num"
-                        >
-                            6
-                        </Typography>
-                        <Typography className="" display="inline">
-                            {' '}
-                            questions
-                        </Typography>
-                    </div>
-                </div>
-            ) : null}
-
-            {showYesNo ? (
-                <div className="">
-                    <Typography className="questionType" variant="h4">
-                        Yes/No
-                    </Typography>
-                    <Typography className="questionTitle">
-                        Do you use this vehicle: Car
-                    </Typography>
-                    <div className="buttonsContainer">
-                        <Button className="yesnoButton">Yes</Button>
-                        <Button className="yesnoButton">No</Button>
-                    </div>
-                    <div className="questionNumber">
-                        <Typography
-                            className=""
-                            display="inline"
-                            id="question_num"
-                        >
-                            5
-                        </Typography>
-                        <Typography className="" display="inline">
-                            {' '}
-                            of{' '}
-                        </Typography>
-                        <Typography
-                            className=""
-                            display="inline"
-                            id="total_num"
-                        >
-                            6
-                        </Typography>
-                        <Typography className="" display="inline">
-                            {' '}
-                            questions
-                        </Typography>
-                    </div>
-                </div>
-            ) : null}
-
-            {showThumbsUpDown ? (
-                <div className="">
-                    <Typography className="questionType" variant="h4">
-                        Thumbs Up/Down:
-                    </Typography>
-                    <Typography className="questionTitle">
-                        Do you like this vehicle: Car
-                    </Typography>
-                    <div className="answerContainer">
-                        <FormControl>
-                            <div className="thumbsContainer">
-                                <ThumbUpIcon
-                                    sx={{ fontSize: 100 }}
-                                ></ThumbUpIcon>
-                                <ThumbDownIcon
-                                    sx={{ fontSize: 100 }}
-                                ></ThumbDownIcon>
-                            </div>
-                        </FormControl>
-                    </div>
-                    <div className="questionNumber">
-                        <Typography
-                            className=""
-                            display="inline"
-                            id="question_num"
-                        >
-                            6
-                        </Typography>
-                        <Typography className="" display="inline">
-                            {' '}
-                            of{' '}
-                        </Typography>
-                        <Typography
-                            className=""
-                            display="inline"
-                            id="total_num"
-                        >
-                            6
-                        </Typography>
-                        <Typography className="" display="inline">
-                            {' '}
-                            questions
-                        </Typography>
-                    </div>
-                </div>
-            ) : null}
+        <Container className="poll-answer-wrapper">
+            <Typography className="pollName" variant="h4">
+                {pollName}
+            </Typography>
+            <Typography className="question-type" variant="h4">
+                {setQuesType(currentQuestion.type)}:
+            </Typography>
+            <div>
+                <PollAnsweringComponent
+                    question={currentQuestion}
+                    index={currentIndex}
+                    addAnswer={handleAddAnswer}
+                    total={pollQuestions.length}
+                ></PollAnsweringComponent>
+            </div>
 
             <div className="buttonsContainer">
                 <Button
@@ -371,18 +253,32 @@ const PollAnswering = (props: any) => {
                     variant="outlined"
                     id="submitButton"
                     onClick={handlePreviousClick}
+                    disabled={currentIndex === 0}
                 >
                     <ArrowBack />
                     Previous question
                 </Button>
-                <Button
-                    className="nextQuestionButton"
-                    variant="outlined"
-                    onClick={handleNextClick}
-                >
-                    Next question
-                    <ArrowForward />
-                </Button>
+                {showNext ? (
+                    <Button
+                        className="nextQuestionButton"
+                        variant="outlined"
+                        onClick={handleNextClick}
+                        id="NextButton"
+                    >
+                        Next question
+                        <ArrowForward />
+                    </Button>
+                ) : null}
+                {showSubmit ? (
+                    <Button
+                        className="nextQuestionButton"
+                        variant="outlined"
+                        onClick={handleSubmit}
+                        id="NextButton"
+                    >
+                        Submit
+                    </Button>
+                ) : null}
             </div>
         </Container>
     );

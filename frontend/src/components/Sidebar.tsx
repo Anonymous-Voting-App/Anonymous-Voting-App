@@ -1,5 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import KnowitLogo from './knowit.svg';
+import { userIsLoggedIn } from '../utils/userUtilities';
+import { userIsAdmin } from '../utils/userUtilities';
 import {
     Box,
     List,
@@ -11,15 +13,21 @@ import {
 } from '@mui/material';
 import './Sidebar.scss';
 
-const pages = ['Create poll', 'My polls'];
-
 const Sidebar = () => {
     const navigate = useNavigate();
+
+    const pages = userIsLoggedIn()
+        ? userIsAdmin()
+            ? ['Create poll', 'Search']
+            : ['Create poll', 'My polls']
+        : ['Create poll'];
 
     const handlePageClick = (page: string) => {
         if (page === 'Create poll') {
             navigate('/');
         } else if (page === 'My polls') {
+            navigate('/user');
+        } else if (page === 'Search') {
             navigate('/admin');
         }
     };

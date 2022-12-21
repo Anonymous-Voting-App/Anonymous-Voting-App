@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Typography, TextField, Button, Switch } from '@mui/material';
 import './PollEditView.scss';
-import { editPoll, getEditPollData } from '../services/pollAndUserService';
+import { editPoll, getEditPollData } from '../services/pollService';
 import BasicSnackbar from './BasicSnackbar';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 const PollEditView = () => {
     const [pollname, setPollName] = useState('');
@@ -16,12 +16,10 @@ const PollEditView = () => {
         severity: ''
     });
     const navigate = useNavigate();
-    const privateId = window.location.href.substring(
-        window.location.href.lastIndexOf('/') + 1
-    );
+    const privateId = useParams().pollId;
 
     useEffect(() => {
-        getPollData(privateId);
+        getPollData(privateId ?? '');
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -53,9 +51,8 @@ const PollEditView = () => {
     const handleUpdate = () => {
         const voteToggleStatus =
             voteToggle === true ? 'showCount' : 'hideCount';
-        editPoll(privateId, pollname, voteToggleStatus, ownerId)
-            .then((response) => {
-                console.log(response);
+        editPoll(privateId ?? '', pollname, voteToggleStatus, ownerId)
+            .then(() => {
                 const status = {
                     message: 'Data updated successfully',
                     severity: 'success'
@@ -65,7 +62,7 @@ const PollEditView = () => {
                     navigate('/admin');
                 }, 2000);
             })
-            .catch((error) => {
+            .catch(() => {
                 const status = {
                     message: 'Sorry update failed',
                     severity: 'error'
@@ -77,7 +74,6 @@ const PollEditView = () => {
     const getPollData = (id: string) => {
         getEditPollData(id)
             .then((response) => {
-                console.log(response);
                 setPollName(response.name);
                 setOnwnerName(response.owner.userName);
                 setOnwnerId(response.owner.id);
@@ -85,8 +81,7 @@ const PollEditView = () => {
                     response.visualFlags[0] === 'showCount' ? true : false;
                 setVoteToggle(toggle);
             })
-            .catch((error) => {
-                // console.log(error);
+            .catch(() => {
                 const status = {
                     message: 'Sorry an error occured while fetching data',
                     severity: 'error'

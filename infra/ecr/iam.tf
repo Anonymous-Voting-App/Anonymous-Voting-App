@@ -1,5 +1,5 @@
 resource "aws_iam_policy" "allow_access_to_ecr" {
-  name        = "ecr-allow-access-${var.name}-${local.environment}"
+  name        = "${var.name}-${local.environment}-allow-ecr-access"
   path        = "/"
   description = "Allow access to ECR for ${local.environment} environment of ${var.name}"
   depends_on  = [aws_ecr_repository.ecr]

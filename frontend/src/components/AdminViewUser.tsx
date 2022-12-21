@@ -1,7 +1,7 @@
 import React from 'react';
 import { Typography, Link, Box } from '@mui/material';
 import './AdminViewPoll.scss';
-import { deleteUser } from '../services/pollAndUserService';
+import { deleteUser } from '../services/userService';
 import { useNavigate } from 'react-router-dom';
 
 const AdminViewPoll = (props: any) => {
@@ -20,9 +20,7 @@ const AdminViewPoll = (props: any) => {
     const handleDelete = (userId: string) => {
         // deletePoll(pollId).
         deleteUser(userId).then((response) => {
-            console.log(response.data);
             if (response.success) {
-                console.log('called');
                 props.showNotification({
                     severity: 'success',
                     message: 'User deleted successfully'

@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { userIsLoggedIn } from '../utils/userUtilities';
+import { userIsAdmin } from '../utils/userUtilities';
 import './App.scss';
 import NavBar from './NavBar';
 import PollCreation from './PollCreation';
@@ -8,6 +10,7 @@ import Login from './Login';
 import BasicSnackbar from './BasicSnackbar';
 import PollAnswering from './PollAnswering';
 import AdminView from './AdminView';
+import MyPolls from './MyPolls';
 import PollResult from './PollResult';
 import { StyledEngineProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -34,7 +37,6 @@ function App() {
             message: status.message,
             severity: status.severity
         });
-        console.log(status, 'notification data');
     };
 
     const handleClose = () => {
@@ -63,7 +65,18 @@ function App() {
                                 }
                             />
                             <Route path="/answer" element={<PollAnswering />} />
-                            <Route path="/admin" element={<AdminView />} />
+                            {userIsLoggedIn() ? (
+                                userIsAdmin() ? (
+                                    <Route
+                                        path="/admin"
+                                        element={<AdminView />}
+                                    />
+                                ) : (
+                                    <Route path="/user" element={<MyPolls />} />
+                                )
+                            ) : (
+                                ''
+                            )}
                             <Route path="/login" element={<Login />} />
                             <Route
                                 path="/admin/polledit/:pollId"
@@ -90,6 +103,15 @@ function App() {
                                 path={'/result/:pollId'}
                                 element={
                                     <PollResult
+                                        showNotification={handleNotification}
+                                    />
+                                }
+                            />{' '}
+                            <Route
+                                path={'/answer/:pollId'}
+                                element={
+                                    <PollAnswering
+                                        pollId={pollId}
                                         showNotification={handleNotification}
                                     />
                                 }

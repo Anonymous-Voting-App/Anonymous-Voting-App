@@ -28,6 +28,15 @@ export interface ResultQuesObj {
 
 export interface ResultOptionObj {
     count: number;
-    title: string | number;
+    title: string | number | any;
     percentage: number;
+}
+
+export interface CurrentUser {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    userName: string;
+    isAdmin?: boolean;
 }

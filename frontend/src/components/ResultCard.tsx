@@ -8,13 +8,21 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 const ResultCard = (props: any) => {
     const options: ResultOptionObj[] = props.ques.options;
-    // console.log(options)
+    const formattedOptions = options.map((option: any) => {
+        return {
+            title: option.title.value,
+            count: option.title.count,
+            percentage: option.title.percentage
+        };
+    });
+
     const fileType =
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
     const fileExtension = '.xlsx';
+
     const handleExport = () => {
         const fileName = 'Data';
-        const ws = XLSX.utils.json_to_sheet(options);
+        const ws = XLSX.utils.json_to_sheet(formattedOptions);
         const wb = { Sheets: { data: ws }, SheetNames: ['data'] };
         const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
         const data = new Blob([excelBuffer], { type: fileType });

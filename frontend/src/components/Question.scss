@@ -1,5 +1,4 @@
 @import '../styles/colors';
-
 @mixin for-phone-only {
     @media (max-width: 599px) {
         @content;
@@ -29,34 +28,28 @@
         padding: 1.25rem;
         background-color: $background-color;
     }
-
     .type-dropdown {
         margin-top: 0;
         margin-bottom: 1.25rem;
         .MuiFormLabel-root {
             left: 4.25rem;
         }
-
         .MuiOutlinedInput-notchedOutline {
             border: none;
         }
-
         .MuiInputLabel-shrink {
             display: none;
         }
-
         .MuiInputBase-root {
             background-color: $melon;
             border-radius: 1.25rem;
             min-width: 16.25rem;
             border: 1px solid $main-color;
-
             .MuiSvgIcon-root {
                 left: 1.875rem;
             }
         }
     }
-
     .question-field,
     .option-field {
         .MuiInputBase-root {
@@ -98,33 +91,27 @@
             cursor: pointer;
         }
     }
-
     .close-icon {
         display: flex;
         justify-content: right;
         width: 100%;
-
         .MuiSvgIcon-root {
             position: relative;
             cursor: pointer;
             right: -5rem;
             width: 1.2rem;
             height: 1.2rem;
-
             @include for-phone-only {
                 right: -2rem;
             }
-
             @include for-tablet-landscape-up {
                 right: -5rem;
             }
-
             @include for-tablet-portrait-up {
                 right: -3rem;
             }
         }
     }
-
     .option-field {
         .MuiInputBase-root {
             width: 14.5rem;
@@ -135,13 +122,11 @@
             position: absolute;
             top: -6px;
         }
-
         .MuiInputLabel-shrink {
             position: absolute;
             top: 0px;
         }
     }
-
     .add-option-btn,
     .add-option-btn:hover {
         margin-top: none;
@@ -152,11 +137,9 @@
         background-color: $clay;
         text-transform: none;
         border: 2px solid $main-color;
-
         @include for-phone-only {
-            font-size: 2.5rem;
+            font-size: 1rem;
         }
-
         .MuiSvgIcon-root {
             margin-right: 0.625rem;
         }

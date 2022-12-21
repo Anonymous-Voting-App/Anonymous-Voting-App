@@ -8,7 +8,7 @@ resource "aws_cloudfront_origin_access_identity" "s3_distribution_oai" {
 }
 
 resource "aws_cloudfront_cache_policy" "CachingOptimizedFrontend" {
-  name        = "CachingOptimizedFrontend"
+  name        = "CachingOptimizedFrontend-${var.name}-${local.environment}"
   comment     = "Default policy when CF compression is enabled"
   default_ttl = 600
   max_ttl     = 1800

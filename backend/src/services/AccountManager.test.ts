@@ -150,7 +150,8 @@ describe('AccountManager', () => {
                 firstName: existingUser.firstname,
                 lastName: existingUser.lastname,
                 email: existingUser.email,
-                userName: existingUser.username
+                userName: existingUser.username,
+                isAdmin: existingUser.isAdmin
             });
             expect(prismaMock.user.findFirst).toHaveBeenCalledTimes(1);
         });

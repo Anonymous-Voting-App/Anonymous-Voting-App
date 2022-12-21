@@ -8,7 +8,7 @@ import {
     Button
 } from '@mui/material';
 import './AdminViewUserProfile.scss';
-import { updateUser } from '../services/pollAndUserService';
+import { updateUser } from '../services/userService';
 import BasicSnackbar from './BasicSnackbar';
 
 const AdminViewUser = (props: any) => {
@@ -39,9 +39,8 @@ const AdminViewUser = (props: any) => {
         });
     };
     const handleUpdate = () => {
-        console.log(username, adminToggle, newPassword);
         updateUser(location.state.id, username, adminToggle, newPassword)
-            .then((response) => {
+            .then(() => {
                 const status = {
                     message: 'Data updated successfully',
                     severity: 'success'
@@ -50,9 +49,8 @@ const AdminViewUser = (props: any) => {
                 setTimeout(() => {
                     navigate('/admin');
                 }, 2000);
-                console.log(response);
             })
-            .catch((error) => {
+            .catch(() => {
                 const status = {
                     message: 'Sorry update failed',
                     severity: 'error'

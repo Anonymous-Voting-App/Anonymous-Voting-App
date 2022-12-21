@@ -100,6 +100,7 @@ jobs:
         name: Deploy frontend to production environment
         needs: frontend-test
         runs-on: ubuntu-latest
+        environment: Production - Frontend
         permissions:
             id-token: write
             contents: read
@@ -239,6 +240,7 @@ jobs:
         name: Deploy backend to production environment
         needs: backend-build-production
         runs-on: ubuntu-latest
+        environment: Production - Backend
         permissions:
             id-token: write
             contents: read
@@ -280,7 +282,7 @@ jobs:
                   task-definition: ${{ steps.task-def.outputs.task-definition }}
                   service: ${{ env.ECS_SERVICE }}
                   cluster: ${{ env.ECS_CLUSTER }}
-                  wait-for-service-stability: false
+                  wait-for-service-stability: true
 
             - name: De-register previous revision
               if: ${{ steps.download-task.outputs.revision > 0 }}
@@ -289,7 +291,7 @@ jobs:
 
     migrate-production-database:
         name: Migrate changes to production database
-        needs: backend-build-production
+        needs: backend-deploy-production
         runs-on: ubuntu-latest
 
         defaults:

@@ -101,6 +101,7 @@ jobs:
         name: Deploy frontend to staging environment
         needs: frontend-test
         runs-on: ubuntu-latest
+        environment: Staging - Frontend
         permissions:
             id-token: write
             contents: read
@@ -239,6 +240,7 @@ jobs:
         name: Deploy backend to staging environment
         needs: backend-build-staging
         runs-on: ubuntu-latest
+        environment: Staging - Backend
         permissions:
             id-token: write
             contents: read
@@ -280,7 +282,7 @@ jobs:
                   task-definition: ${{ steps.task-def.outputs.task-definition }}
                   service: ${{ env.ECS_SERVICE }}
                   cluster: ${{ env.ECS_CLUSTER }}
-                  wait-for-service-stability: false
+                  wait-for-service-stability: true
 
             - name: De-register previous revision
               if: ${{ steps.download-task.outputs.revision > 0 }}
@@ -289,7 +291,7 @@ jobs:
 
     migrate-staging-database:
         name: Migrate changes to staging database
-        needs: backend-build-staging
+        needs: backend-deploy-staging
         runs-on: ubuntu-latest
 
         defaults:

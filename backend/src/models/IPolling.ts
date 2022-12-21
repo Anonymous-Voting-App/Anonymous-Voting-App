@@ -32,7 +32,7 @@ export interface AnswersData {
 }
 
 export interface PollData {
-    id: string;
+    id?: string;
     name: string;
     type: string;
     publicId: string;
